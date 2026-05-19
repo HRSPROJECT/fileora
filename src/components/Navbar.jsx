@@ -76,6 +76,10 @@ const Navbar = ({ theme, toggleTheme }) => {
         
         <div style={{ display: 'flex', gap: '2rem', fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
           <a href="#features" style={{ transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = 'var(--text-primary)'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>Features</a>
+          <a href="#tools" style={{ transition: 'color 0.2s', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onMouseOver={(e) => e.target.style.color = 'var(--text-primary)'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
+            All Tools
+            <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem', backgroundColor: 'var(--bg-tertiary)', borderRadius: '1rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>Coming Soon</span>
+          </a>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
