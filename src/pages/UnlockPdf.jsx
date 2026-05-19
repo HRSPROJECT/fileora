@@ -6,7 +6,7 @@ import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
-import { PDFDocument } from 'pdf-lib'
+import { decryptPDF, isEncrypted } from '@pdfsmaller/pdf-decrypt'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
 
 const faqs = [
@@ -32,18 +32,16 @@ export default function UnlockPdf() {
 
     try {
       const bytes = await selectedFile.arrayBuffer()
-      // Test if document is encrypted
-      const doc = await PDFDocument.load(bytes)
-      // If it loaded without error, it is not encrypted
-      const unlockedBytes = await doc.save()
-      setUnlockedBlob(new Blob([unlockedBytes], { type: 'application/pdf' }))
-    } catch (err) {
-      if (err.message.includes('encrypted') || err.message.includes('password') || err.message.includes('Decrypt')) {
+      const uint8 = new Uint8Array(bytes)
+      const info = await isEncrypted(uint8)
+      if (info.encrypted) {
         setPasswordRequired(true)
       } else {
-        setError('This PDF is encrypted and requires a password to open.')
-        setPasswordRequired(true)
+        setUnlockedBlob(new Blob([uint8], { type: 'application/pdf' }))
       }
+    } catch (err) {
+      console.error(err)
+      setError('Could not analyze the PDF file structure.')
     }
   }
 
@@ -54,12 +52,12 @@ export default function UnlockPdf() {
     try {
       await new Promise((r) => setTimeout(r, 1000))
       const bytes = await file.arrayBuffer()
-      const doc = await PDFDocument.load(bytes, { password })
-      const unlockedBytes = await doc.save()
-      setUnlockedBlob(new Blob([unlockedBytes], { type: 'application/pdf' }))
+      const uint8 = new Uint8Array(bytes)
+      const decrypted = await decryptPDF(uint8, password)
+      setUnlockedBlob(new Blob([decrypted], { type: 'application/pdf' }))
       setPasswordRequired(false)
     } catch (err) {
-      setError('Incorrect password. Please try again.')
+      setError('Incorrect password or unsupported encryption. Please try again.')
     } finally {
       setProcessing(false)
     }
