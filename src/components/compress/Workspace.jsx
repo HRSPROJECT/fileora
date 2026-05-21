@@ -154,16 +154,16 @@ const Workspace = ({ files, setFiles, onReset }) => {
   }, [results]);
 
   return (
-    <div className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+    <div className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '1.5rem' }}>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={onReset} className="btn btn-ghost" style={{ padding: '0.5rem' }}>
+      <div className="workspace-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+          <button onClick={onReset} className="btn btn-ghost" style={{ padding: '0.5rem', flexShrink: 0 }}>
             <ArrowLeft size={20} />
           </button>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-primary)' }}>Optimization Workspace</h2>
+          <h2 style={{ fontSize: 'clamp(1.1rem, 3.5vw, 1.5rem)', fontWeight: 600, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Optimization Workspace</h2>
         </div>
-        <div className="badge">
+        <div className="badge" style={{ flexShrink: 0 }}>
           <Shield size={14} style={{ marginRight: '0.25rem' }} /> Local Batch Processing
         </div>
       </div>
@@ -174,7 +174,7 @@ const Workspace = ({ files, setFiles, onReset }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Main Canvas Area */}
-          <div className="card" style={{ minHeight: '350px', height: 'max(50vh, 350px)', maxHeight: '600px', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+          <div className="card" style={{ minHeight: '280px', height: 'max(40vh, 280px)', maxHeight: '600px', padding: '0.75rem', display: 'flex', flexDirection: 'column' }}>
             {isProcessing && !activeResult ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>
                 <div style={{ marginBottom: '1rem' }}>Processing batch queue ({progress}%)...</div>
@@ -266,7 +266,7 @@ const Workspace = ({ files, setFiles, onReset }) => {
         </div>
 
         {/* Sidebar Controls */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '100px' }}>
+        <div className="workspace-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           <div className="card" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontWeight: 600, color: 'var(--text-primary)' }}>
