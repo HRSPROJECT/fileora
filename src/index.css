@@ -1044,6 +1044,49 @@ img {
   }
 }
 
+/* Premium dynamic fullscreen/immersion rules when Document Scanner is active on mobile */
+.scanner-viewfinder-window {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4/3;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  transition: aspect-ratio 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  /* Hide standard headers, hero copy, and scanned queue sidebars to focus screen space */
+  .camera-active-mode .site-header {
+    display: none !important;
+  }
+  .tool-hero.hide-on-camera-mobile {
+    display: none !important;
+  }
+  .workspace-controls-sidebar.hide-on-camera-mobile {
+    display: none !important;
+  }
+  
+  /* Give the active scanner edge-to-edge full width feel */
+  .camera-active-mode .scanner-preview-container {
+    padding: 12px 6px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+  
+  /* Switch to tall vertical portrait aspect ratio matching document and hand scanning */
+  .scanner-viewfinder-window {
+    aspect-ratio: 3/4;
+    border-radius: 8px;
+  }
+}
+
 /* Tesseract OCR Panel responsive columns */
 .ocr-split-pane {
   display: grid;

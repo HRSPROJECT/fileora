@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Camera, Upload, Trash2, Plus, Download, Sparkles, Settings, Eye, CheckCircle, RotateCw, Check, ChevronLeft, ChevronRight, Image as ImageIcon, FileText, Layers, Video, Shield, Smartphone, AlertTriangle, RefreshCw, GripVertical } from 'lucide-react'
+import { Camera, Upload, Trash2, Plus, Download, Sparkles, Settings, Eye, CheckCircle, RotateCw, Check, ChevronLeft, ChevronRight, Image as ImageIcon, FileText, Layers, Video, Shield, Smartphone, AlertTriangle, RefreshCw, GripVertical, X } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
@@ -1266,7 +1266,7 @@ export default function Scanner() {
   };
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isCameraActive ? 'camera-active-mode' : ''}`}>
       <Navbar />
       <Helmet>
         <title>Free PDF Document Scanner Online - CamScanner & Google Drive Alternative | Fileora</title>
@@ -1280,7 +1280,7 @@ export default function Scanner() {
       </Helmet>
 
       <main className="tool-main">
-        <section className="tool-hero container">
+        <section className={`tool-hero container ${isCameraActive ? 'hide-on-camera-mobile' : ''}`}>
           <div className="badge animate-pulse" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)', border: '1px solid rgba(34, 197, 94, 0.2)', marginBottom: '16px' }}>
             <Shield size={12} /> 100% Client-Side Privacy
           </div>
@@ -1293,7 +1293,7 @@ export default function Scanner() {
             
             {/* 1. Left Queue Panel: Page thumbnails drawer */}
             {pages.length > 0 && (
-              <div className="workspace-controls-sidebar">
+              <div className={`workspace-controls-sidebar ${isCameraActive ? 'hide-on-camera-mobile' : ''}`}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Pages ({pages.length})</span>
                   <button onClick={() => { startCamera(); }} className="btn btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 10px', fontSize: '12px' }}>
@@ -1579,14 +1579,14 @@ export default function Scanner() {
                         </select>
                       )}
 
-                      <button onClick={stopCamera} className="btn btn-ghost" style={{ padding: '4px 10px', fontSize: '12px' }}>
-                        Close Camera
+                      <button onClick={stopCamera} className="btn btn-ghost" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '6px 12px', fontSize: '12px', borderRadius: '20px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                        <X size={14} /> Close
                       </button>
                     </div>
                   </div>
 
                   {/* Viewfinder Window with auto-alignment guidelines */}
-                  <div style={{ position: 'relative', width: '100%', maxWidth: '640px', background: '#000', borderRadius: '12px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', aspectRatio: '4/3', boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}>
+                  <div className="scanner-viewfinder-window">
                     <video 
                       ref={videoRef} 
                       playsInline 
