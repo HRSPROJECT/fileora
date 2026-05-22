@@ -25,7 +25,16 @@ const routes = [
   '/crop-pdf',
   '/pdf-to-jpg',
   '/heic-to-jpg',
-  '/jpg-to-pdf'
+  '/jpg-to-pdf',
+  '/rotate-pdf',
+  '/watermark-pdf',
+  '/number-pdf',
+  '/passport-photo',
+  '/protect-pdf',
+  '/sign-pdf',
+  '/pdf-to-word',
+  '/word-to-pdf',
+  '/scanner'
 ];
 
 async function prerender() {

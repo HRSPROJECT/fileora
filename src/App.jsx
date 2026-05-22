@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import React, { Suspense, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ThemeProvider } from './context/ThemeContext'
 
@@ -21,6 +21,16 @@ const PngToPdf = React.lazy(() => import('./pages/PngToPdf'))
 const PdfToJpg = React.lazy(() => import('./pages/PdfToJpg'))
 const HeicToJpg = React.lazy(() => import('./pages/HeicToJpg'))
 const JpgToPdf = React.lazy(() => import('./pages/JpgToPdf'))
+const RotatePdf = React.lazy(() => import('./pages/RotatePdf'))
+const WatermarkPdf = React.lazy(() => import('./pages/WatermarkPdf'))
+const NumberPdf = React.lazy(() => import('./pages/NumberPdf'))
+const PassportPhoto = React.lazy(() => import('./pages/PassportPhoto'))
+const ProtectPdf = React.lazy(() => import('./pages/ProtectPdf'))
+const SignPdf = React.lazy(() => import('./pages/SignPdf'))
+const PdfToWord = React.lazy(() => import('./pages/PdfToWord'))
+const WordToPdf = React.lazy(() => import('./pages/WordToPdf'))
+const Scanner = React.lazy(() => import('./pages/Scanner'))
+
 
 const LoadingFallback = () => (
   <div style={{
@@ -51,11 +61,22 @@ const LoadingFallback = () => (
   </div>
 )
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+}
+
 export default function App() {
   return (
     <HelmetProvider>
       <ThemeProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -73,6 +94,15 @@ export default function App() {
               <Route path="/pdf-to-jpg" element={<PdfToJpg />} />
               <Route path="/heic-to-jpg" element={<HeicToJpg />} />
               <Route path="/jpg-to-pdf" element={<JpgToPdf />} />
+              <Route path="/rotate-pdf" element={<RotatePdf />} />
+              <Route path="/watermark-pdf" element={<WatermarkPdf />} />
+              <Route path="/number-pdf" element={<NumberPdf />} />
+              <Route path="/passport-photo" element={<PassportPhoto />} />
+              <Route path="/protect-pdf" element={<ProtectPdf />} />
+              <Route path="/sign-pdf" element={<SignPdf />} />
+              <Route path="/pdf-to-word" element={<PdfToWord />} />
+              <Route path="/word-to-pdf" element={<WordToPdf />} />
+              <Route path="/scanner" element={<Scanner />} />
             </Routes>
           </Suspense>
         </BrowserRouter>

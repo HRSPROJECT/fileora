@@ -17,6 +17,14 @@ export default function Footer() {
     ['PDF to JPG', '/pdf-to-jpg'],
     ['HEIC to JPG', '/heic-to-jpg'],
     ['JPG to PDF', '/jpg-to-pdf'],
+    ['Rotate PDF', '/rotate-pdf'],
+    ['Watermark PDF', '/watermark-pdf'],
+    ['Add Page Numbers', '/number-pdf'],
+    ['Passport Photo', '/passport-photo'],
+    ['Protect PDF', '/protect-pdf'],
+    ['Sign PDF', '/sign-pdf'],
+    ['PDF to Word', '/pdf-to-word'],
+    ['Word to PDF', '/word-to-pdf'],
   ]
 
   return (

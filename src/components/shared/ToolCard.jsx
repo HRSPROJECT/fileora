@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 
 export default function ToolCard({ href, icon, title, description, badge, formats }) {
-  const live = badge === 'Live'
+  const live = badge === 'Live' || badge === 'New'
   const content = (
     <>
       <div className="tool-card-top">

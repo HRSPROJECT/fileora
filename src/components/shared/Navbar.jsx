@@ -42,6 +42,7 @@ export default function Navbar() {
     { name: 'PNG to PDF', to: '/png-to-pdf' },
     { name: 'HEIC to JPG', to: '/heic-to-jpg' },
     { name: 'JPG to PDF', to: '/jpg-to-pdf' },
+    { name: 'Passport Photo', to: '/passport-photo' },
   ]
 
   const pdfTools = [
@@ -52,6 +53,13 @@ export default function Navbar() {
     { name: 'Resize PDF', to: '/resize-pdf' },
     { name: 'Crop PDF', to: '/crop-pdf' },
     { name: 'PDF to JPG', to: '/pdf-to-jpg' },
+    { name: 'Rotate PDF', to: '/rotate-pdf' },
+    { name: 'Watermark PDF', to: '/watermark-pdf' },
+    { name: 'Add Page Numbers', to: '/number-pdf' },
+    { name: 'Protect PDF', to: '/protect-pdf' },
+    { name: 'Sign PDF', to: '/sign-pdf' },
+    { name: 'PDF to Word', to: '/pdf-to-word' },
+    { name: 'Word to PDF', to: '/word-to-pdf' },
   ]
 
   return (
