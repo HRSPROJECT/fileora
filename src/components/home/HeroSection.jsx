@@ -18,6 +18,23 @@ export default function HeroSection() {
             View All Tools <ChevronDown size={18} />
           </a>
         </div>
+        
+        {/* Product Hunt Featured Badge */}
+        <div className="hero-badge-container">
+          <a 
+            href="https://www.producthunt.com/products/fileora-free-online-file-tools?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-fileora-free-online-file-tools" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hero-badge-link"
+          >
+            <img 
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1150733&theme=light&t=1779528462343" 
+              alt="Fileora — Free Online File Tools - Free file tools that run entirely in your browser  | Product Hunt" 
+              width="250" 
+              height="54" 
+            />
+          </a>
+        </div>
       </div>
     </section>
   )

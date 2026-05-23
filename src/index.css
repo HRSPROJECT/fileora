@@ -1467,3 +1467,25 @@ img {
   letter-spacing: 0.05em;
   opacity: 0.8;
 }
+
+/* Product Hunt Badge Styling */
+.hero-badge-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.hero-badge-link {
+  display: inline-block;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.hero-badge-link:hover {
+  transform: scale(1.03);
+  filter: brightness(1.05);
+}
+
+.hero-badge-link img {
+  width: 250px;
+  height: 54px;
+}

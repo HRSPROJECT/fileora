@@ -151,6 +151,14 @@ export default function Navbar() {
             <GithubIcon />
             Open Source
           </a>
+          <a
+            className="nav-link"
+            href="https://www.producthunt.com/products/fileora-free-online-file-tools"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Product Hunt
+          </a>
           <NavLink className="nav-pill" to="/compress">
             Compress
           </NavLink>
@@ -196,6 +204,9 @@ export default function Navbar() {
 
           <a href="https://github.com/HRSPROJECT/image-compressor" target="_blank" rel="noreferrer" onClick={close} className="mobile-github-link">
             GitHub / Open Source
+          </a>
+          <a href="https://www.producthunt.com/products/fileora-free-online-file-tools" target="_blank" rel="noopener noreferrer" onClick={close} className="mobile-ph-link">
+            Product Hunt
           </a>
         </div>
       )}
@@ -274,6 +285,14 @@ export default function Navbar() {
           border-top: 1px solid var(--border-color);
           margin-top: 8px;
           padding-top: 12px;
+        }
+        .mobile-ph-link {
+          margin-top: 4px;
+          padding-top: 8px;
+          display: block;
+          color: var(--text-secondary);
+          text-decoration: none;
+          font-size: 14px;
         }
         .nav-dropdown-item:hover {
           background: var(--bg-tertiary, #1F2937);
