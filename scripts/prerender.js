@@ -80,8 +80,11 @@ async function prerender() {
       try {
         await page.goto(url, { waitUntil: 'networkidle0', timeout: 20000 });
         
-        // Wait an additional 500ms to allow any immediate micro-render to complete
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Wait for lazy loaded route component spinner fallback to disappear
+        await page.waitForSelector('.loader-shell', { hidden: true, timeout: 10000 }).catch(() => {});
+        
+        // Wait an additional 800ms to allow React Helmet to flush tags to the DOM
+        await new Promise((resolve) => setTimeout(resolve, 800));
 
         // Get the full HTML
         const html = await page.content();

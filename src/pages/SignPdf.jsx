@@ -377,6 +377,8 @@ export default function SignPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Sign PDF Online - Draw or Type PDF Signatures | Fileora" />
         <meta name="twitter:description" content="Sign PDF files online for free. Type standard cursive signatures, draw smooth custom signatures, or upload transparent image PNG stamps. Drag-resizable layout." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -394,7 +396,7 @@ export default function SignPdf() {
         </section>
 
         {!file && (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="80MB"
@@ -758,13 +760,13 @@ export default function SignPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Premium Vector Stamping for Digital Signatures</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Instantly authenticate leasing letters, client NDA documents, and administrative forms securely. 
             Because Fileora embeds transparency nodes inside the PDF file coordinate space, signature graphics scale losslessly without compromising document layout.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Typed, drawn, and image stamp configurations · ✓ Precision drag-and-resize placement grid · ✓ Complete bank-level security.
           </p>
         </section>

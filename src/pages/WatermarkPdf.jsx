@@ -337,6 +337,11 @@ export default function WatermarkPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Add Watermark to PDF Online - Free & Private | Fileora" />
+        <meta name="twitter:description" content="Add text or image watermarks to PDF files online for free. Custom placement, opacity, rotation, colors, and sizing. Fast client-side stamp technology." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -356,7 +361,7 @@ export default function WatermarkPdf() {
         )}
 
         {!file && !processing && (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="80MB"
@@ -695,14 +700,14 @@ export default function WatermarkPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Premium Lossless Security Stamping for PDF Files</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Perfectly protect bank files, intellectual drafts, and confidential contracts. 
             Because this tool stamps high-quality vector paths and image masks directly into PDF coordinate spaces, 
             watermarked layouts look absolutely crisp on zoom levels and print media without flattening pages.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Adjust placement and rotation values · ✓ Preserve PDF text rendering structures · ✓ Fast local execution speeds.
           </p>
         </section>
@@ -714,12 +719,12 @@ export default function WatermarkPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/protect-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Protect PDF</a>
-            <a href="/sign-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Sign PDF</a>
-            <a href="/crop-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Crop PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/protect-pdf" className="btn btn-secondary btn-related">Protect PDF</a>
+            <a href="/sign-pdf" className="btn btn-secondary btn-related">Sign PDF</a>
+            <a href="/crop-pdf" className="btn btn-secondary btn-related">Crop PDF</a>
           </div>
         </section>
       </main>

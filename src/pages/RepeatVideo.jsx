@@ -121,6 +121,8 @@ export default function RepeatVideo() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Loop &amp; Repeat Video Online — Free &amp; Offline | Fileora" />
         <meta name="twitter:description" content="Repeat and loop video files online for free. Combine multiple loops of the same video into a single MP4 locally inside your browser with 100% privacy." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -239,14 +241,55 @@ export default function RepeatVideo() {
           )}
         </section>
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Zero Quality Loss Video Stitching &amp; Repeating</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Traditional repeat tools force you to transcode and re-compress frames, which causes extreme rendering latency and degrades pixel definition. Fileora handles this using a lightning-fast WebAssembly-based **concat demuxer**.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
             Since the video format, dimensions, bitrates, and keyframe intervals are exactly identical, we copy the original streams directly and repeat the reference blocks. This takes less than a second for up to 15 loops, uses zero remote servers, and preserves 100% of your visual quality.
           </p>
+
+          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0' }} />
+
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>How to Repeat and Loop Videos Offline</h3>
+          <ol style={{ paddingLeft: '20px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
+            <li><strong>Import Selected Clip:</strong> Drag and drop your MP4, MOV, or WebM video file into the upload zone above. The video is securely held in the browser's high-speed local filesystem sandbox (OPFS) and is never transmitted to any external networks.</li>
+            <li><strong>Select Repeats Target:</strong> Use the stylized slider to specify how many times you want the video clip to loop (from 2 up to 15 repetitions). The interface will calculate the output segment structures dynamically.</li>
+            <li><strong>Compile & Save:</strong> Click the "Create Looped Video" button. Our client-side WebAssembly demuxer concatenates the streams losslessly within seconds. Once finished, preview the looped video directly and download the high-resolution output file.</li>
+          </ol>
+
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Common Use Cases for Looping Videos</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>Social Media Loops</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Perfect for Instagram Reels, TikTok clips, or YouTube Shorts. Repeat standard short sequences or animated clips to capture viewer attention indefinitely.</p>
+            </div>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>Kiosk & Digital Signage</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Ideal for offline display boards, storefront screens, or restaurant menus. Repeat promotional clips or catalogs continuously without manual intervention.</p>
+            </div>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>Music Beats & Soundscapes</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Great for repeating visualizers, ambient soundtracks, or study beats tracks. Stitch together short visual hooks into hour-long continuous files.</p>
+            </div>
+          </div>
+
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Frequently Asked Questions</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>Does looping a video reduce its resolution or quality?</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>No. Standard looping tools transcode and re-compress video blocks, which degrades color clarity and sharpness. Fileora uses direct stream copy concat. Because we only copy the native bitstream, there is absolute zero quality loss.</p>
+            </div>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>What file size and video formats are supported?</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>We support all standard formats including MP4, Apple MOV, WebM, and MKV. Since the processing runs 100% locally in your browser memory via the Origin Private File System, there are no file size limits, allowing you to compile huge files smoothly.</p>
+            </div>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>Is Fileora free of queue wait times and usage limits?</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Yes. Since processing executes entirely client-side on your own device, we do not pay for heavy cloud server rendering. We pass these savings directly to you, making all video utilities completely unlimited and free forever.</p>
+            </div>
+          </div>
         </section>
       </main>
       <Footer />

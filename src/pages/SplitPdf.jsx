@@ -128,6 +128,11 @@ export default function SplitPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PDF Splitter Online — Split PDF, Remove Pages | Fileora" />
+        <meta name="twitter:description" content="Split PDF files online for free. Extract pages, split by range, or remove specific pages. Browser-based, no signup, files never uploaded to server." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -139,7 +144,7 @@ export default function SplitPdf() {
         </section>
 
         {!file ? (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="100MB"
@@ -159,7 +164,7 @@ export default function SplitPdf() {
           <section className="workspace-panel">
             {/* Visual pages list */}
             <div className="file-list-panel" style={{ background: 'var(--bg-secondary)', borderRadius: '8px', padding: '1.5rem', alignSelf: 'stretch', display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '12px' }}>Visual Page Selector</h3>
+              <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '12px' }}>Visual Page Selector</p>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>Click pages to select/deselect them for your operation.</p>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '16px', overflowY: 'auto', flex: 1, paddingRight: '6px' }}>
@@ -292,13 +297,13 @@ export default function SplitPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Locally Run PDF Splitter & Page Remover</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Perfect for extracting pages from tax declarations, split chapters of reference textbooks, and removing blank cover sheets. 
             Since operations are executed purely client-side, sensitive information never passes over any web connection.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Split by index list · ✓ Visual grid checklist selection · ✓ Vector and graphic safety.
           </p>
         </section>
@@ -310,12 +315,12 @@ export default function SplitPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
-            <a href="/compress-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PDF Compressor</a>
-            <a href="/resize-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Resize PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
+            <a href="/compress-pdf" className="btn btn-secondary btn-related">PDF Compressor</a>
+            <a href="/resize-pdf" className="btn btn-secondary btn-related">Resize PDF</a>
           </div>
         </section>
       </main>

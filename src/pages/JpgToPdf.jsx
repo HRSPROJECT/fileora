@@ -124,6 +124,11 @@ export default function JpgToPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Convert JPG to PDF Online - Free & Private | Fileora" />
+        <meta name="twitter:description" content="Convert JPG images to PDF online for free. Arrange pages in custom order, adjust page size, orientation, and margins. Safe, local client-side compilation." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -135,7 +140,7 @@ export default function JpgToPdf() {
         </section>
 
         {files.length === 0 ? (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="image/jpeg,image/jpg"
               multiple={true}
@@ -193,9 +198,8 @@ export default function JpgToPdf() {
 
               {/* Arrange pages queue */}
               <div>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Arrange Pages ({files.length})
-                </h3>
+                <p style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Arrange Pages ({files.length})
+                </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
                   {files.map((item, index) => (
                     <div 
@@ -367,13 +371,13 @@ export default function JpgToPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Premium, Dedicated, High-Quality JPG to PDF Compiler</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Perfectly combine JPEG photographs, scans, and documents into neat, beautifully aligned PDF collections. 
             Adjust layouts, switch page presets, and define custom outer margins on the fly without waiting for remote server upload queues.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Adjust margin offsets · ✓ Re-order slides dynamically · ✓ Lossless image canvas embedding.
           </p>
         </section>
@@ -385,12 +389,12 @@ export default function JpgToPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/image-to-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Image to PDF</a>
-            <a href="/png-to-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PNG to PDF</a>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/image-to-pdf" className="btn btn-secondary btn-related">Image to PDF</a>
+            <a href="/png-to-pdf" className="btn btn-secondary btn-related">PNG to PDF</a>
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
           </div>
         </section>
       </main>

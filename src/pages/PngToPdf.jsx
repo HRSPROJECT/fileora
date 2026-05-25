@@ -84,6 +84,11 @@ export default function PngToPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PNG to PDF Converter Online | Fileora" />
+        <meta name="twitter:description" content="Convert PNG images to PDF online for free. Also supports JPG, WebP, AVIF. Combine multiple images into one PDF. Browser-based, no signup." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -95,7 +100,7 @@ export default function PngToPdf() {
         </section>
 
         {files.length === 0 ? (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="image/png"
               multiple={true}
@@ -128,7 +133,7 @@ export default function PngToPdf() {
                   style={{ width: '100%', height: '100%', flex: 1, border: 'none' }}
                 />
               ) : (
-                <div style={{ color: 'var(--text-secondary)' }}>Uploading complete. Generating layout.</div>
+                <div className="tool-description-para-last">Uploading complete. Generating layout.</div>
               )}
             </div>
 
@@ -273,13 +278,13 @@ export default function PngToPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Lossless, Dedicated PNG to PDF Converter</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Combine high-res transparent PNG captures, screenshots, certificates, and signature files into unified PDF collections. 
             Because we stream raw file structures rather than compressing graphics, all raster vectors stay perfectly readable.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Preserve transparency structures · ✓ Fluid drag and drop bulk processing · ✓ Safe for enterprise bank forms.
           </p>
         </section>
@@ -291,12 +296,12 @@ export default function PngToPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/image-to-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Image to PDF</a>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
-            <a href="/compress-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PDF Compressor</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/image-to-pdf" className="btn btn-secondary btn-related">Image to PDF</a>
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
+            <a href="/compress-pdf" className="btn btn-secondary btn-related">PDF Compressor</a>
           </div>
         </section>
       </main>

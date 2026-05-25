@@ -76,6 +76,11 @@ export default function IlovepdfAlternative() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Best iLovePDF Alternative: 100% Free, Private & Offline | Fileora" />
+        <meta name="twitter:description" content="Looking for a secure iLovePDF alternative? Discover Fileora. Process PDF, Word, and images locally in your browser. No files uploaded, no limits, no signup." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -109,9 +114,9 @@ export default function IlovepdfAlternative() {
               <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Lock size={24} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>100% Air-Gapped Privacy</h3>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>100% Air-Gapped Privacy</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                Other platforms upload your files to third-party databases. Fileora processes your data directly inside your browser memory using HTML5 and WebAssembly. Your documents remain yours.
+                Other platforms upload your files to third-party databases. Fileora processes your data directly inside your browser memory using HTML5 and WebAssembly. <strong>Your documents remain yours.</strong>
               </p>
             </div>
 
@@ -119,9 +124,9 @@ export default function IlovepdfAlternative() {
               <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Zap size={24} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Network Bottleneck</h3>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Network Bottleneck</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                Tired of waiting for 100MB documents to upload and download? Fileora works at lightning-fast speed because there is no upload lag. Large PDF compression is done instantly on device.
+                Tired of waiting for 100MB documents to upload and download? Fileora works at lightning-fast speed because there is no upload lag. <strong>Large PDF compression is done instantly on device.</strong>
               </p>
             </div>
 
@@ -129,9 +134,9 @@ export default function IlovepdfAlternative() {
               <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Sparkles size={24} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Paywalls or Signup</h3>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Paywalls or Signup</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                Forget daily quotas, paywalls, premium packages, or aggressive email subscriptions. Get unlimited, free access to all utility converters with an ad-free clean workspace.
+                Forget daily quotas, paywalls, premium packages, or aggressive email subscriptions. Get unlimited, free access to all utility converters with an <strong>ad-free clean workspace.</strong>
               </p>
             </div>
           </div>
@@ -141,7 +146,7 @@ export default function IlovepdfAlternative() {
         <section id="compare" className="container" style={{ marginBottom: '80px', scrollMarginTop: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Side-by-Side Comparison</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>How Fileora stacks up against standard cloud utility models</p>
+            <p className="tool-description-para-last">How Fileora stacks up against standard cloud utility models</p>
           </div>
 
           <div style={{ overflowX: 'auto', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
@@ -184,7 +189,7 @@ export default function IlovepdfAlternative() {
               <Info size={28} />
             </div>
             <div>
-              <h4 style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '6px' }}>Attention: Corporate & Government Security Notice</h4>
+              <h3 style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '6px' }}>Attention: Corporate &amp; Government Security Notice</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
                 Uploading proprietary spreadsheets, customer registries, scanned passports, or tax forms violates many strict corporate IT directives and government policies (e.g. GDPR, HIPAA, Indian IT Act). Because **Fileora** processes everything directly in your browser, it is fully compliant with air-gapped data security regulations.
               </p>
@@ -196,7 +201,7 @@ export default function IlovepdfAlternative() {
         <section id="tools" className="container" style={{ marginBottom: '80px', scrollMarginTop: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Launch Local Fileora Tools</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>No wait times. Click a utility below to start converting client-side instantly.</p>
+            <p className="tool-description-para-last">No wait times. Click a utility below to start converting client-side instantly.</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
@@ -234,7 +239,7 @@ export default function IlovepdfAlternative() {
         <section className="container" style={{ maxWidth: '800px', margin: '0 auto 80px auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Frequently Asked Questions</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>Have questions about browser processing? Find details here.</p>
+            <p className="tool-description-para-last">Have questions about browser processing? Find details here.</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

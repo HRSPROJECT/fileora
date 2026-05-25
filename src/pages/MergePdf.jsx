@@ -34,6 +34,11 @@ export default function MergePdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PDF Merger Online — Combine PDFs | Fileora" />
+        <meta name="twitter:description" content="Merge multiple PDF files into one free. Drag to reorder. Files never leave your browser. No signup." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -53,14 +58,14 @@ export default function MergePdf() {
           setFiles(accepted)
         }} />}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Free PDF Merger — Combine PDF Files Online</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Stitch chapters, receipts, tax logs, and separate PDF files into a single, clean document. 
             Unlike traditional web utilities, Fileora performs direct page-copy streams. It does not compress 
             vector text or degrade embedded high-res assets, so your combined output stays completely sharp.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Exact document copying without data leakage · ✓ Adjust the exact sequence order · ✓ Safe for sensitive documents.
           </p>
         </section>
@@ -68,12 +73,12 @@ export default function MergePdf() {
         <HowItWorks steps={[['Upload PDFs', 'Add two or more PDF files from your device.'], ['Arrange order', 'Move files up or down before merging.'], ['Download merged PDF', 'Save one combined PDF generated locally.']]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/split-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Split PDF</a>
-            <a href="/compress-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PDF Compressor</a>
-            <a href="/image-to-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Image to PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related Tools</h3>
+          <div className="related-tools-links">
+            <a href="/split-pdf" className="btn btn-secondary btn-related">Split PDF</a>
+            <a href="/compress-pdf" className="btn btn-secondary btn-related">PDF Compressor</a>
+            <a href="/image-to-pdf" className="btn btn-secondary btn-related">Image to PDF</a>
           </div>
         </section>
       </main>

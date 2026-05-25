@@ -145,6 +145,8 @@ export default function ProtectPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Protect PDF - Add Password & Lock PDF Online | Fileora" />
         <meta name="twitter:description" content="Secure your PDF files for free online. Set opening passwords, edit lock codes, copy-protection, and printing blocks locally in your browser." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -159,7 +161,7 @@ export default function ProtectPdf() {
         </section>
 
         {!file && (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="100MB"
@@ -222,7 +224,7 @@ export default function ProtectPdf() {
                       {userPassword && (
                         <div style={{ marginTop: '8px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
-                            <span style={{ color: 'var(--text-secondary)' }}>Password Strength:</span>
+                            <span className="tool-description-para-last">Password Strength:</span>
                             <span style={{ fontWeight: 'bold', color: strength.color }}>{strength.label}</span>
                           </div>
                           <div style={{ width: '100%', height: '4px', background: 'var(--bg-primary)', borderRadius: '2px', overflow: 'hidden' }}>
@@ -342,13 +344,13 @@ export default function ProtectPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Premium Client-Side Security Protection for PDF Files</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Encrypt financial portfolios, confidential business contracts, and legal submissions instantly. 
             Because this tool executes 100% inside your local sandbox memory space, your original PDFs and security passwords are never sent to remote servers.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Professional open and permissions passlocks · ✓ Granular copy/edit restriction flags · ✓ Zero server latency.
           </p>
         </section>

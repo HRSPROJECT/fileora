@@ -102,6 +102,11 @@ export default function UnlockPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PDF Password Remover — Unlock PDF Online | Fileora" />
+        <meta name="twitter:description" content="Remove password from PDF files online for free. Unlock PDF instantly in your browser. No signup, no server uploads, completely private." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -113,7 +118,7 @@ export default function UnlockPdf() {
         </section>
 
         {!file ? (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="100MB"
@@ -213,14 +218,14 @@ export default function UnlockPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>100% Private, Zero Server Upload PDF Password Remover</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Safely unlock bank statements, salary slips, and confidential tax documents. 
             Because this tool executes completely inside your local browser memory space, your password is never 
             transmitted across any network, safeguarding your private credentials.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Absolute key security · ✓ Instant removal of print/edit locks · ✓ High efficiency copy speeds.
           </p>
         </section>
@@ -232,12 +237,12 @@ export default function UnlockPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/compress-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PDF Compressor</a>
-            <a href="/split-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Split PDF</a>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/compress-pdf" className="btn btn-secondary btn-related">PDF Compressor</a>
+            <a href="/split-pdf" className="btn btn-secondary btn-related">Split PDF</a>
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
           </div>
         </section>
       </main>

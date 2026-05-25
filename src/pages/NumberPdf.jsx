@@ -275,6 +275,11 @@ export default function NumberPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Add Page Numbers to PDF Online - Free & Private | Fileora" />
+        <meta name="twitter:description" content="Add page numbers to PDF files online for free. Exclude cover sheet, start from any page, customize numbering formats, placement coordinates, sizing, and colors." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -294,7 +299,7 @@ export default function NumberPdf() {
         )}
 
         {!file && !processing && (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="80MB"
@@ -357,9 +362,7 @@ export default function NumberPdf() {
               </div>
 
               <div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  Numbering Formats
-                </h3>
+                <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Numbering Formats</p>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Pages: {totalPages}</p>
               </div>
 
@@ -532,13 +535,13 @@ export default function NumberPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Premium Lossless Vector Page Numbering for PDF Files</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Perfectly compile standard indexes, pagination, and visual labels onto business reports, legal filings, and school notes. 
             Because Fileora edits raw coordinates directly on PDF layers, page indexes remain extremely clear on high-resolution print margins.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Exclude cover page skips · ✓ 6 positioning presets · ✓ Crisp local javascript execution.
           </p>
         </section>
@@ -550,12 +553,12 @@ export default function NumberPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/rotate-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Rotate PDF</a>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
-            <a href="/split-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Split PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/rotate-pdf" className="btn btn-secondary btn-related">Rotate PDF</a>
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
+            <a href="/split-pdf" className="btn btn-secondary btn-related">Split PDF</a>
           </div>
         </section>
       </main>

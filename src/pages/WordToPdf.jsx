@@ -357,6 +357,12 @@ export default function WordToPdf() {
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="DOCX Render Sandbox" />
+        <meta name="twitter:description" content="Convert Word DOCX files containing mathematical equations, chemical formulas, and tables to PDF online. Pure client-side privacy." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
       </Helmet>
 
       <main className="tool-main">
@@ -377,7 +383,7 @@ export default function WordToPdf() {
         )}
 
         {!file && !processing && (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               maxSizeLabel="50MB"
@@ -561,13 +567,13 @@ export default function WordToPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Premium, Private, and High-Fidelity Word-to-PDF Conversion</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Isolate formatting styles, preserve alignments, lists, complex mathematical scripts, chemical formulas, and tables instantly in your browser. 
             Because this tool executes 100% client-side inside the local web worker environment of your machine, you never have to worry about security or cloud upload limits.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Professional client-side parsing · ✓ Standard margin adjustments · ✓ Safe, confidential, and instant.
           </p>
         </section>

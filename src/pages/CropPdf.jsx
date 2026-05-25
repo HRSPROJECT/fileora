@@ -124,6 +124,11 @@ export default function CropPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PDF Cropper Online — Crop PDF Pages | Fileora" />
+        <meta name="twitter:description" content="Crop PDF pages online for free. Remove margins, crop to custom size. Browser-based, no signup." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -135,7 +140,7 @@ export default function CropPdf() {
         </section>
 
         {!file ? (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="100MB"
@@ -167,7 +172,7 @@ export default function CropPdf() {
                   style={{ width: '100%', height: '100%', flex: 1, border: 'none' }}
                 />
               ) : (
-                <div style={{ color: 'var(--text-secondary)' }}>Select edge percentages to crop.</div>
+                <div className="tool-description-para-last">Select edge percentages to crop.</div>
               )}
             </div>
 
@@ -194,7 +199,7 @@ export default function CropPdf() {
                 {/* Top Crop */}
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Top Margin</span>
+                    <span className="tool-description-para-last">Top Margin</span>
                     <span style={{ fontWeight: 600 }}>{topCrop}%</span>
                   </div>
                   <input
@@ -211,7 +216,7 @@ export default function CropPdf() {
                 {/* Bottom Crop */}
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Bottom Margin</span>
+                    <span className="tool-description-para-last">Bottom Margin</span>
                     <span style={{ fontWeight: 600 }}>{bottomCrop}%</span>
                   </div>
                   <input
@@ -228,7 +233,7 @@ export default function CropPdf() {
                 {/* Left Crop */}
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Left Margin</span>
+                    <span className="tool-description-para-last">Left Margin</span>
                     <span style={{ fontWeight: 600 }}>{leftCrop}%</span>
                   </div>
                   <input
@@ -245,7 +250,7 @@ export default function CropPdf() {
                 {/* Right Crop */}
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Right Margin</span>
+                    <span className="tool-description-para-last">Right Margin</span>
                     <span style={{ fontWeight: 600 }}>{rightCrop}%</span>
                   </div>
                   <input
@@ -274,13 +279,13 @@ export default function CropPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Crop Margins with Zero Structural Distortion</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Ideal for cropping scanning borders, excessive white space, margins, or tailoring printable page zones. 
             Because this tool operates natively on structural parameters, the inner text vectors remain crisp and scalable.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Clean margin boundary resizing · ✓ Independent edge margin percentage adjustments · ✓ Rapid client-side compile times.
           </p>
         </section>
@@ -292,12 +297,12 @@ export default function CropPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/resize-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Resize PDF</a>
-            <a href="/compress-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PDF Compressor</a>
-            <a href="/split-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Split PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/resize-pdf" className="btn btn-secondary btn-related">Resize PDF</a>
+            <a href="/compress-pdf" className="btn btn-secondary btn-related">PDF Compressor</a>
+            <a href="/split-pdf" className="btn btn-secondary btn-related">Split PDF</a>
           </div>
         </section>
       </main>

@@ -76,6 +76,11 @@ export default function CamscannerAlternative() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Best Free CamScanner Alternative: 100% Secure & Online | Fileora" />
+        <meta name="twitter:description" content="Looking for a secure, ad-free CamScanner alternative? Scan documents securely in your browser with Fileora. Absolute privacy, automatic cropping, no watermarks." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -86,8 +91,8 @@ export default function CamscannerAlternative() {
           <div className="badge animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', border: '1px solid rgba(16, 185, 129, 0.2)', marginBottom: '16px' }}>
             <Camera size={12} /> Air-Gapped Camera Processing
           </div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: '16px', lineHeight: 1.2 }}>
-            A Free, Spyware-Free <span style={{ background: 'linear-gradient(135deg, #10B981, #3B82F6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CamScanner Alternative</span>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(135deg, var(--text-primary) 50%, #10B981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '16px', lineHeight: 1.2, display: 'inline-block' }}>
+            A Free, Spyware-Free CamScanner Alternative
           </h1>
           <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '24px' }}>
             Avoid risky mobile apps that harvest your camera feeds and document data. Turn your browser into a secure scanner workspace. Automatic boundary cropping, perspective undistortion, and sharp filters running locally.
@@ -109,9 +114,9 @@ export default function CamscannerAlternative() {
               <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Shield size={24} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>100% Zero-Leak Guarantee</h3>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>100% Zero-Leak Guarantee</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                Your physical documents contain highly sensitive info (names, ID numbers, addresses). Fileora processes camera frames directly inside browser runtime memory. Zero packets sent to any backend servers.
+                Your physical documents contain highly sensitive info (names, ID numbers, addresses). Fileora processes camera frames directly inside browser runtime memory. <strong>Zero packets sent to any backend servers.</strong>
               </p>
             </div>
 
@@ -119,9 +124,9 @@ export default function CamscannerAlternative() {
               <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Key size={24} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Branding Watermarks</h3>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Branding Watermarks</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                Do not pay premium fees just to remove ugly "Scanned by..." stamps. Compile fully clean, professional, high-fidelity PDFs ready for corporate submissions, passports, or university portals.
+                Do not pay premium fees just to remove ugly "Scanned by..." stamps. Compile fully clean, professional, high-fidelity PDFs ready for <strong>corporate submissions, passports, or university portals.</strong>
               </p>
             </div>
 
@@ -129,9 +134,9 @@ export default function CamscannerAlternative() {
               <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Sparkles size={24} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>Advanced Computer Vision</h3>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>Advanced Computer Vision</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                Fileora's workspace offers real-time edge indicators, 4-point quadrilateral alignment grids, perspective deskewing adjustments, and custom B&W filters that emulate professional document scanners.
+                Fileora's workspace offers real-time edge indicators, 4-point quadrilateral alignment grids, perspective deskewing adjustments, and custom B&W filters that <strong>emulate professional document scanners.</strong>
               </p>
             </div>
           </div>
@@ -141,7 +146,7 @@ export default function CamscannerAlternative() {
         <section id="compare" className="container" style={{ marginBottom: '80px', scrollMarginTop: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Side-by-Side Comparison</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>How Fileora stacks up against standard mobile scanning applications</p>
+            <p className="tool-description-para-last">How Fileora stacks up against standard mobile scanning applications</p>
           </div>
 
           <div style={{ overflowX: 'auto', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
@@ -184,7 +189,7 @@ export default function CamscannerAlternative() {
               <Info size={28} />
             </div>
             <div>
-              <h4 style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '6px' }}>Compliance and Corporate Air-Gap Security Notice</h4>
+              <h3 style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '6px' }}>Compliance and Corporate Air-Gap Security Notice</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
                 Government policies and IT regulations enforce strict compliance limits on where camera assets can be stored or calculated. Fileora represents a 100% compliant secure client-side sandbox utility since zero packets leave your device, matching all corporate compliance and GDPR regulations.
               </p>
@@ -196,7 +201,7 @@ export default function CamscannerAlternative() {
         <section id="tools" className="container" style={{ marginBottom: '80px', scrollMarginTop: '80px' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Launch Local Fileora Tools</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>No wait times. Click a utility below to start converting client-side instantly.</p>
+            <p className="tool-description-para-last">No wait times. Click a utility below to start converting client-side instantly.</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
@@ -234,7 +239,7 @@ export default function CamscannerAlternative() {
         <section className="container" style={{ maxWidth: '800px', margin: '0 auto 80px auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Frequently Asked Questions</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>Have questions about browser processing? Find details here.</p>
+            <p className="tool-description-para-last">Have questions about browser processing? Find details here.</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

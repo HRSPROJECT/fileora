@@ -34,6 +34,11 @@ export default function ImageToPdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free Image to PDF Converter Online | Fileora" />
+        <meta name="twitter:description" content="Convert JPG and PNG images to PDF free. Combine multiple images into one PDF. Browser-based, no signup." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -53,14 +58,14 @@ export default function ImageToPdf() {
           setFiles(accepted)
         }} />}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Convert JPG, PNG & WebP to PDF</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Transform your standard images and photos into standardized PDF documents. Ideal for school assignments, 
             government registration forms, and corporate reports. Since we use pure Javascript client-side compilation, 
             your files are never transmitted to any third-party server, ensuring complete confidentiality.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Custom page sizes (A4, Letter, Fit Image) · ✓ Margin settings (None, Small, Large) · ✓ Drag and drop reordering of images.
           </p>
         </section>
@@ -68,12 +73,12 @@ export default function ImageToPdf() {
         <HowItWorks steps={[['Upload images', 'Add one or more JPG, PNG or WebP files.'], ['Set PDF layout', 'Choose page size, orientation, margins and order.'], ['Generate PDF', 'Download one PDF created in your browser.']]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/png-to-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PNG to PDF</a>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
-            <a href="/compress-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PDF Compressor</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related Tools</h3>
+          <div className="related-tools-links">
+            <a href="/png-to-pdf" className="btn btn-secondary btn-related">PNG to PDF</a>
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
+            <a href="/compress-pdf" className="btn btn-secondary btn-related">PDF Compressor</a>
           </div>
         </section>
       </main>

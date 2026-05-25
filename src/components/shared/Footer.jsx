@@ -1,6 +1,32 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function Footer() {
+  const location = useLocation()
+  const path = location.pathname
+
+  // Dynamically diversify internal backlink anchors to satisfy Sitechecker link audit
+  let ilovepdfAnchor = 'Fileora vs iLovePDF'
+  let smallpdfAnchor = 'Fileora vs Smallpdf'
+  let camscannerAnchor = 'Fileora vs CamScanner'
+
+  if (path.includes('pdf')) {
+    ilovepdfAnchor = 'iLovePDF Free Alternative'
+    smallpdfAnchor = 'Smallpdf Free Alternative'
+    camscannerAnchor = 'CamScanner PDF Alternative'
+  } else if (path.includes('compress') || path.includes('resize') || path.includes('convert') || path.includes('heic') || path.includes('png') || path.includes('jpg')) {
+    ilovepdfAnchor = 'Compare iLovePDF Online'
+    smallpdfAnchor = 'Compare Smallpdf Online'
+    camscannerAnchor = 'Compare CamScanner Offline'
+  } else if (path.includes('video') || path.includes('mp4') || path.includes('mov') || path.includes('trim') || path.includes('merge') || path.includes('repeat')) {
+    ilovepdfAnchor = 'iLovePDF Competitor'
+    smallpdfAnchor = 'Smallpdf Competitor'
+    camscannerAnchor = 'CamScanner Competitor'
+  } else if (path === '/') {
+    ilovepdfAnchor = 'Best iLovePDF Alternative'
+    smallpdfAnchor = 'Best Smallpdf Alternative'
+    camscannerAnchor = 'Best CamScanner Alternative'
+  }
+
   const pdfLinks = [
     ['PDF Compressor', '/compress-pdf'],
     ['Merge PDF', '/merge-pdf'],
@@ -44,9 +70,9 @@ export default function Footer() {
   ]
 
   const alternativeLinks = [
-    ['Fileora vs iLovePDF', '/alternative/ilovepdf'],
-    ['Fileora vs Smallpdf', '/alternative/smallpdf'],
-    ['Fileora vs CamScanner', '/alternative/camscanner'],
+    [ilovepdfAnchor, '/alternative/ilovepdf'],
+    [smallpdfAnchor, '/alternative/smallpdf'],
+    [camscannerAnchor, '/alternative/camscanner'],
   ]
 
   return (
@@ -59,17 +85,17 @@ export default function Footer() {
             <p className="footer-brand-desc">
               State-of-the-art privacy-first browser tools. Compress, merge, scan, and convert documents locally without uploads.
             </p>
-            <div style={{ display: 'flex', gap: '12px', fontSize: '0.8rem', marginTop: '4px' }}>
-              <a href="https://github.com/HRSPROJECT/image-compressor" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>GitHub</a>
-              <span style={{ color: 'var(--text-tertiary)' }}>·</span>
-              <a href="https://x.com/fileora_tech" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Twitter / X</a>
+            <div className="footer-social-links">
+              <a href="https://github.com/HRSPROJECT/image-compressor" target="_blank" rel="noreferrer" className="footer-social-link">GitHub</a>
+              <span className="footer-social-divider">·</span>
+              <a href="https://x.com/fileora_tech" target="_blank" rel="noreferrer" className="footer-social-link">Twitter / X</a>
             </div>
-            <span className="footer-brand-check" style={{ marginTop: '8px', display: 'block' }}>✓ 100% Client-Side Engine</span>
+            <span className="footer-brand-check footer-compliance-check">✓ 100% Client-Side Engine</span>
           </div>
 
           {/* PDF Column */}
           <div>
-            <h4 className="footer-col-title">PDF Utilities</h4>
+            <h3 className="footer-col-title">PDF Utilities</h3>
             <div className="footer-col-links">
               {pdfLinks.map(([label, href]) => (
                 <Link key={href} to={href} className="footer-nav-link footer-nav-link-base">{label}</Link>
@@ -79,7 +105,7 @@ export default function Footer() {
 
           {/* Image Column */}
           <div>
-            <h4 className="footer-col-title">Image Utilities</h4>
+            <h3 className="footer-col-title">Image Utilities</h3>
             <div className="footer-col-links">
               {imageLinks.map(([label, href]) => (
                 <Link key={href} to={href} className="footer-nav-link footer-nav-link-base">{label}</Link>
@@ -89,7 +115,7 @@ export default function Footer() {
 
           {/* Video Column */}
           <div>
-            <h4 className="footer-col-title">Video Utilities</h4>
+            <h3 className="footer-col-title">Video Utilities</h3>
             <div className="footer-col-links">
               {videoLinks.map(([label, href]) => (
                 <Link key={href} to={href} className="footer-nav-link footer-nav-link-base">{label}</Link>
@@ -100,7 +126,7 @@ export default function Footer() {
           {/* Scanner & Alternatives Column */}
           <div className="footer-col-scanner-alt">
             <div>
-              <h4 className="footer-col-title">Mobile Scanner</h4>
+              <h3 className="footer-col-title">Mobile Scanner</h3>
               <div className="footer-col-links">
                 {scannerLinks.map(([label, href]) => (
                   <Link key={href} to={href} className="footer-nav-link footer-nav-link-highlight">{label}</Link>
@@ -109,7 +135,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h4 className="footer-col-title">Alternatives</h4>
+              <h3 className="footer-col-title">Alternatives</h3>
               <div className="footer-col-links">
                 {alternativeLinks.map(([label, href]) => (
                   <Link key={href} to={href} className="footer-nav-link footer-nav-link-base">{label}</Link>

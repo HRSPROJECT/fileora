@@ -1,4 +1,5 @@
 # Cloudflare Pages Redirects
-# All routes are statically pre-rendered as direct HTML files (e.g. compress.html), 
-# so no fallback rewrite is needed. Cloudflare automatically serves 404.html with a 
-# true HTTP 404 status code for invalid paths.
+# Redirect www to non-www
+https://www.fileora.tech/* https://fileora.tech/:splat 301
+# Fallback for non-prerendered routes (SPA routing)
+/* /index.html 200

@@ -118,7 +118,7 @@ export default function Home() {
                 </div>
                 <h3>WebAssembly Engine</h3>
                 <p>
-                  We compile high-performance C++ and Rust libraries directly into sandboxed WebAssembly (Wasm) bytecode. This allows heavy document operations like PDF encryption, image compression, and character recognition to execute locally at near-native CPU speeds inside your browser.
+                  We compile high-performance C++ and Rust libraries directly into sandboxed WebAssembly (Wasm) bytecode. This allows heavy document operations like PDF encryption, image compression, and character recognition to execute locally at <strong>near-native CPU speeds</strong> inside your browser.
                 </p>
               </div>
 
@@ -128,7 +128,7 @@ export default function Home() {
                 </div>
                 <h3>Zero Upload Latency</h3>
                 <p>
-                  Traditional file tools waste precious time uploading multi-megabyte files to a distant cloud server and then waiting to download the completed result. Fileora reads your files directly from your physical drive into browser memory, delivering instantaneous, lag-free processing.
+                  Traditional file tools waste precious time uploading multi-megabyte files to a distant cloud server and then waiting to download the completed result. Fileora reads your files directly from your physical drive into browser memory, delivering <strong>instantaneous, lag-free processing</strong>.
                 </p>
               </div>
 
@@ -138,7 +138,7 @@ export default function Home() {
                 </div>
                 <h3>In-Browser Sandboxing</h3>
                 <p>
-                  Every operation runs inside your browser's native security sandbox. By eliminating network uploads entirely, your files are immune to interception, data breaches, or cloud logging. Once you close the tab, all loaded document memory is immediately freed.
+                  Every operation runs inside your browser's native security sandbox. By eliminating network uploads entirely, your files are immune to interception, data breaches, or cloud logging. Once you close the tab, <strong>all loaded document memory is immediately freed</strong>.
                 </p>
               </div>
             </div>
@@ -147,7 +147,7 @@ export default function Home() {
             <div className="security-compliance-box">
               <h3>Sovereign Data Privacy & Regulatory Compliance</h3>
               <p>
-                Because Fileora executes 100% client-side, we possess zero access to your files, documents, metadata, or personal identities. This architectural design makes our toolkit immediately compliant with strict international data residency regulations.
+                Because Fileora executes 100% client-side, we possess zero access to your files, documents, metadata, or personal identities. This architectural design makes our toolkit immediately <strong>compliant with strict international data residency regulations</strong>.
               </p>
               <div className="compliance-grid">
                 <div className="compliance-item">

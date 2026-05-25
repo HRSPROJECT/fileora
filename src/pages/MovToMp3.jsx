@@ -103,6 +103,8 @@ export default function MovToMp3() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Extract MOV to MP3 Online — Free &amp; Offline | Fileora" />
         <meta name="twitter:description" content="Extract audio tracks from Apple QuickTime MOV videos to universal high-quality MP3 format. 100% offline, private client-side audio extraction in your browser." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -228,14 +230,55 @@ export default function MovToMp3() {
           )}
         </section>
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Confidential Client-Side Audio Extraction</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Uploading private video logs or iPhone captures across external networks to convert them to audio presents substantial security concerns. Fileora parses and extracts the binary layers of your Apple QuickTime H.264 streams directly within your local browser sandbox.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
             Using advanced local WebAssembly compiling systems, the audio channels are separated and re-encoded using `libmp3lame` natively on your machine's CPU. 100% private, instant, and completely safe.
           </p>
+
+          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '32px 0' }} />
+
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Step-by-Step Guide to Convert MOV to MP3</h3>
+          <ol style={{ paddingLeft: '20px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
+            <li><strong>Select or Drop Video:</strong> Click on the drag-and-drop workspace above to select your target Apple MOV container file. Fileora secures the file instantly into the local sandboxed filesystem (OPFS) without transmitting a single byte over the internet.</li>
+            <li><strong>Choose Audio Quality Preset:</strong> Select the output audio bitrate according to your requirements. We support 128 kbps (lightweight), 192 kbps (balanced standard), and 320 kbps (lossless high fidelity audio).</li>
+            <li><strong>Extract & Download:</strong> Click the "Extract MP3 Audio" button. The browser will configure the processing worker in the background, decode the QuickTime audio channels, and package them into an MP3 file within seconds. Once ready, download it directly to your folder.</li>
+          </ol>
+
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Understanding Audio Bitrates (kbps)</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>128 kbps — Standard</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Ideal for audiobooks, vocal podcasts, or lecture recordings. Keeps file weights minimal while maintaining clear and readable dialogue channels.</p>
+            </div>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>192 kbps — Balanced</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Perfect for standard video streams, generic music captures, and social media exports. Excellent balance of compressed file size and sound clarity.</p>
+            </div>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>320 kbps — High Fidelity</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Optimized for musical instruments, live concerts, or professional acoustic records. Ensures zero compressed artifacts and preserves the original dynamic range.</p>
+            </div>
+          </div>
+
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Frequently Asked Questions</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>Is my video file uploaded to any servers?</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>No, absolutely not. Unlike standard cloud-based converters, Fileora operates with 100% offline local technology. Your private videos remain in your physical browser memory space and are never transmitted over the internet.</p>
+            </div>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>How does the in-browser converter process large files?</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>We utilize a highly secure local sandboxed database called Origin Private File System (OPFS). This writes the uploaded video stream directly onto your physical hard drive (SSD/HDD) instead of storing the data in the browser RAM, entirely preventing crashes and lag on massive files.</p>
+            </div>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>Why is Fileora a better alternative to standard cloud video utilities?</h4>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Cloud platforms like Zamzar or CloudConvert collect metadata, enforce queue limits, and store uploaded files on remote nodes. Fileora is free of limits, processes conversions instantly since there are no uploads, and secures your sensitive data in compliance with strict privacy standards.</p>
+            </div>
+          </div>
         </section>
       </main>
       <Footer />

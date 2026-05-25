@@ -111,6 +111,8 @@ export default function MovToMp4() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Apple MOV to MP4 Converter Online — Free &amp; Offline | Fileora" />
         <meta name="twitter:description" content="Convert Apple QuickTime MOV videos to universal MP4 files online for free. 100% offline, privacy-first conversion directly inside your browser." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -163,8 +165,8 @@ export default function MovToMp4() {
 
               {compress && resultSize > 0 && (
                 <div style={{ padding: '0.75rem 1.25rem', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', fontSize: '14px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-                  <div style={{ color: 'var(--text-secondary)' }}>Original Size: <span style={{ fontWeight: 600 }}>{formatBytes(file.size)}</span></div>
-                  <div style={{ color: 'var(--text-secondary)' }}>Optimized Size: <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>{formatBytes(resultSize)}</span></div>
+                  <div className="tool-description-para-last">Original Size: <span style={{ fontWeight: 600 }}>{formatBytes(file.size)}</span></div>
+                  <div className="tool-description-para-last">Optimized Size: <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>{formatBytes(resultSize)}</span></div>
                   <div style={{ color: 'var(--success)', fontWeight: 600 }}>Saved: {((file.size - resultSize) / file.size * 100).toFixed(1)}%</div>
                 </div>
               )}
@@ -281,12 +283,12 @@ export default function MovToMp4() {
           )}
         </section>
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>High-Speed Apple MOV Container Remuxing</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             When converting video captured on iPhone, iPad, or macOS, you are typically converting an Apple QuickTime H.264 video track housed in a `.mov` container. Since standard web browsers and Windows devices cannot natively play `.mov` paths smoothly, Fileora remuxes the underlying streams directly into a `.mp4` packaging.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             Because the internal streams match in audio/video layouts, the WebAssembly engine performs a **direct stream copy** (no transcode re-encoding). This takes less than 1 second, retains 100% video resolution and visual quality, and writes the output directly back to your downloads sandbox.
           </p>
         </section>

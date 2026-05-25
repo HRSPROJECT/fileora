@@ -1269,13 +1269,20 @@ export default function Scanner() {
     <div className={`app-shell ${isCameraActive ? 'camera-active-mode' : ''}`}>
       <Navbar />
       <Helmet>
-        <title>Free PDF Document Scanner Online - CamScanner & Google Drive Alternative | Fileora</title>
+        <title>Free PDF Scanner Online — Scan Documents | Fileora</title>
         <meta name="description" content="Scan multi-page documents securely with your camera. Features auto-border cropping, perspective correction, and professional document filters locally." />
         <link rel="canonical" href="https://fileora.tech/scanner" data-rh="true" />
-        <meta property="og:title" content="Free PDF Document Scanner Online - CamScanner Alternative | Fileora" />
+        <meta property="og:title" content="Free PDF Scanner Online — Scan Documents | Fileora" />
         <meta property="og:description" content="Scan documents securely. Multi-page capture with real-time guides, auto-crop boundaries, perspective alignment, and premium contrast filter adjustments." />
         <meta property="og:url" content="https://fileora.tech/scanner" />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://fileora.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PDF Scanner Online — Scan Documents | Fileora" />
+        <meta name="twitter:description" content="Scan documents securely. Multi-page capture with real-time guides, auto-crop boundaries, perspective alignment, and premium contrast filter adjustments." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
       </Helmet>
 
@@ -1449,7 +1456,7 @@ export default function Scanner() {
                       <AlertTriangle size={32} />
                     </div>
                     <div>
-                      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>Duplicate Scan Detected</h3>
+                      <p style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>Duplicate Scan Detected</p>
                       <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                         It looks like you've already scanned this document page. Would you like to keep this scan as a duplicate page anyway, or skip it?
                       </p>
@@ -1514,7 +1521,7 @@ export default function Scanner() {
                     <Layers size={36} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>Launch AI Document Scanner</h3>
+                    <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>Launch AI Document Scanner</p>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Securely convert paper documents, invoices, receipts, and whiteboard sketches into high-fidelity PDF scans offline directly on your device.</p>
                   </div>
                   
@@ -2010,9 +2017,9 @@ export default function Scanner() {
                         }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <FileText size={16} style={{ color: 'var(--accent-primary)' }} /> Privacy-First Offline OCR
-                              </h3>
+                              </p>
                               <span style={{ fontSize: '11px', background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-primary)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>Tesseract.js Engine</span>
                             </div>
                             
@@ -2176,24 +2183,76 @@ export default function Scanner() {
           <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Professional Edge Cropping & Visual Clarity</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
             <div style={{ padding: '20px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-              <h4 style={{ color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <Layers size={18} style={{ color: 'var(--accent-primary)' }} /> Auto-Capture Stability
-              </h4>
+              </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Intelligently samples pixel-wise motion shift in real-time. Automatically snaps the document once the camera is held perfectly still, completely hands-free.</p>
             </div>
             
             <div style={{ padding: '20px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-              <h4 style={{ color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <RotateCw size={18} style={{ color: 'var(--accent-primary)' }} /> Duplicate Scan Guard
-              </h4>
+              </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Utilizes client-side 8x8 perceptual grayscale signatures to cross-examine and flag repeat document snaps, preventing accidental double uploads.</p>
             </div>
 
             <div style={{ padding: '20px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-              <h4 style={{ color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <Sparkles size={18} style={{ color: 'var(--accent-primary)' }} /> Magic Scan Dynamic Filter
-              </h4>
+              </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Leverages client-side pixel adjustments to automatically boost contrast, white-out shadows, and dark-level ink characters for crystal-clear readability.</p>
+            </div>
+          </div>
+        </section>
+
+        <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '48px auto', maxWidth: '850px' }} />
+
+        <section className="container tool-description-section">
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Comprehensive Guide to Online Document Scanning</h2>
+          <p className="tool-description-para">
+            Converting physical receipts, contracts, sketches, and notes into digital files has traditionally required heavy scanner machines or privacy-invasive mobile scanner apps. Fileora delivers a state-of-the-art alternative—providing fully automatic cropping, perspective correction, image optimization, and optical character recognition (OCR) natively inside your browser.
+          </p>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
+            Our dynamic scanning engine requires no third-party integrations, cloud uploads, or account logins. Your private documents are processed completely client-side, making Fileora the ultimate choice for confidential legal, financial, and personal scans.
+          </p>
+
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Step-by-Step Instructions</h2>
+          <ol style={{ paddingLeft: '20px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
+            <li><strong>Choose Capture Mode:</strong> Tap the camera icon above to scan live using your device's camera (smartphone or laptop webcam) or drop existing image files (JPEG, PNG) directly into the workspace.</li>
+            <li><strong>Auto-Cropping & Perspective Grid:</strong> Fileora automatically calculates document corners in real-time. Drag the crop corner pins to tweak the borders manually with pixel precision. The perspective solver will instantly flatten skewed or angled captures.</li>
+            <li><strong>Apply Visual Filters:</strong> Choose from standard filters including "Magic Color" (boosts ink readability while whitening out page shadows), "B&W" (transforms into standard photocopy style), "Grayscale", or "Original".</li>
+            <li><strong>Configure OCR & Save:</strong> Enable OCR (Optical Character Recognition) to extract search-optimized text. You can re-order captured pages, append extra pages, and download the compiled package as a multipage PDF or individual JPEG files.</li>
+          </ol>
+
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Tips for Perfect Document Scans</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>1. Maximize Illumination</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Scan documents in bright, uniform, and natural lighting. Avoid direct, harsh flashbulbs or overhead lights that cast dark hand shadows onto the document surface.</p>
+            </div>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>2. Use High-Contrast Backgrounds</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Place light-colored paper documents on dark tables or backdrops. This contrast enables our auto-capture boundary detectors to map corners instantly.</p>
+            </div>
+            <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '8px' }}>3. Align the Camera Parallel</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Keep your smartphone parallel to the document plane during capture. Although our perspective flattener corrects angles, parallel captures yield the sharpest text rendering.</p>
+            </div>
+          </div>
+
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>Frequently Asked Questions</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>Is Fileora safe to scan sensitive personal or corporate documents?</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Yes, 100% safe. Unlike standard scanning tools like CamScanner or Adobe Scan which store your captures on external cloud databases, Fileora operates entirely inside your physical browser memory. We maintain a strict zero-server storage policy—your documents never travel across the network.</p>
+            </div>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>Does the OCR feature support different languages?</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Our in-browser Optical Character Recognition runs natively on your machine's CPU via Tesseract.js. It automatically extracts selectable, searchable text blocks, allowing you to copy-paste ink structures smoothly in English, with additional local packages launching soon.</p>
+            </div>
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h3 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>Why is Fileora a better alternative to cloud-based document scanners?</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Cloud-based scanners require continuous internet connections, capture personal metadata, enforce watermarks, and cap daily pages. Fileora is free of watermarks, works completely offline once loaded, provides unlimited pages, and guarantees total document confidentiality in compliance with HIPAA and GDPR regulations.</p>
             </div>
           </div>
         </section>

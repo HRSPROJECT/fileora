@@ -34,6 +34,11 @@ export default function Convert() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free Image Converter — JPG to PNG WebP AVIF | Fileora" />
+        <meta name="twitter:description" content="Convert images between JPG, PNG, WebP and AVIF online for free. Instant browser-based conversion. No signup." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -53,14 +58,14 @@ export default function Convert() {
           setFile(next)
         }} />}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Supported Formats & Image Conversion Options</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Convert JPG to PNG, PNG to WebP, WebP to AVIF, and other combinations effortlessly. 
             Because this tool utilizes HTML5 canvas rendering directly on your browser, nothing is uploaded to a remote server. 
             Your privacy is fully protected, and conversions take milliseconds instead of minutes.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Zero quality loss when translating lossless formats · ✓ Realtime output adjustments · ✓ Instant local download.
           </p>
         </section>
@@ -68,12 +73,12 @@ export default function Convert() {
         <HowItWorks steps={[['Upload an image', 'Choose JPG, PNG, WebP, AVIF or GIF.'], ['Choose output format', 'Set JPG, PNG, WebP or AVIF and adjust quality.'], ['Download converted file', 'Save the converted image with the right extension.']]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/compress" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Image Compressor</a>
-            <a href="/resize" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Image Resizer</a>
-            <a href="/image-to-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Image to PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related Tools</h3>
+          <div className="related-tools-links">
+            <a href="/compress" className="btn btn-secondary btn-related">Image Compressor</a>
+            <a href="/resize" className="btn btn-secondary btn-related">Image Resizer</a>
+            <a href="/image-to-pdf" className="btn btn-secondary btn-related">Image to PDF</a>
           </div>
         </section>
       </main>

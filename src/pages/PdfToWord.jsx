@@ -516,6 +516,12 @@ export default function PdfToWord() {
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Convert PDF to Word Online - Free & Editable | Fileora" />
+        <meta name="twitter:description" content="Convert PDF documents into editable Word Docx files online for free. Pure client-side privacy with no uploads. Instant, safe, and professional text conversion." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
       </Helmet>
 
       <main className="tool-main">
@@ -536,7 +542,7 @@ export default function PdfToWord() {
         )}
 
         {!file && !processing && (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="100MB"
@@ -723,13 +729,13 @@ export default function PdfToWord() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Clean, Private, and High-Fidelity PDF-to-Word Conversion</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Transform standard PDF scans, invoices, ebooks, and documents into clean Microsoft Word files in seconds. 
             Because this tool executes 100% inside your web browser sandbox using modern HTML5 file APIs, your document data is completely protected from being sent to external databases or servers.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Professional client-side parsing · ✓ Standard margins and layout reconstruction · ✓ High compatibility Microsoft Word format.
           </p>
         </section>

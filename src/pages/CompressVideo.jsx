@@ -108,6 +108,8 @@ export default function CompressVideo() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Compress Video Online — Shrink Video File Size | Fileora" />
         <meta name="twitter:description" content="Reduce video file sizes online for free. In-browser client-side video compressor—shrink MP4, MOV, WebM files locally with zero limits and 100% privacy." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -159,8 +161,8 @@ export default function CompressVideo() {
               </div>
 
               <div style={{ padding: '0.75rem 1.25rem', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', fontSize: '14px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-                <div style={{ color: 'var(--text-secondary)' }}>Original: <span style={{ fontWeight: 600 }}>{formatBytes(file.size)}</span></div>
-                <div style={{ color: 'var(--text-secondary)' }}>Compressed: <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>{formatBytes(resultSize)}</span></div>
+                <div className="tool-description-para-last">Original: <span style={{ fontWeight: 600 }}>{formatBytes(file.size)}</span></div>
+                <div className="tool-description-para-last">Compressed: <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>{formatBytes(resultSize)}</span></div>
                 <div style={{ color: 'var(--success)', fontWeight: 600 }}>Saved: {((file.size - resultSize) / file.size * 100).toFixed(1)}%</div>
               </div>
 
@@ -280,12 +282,12 @@ export default function CompressVideo() {
           )}
         </section>
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Smart Client-Side Video Size Shrinking</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Traditional video compress utilities upload your huge clips across network servers where they are queued, processed, and potentially logged. This poses extreme privacy threats, especially for custom private or corporate legal recordings. Fileora performs high-fidelity H.264 compression entirely inside your local sandbox.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             By adjusting the quality bitrates (CRF limits) and downscaling standard multi-thousand resolution dimensions (e.g. converting heavy 4K/1080p outputs into mobile-friendly 720p layouts), Fileora shrinks clip weights up to 90% locally in seconds. Perfect for email attachments, mobile messaging caps, and archiving.
           </p>
         </section>

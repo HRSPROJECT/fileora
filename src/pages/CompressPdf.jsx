@@ -122,15 +122,20 @@ export default function CompressPdf() {
     <div className="app-shell">
       <Navbar />
       <Helmet>
-        <title>Free PDF Compressor — Compress PDF to 100KB, 200KB, 500KB Online | Fileora</title>
+        <title>Free PDF Compressor Online — Shrink PDF File Size | Fileora</title>
         <meta name="description" content="Compress PDF files for free online. Target exact sizes like 100KB, 200KB, or 500KB. Safe, browser-based local compression with zero loss in visual quality." />
         <link rel="canonical" href="https://fileora.tech/compress-pdf" data-rh="true" />
-        <meta property="og:title" content="Free PDF Compressor — Compress PDF to 100KB, 200KB, 500KB Online | Fileora" />
+        <meta property="og:title" content="Free PDF Compressor Online — Shrink PDF File Size | Fileora" />
         <meta property="og:description" content="Compress PDF files for free online. Target exact sizes like 100KB, 200KB, or 500KB. Safe, browser-based local compression with zero loss in visual quality." />
         <meta property="og:url" content="https://fileora.tech/compress-pdf" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PDF Compressor Online — Shrink PDF File Size | Fileora" />
+        <meta name="twitter:description" content="Compress PDF files for free online. Target exact sizes like 100KB, 200KB, or 500KB. Safe, browser-based local compression with zero loss in visual quality." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -142,7 +147,7 @@ export default function CompressPdf() {
         </section>
 
         {!file ? (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="100MB"
@@ -174,7 +179,7 @@ export default function CompressPdf() {
                   style={{ width: '100%', height: '100%', flex: 1, border: 'none' }}
                 />
               ) : (
-                <div style={{ color: 'var(--text-secondary)' }}>Preparation complete. Select preset to optimize.</div>
+                <div className="tool-description-para-last">Preparation complete. Select preset to optimize.</div>
               )}
             </div>
 
@@ -226,7 +231,7 @@ export default function CompressPdf() {
               {targetSize === 'custom' && (
                 <div className="animate-fade-in" style={{ backgroundColor: 'var(--bg-primary)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Compression Level</span>
+                    <span className="tool-description-para-last">Compression Level</span>
                     <span style={{ fontWeight: 600 }}>{customQuality}%</span>
                   </div>
                   <input
@@ -249,11 +254,11 @@ export default function CompressPdf() {
               {!processing && compressedSize > 0 && (
                 <div style={{ padding: '12px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '6px', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                   <div>
-                    <span style={{ color: 'var(--text-secondary)' }}>Optimized Size</span>
+                    <span className="tool-description-para-last">Optimized Size</span>
                     <div style={{ fontWeight: 700, color: 'var(--accent-primary)', fontSize: '16px' }}>{formatBytes(compressedSize)}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Savings</span>
+                    <span className="tool-description-para-last">Savings</span>
                     <div style={{ fontWeight: 700, color: 'var(--success)', fontSize: '16px' }}>
                       -{Math.max(0, Math.round(((file.size - compressedSize) / file.size) * 100))}%
                     </div>
@@ -273,14 +278,14 @@ export default function CompressPdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>State-of-the-Art Browser-Based PDF Compressor</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Perfect for Indian students and government portals that enforce strict upload limits like 100KB, 200KB or 500KB.
             Because this tool executes client-side using advanced WebAssembly streams, it works instantly on your phone
             or computer with zero server roundtrips.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ High compression mode · ✓ Preserves structural tags and fonts · ✓ Perfect for passport submissions and tax portals.
           </p>
         </section>
@@ -292,12 +297,12 @@ export default function CompressPdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/split-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Split PDF</a>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
-            <a href="/resize-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Resize PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/split-pdf" className="btn btn-secondary btn-related">Split PDF</a>
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
+            <a href="/resize-pdf" className="btn btn-secondary btn-related">Resize PDF</a>
           </div>
         </section>
       </main>

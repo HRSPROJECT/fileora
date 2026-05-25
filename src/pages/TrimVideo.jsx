@@ -227,6 +227,8 @@ export default function TrimVideo() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Trim Video Online — Cut &amp; Slice Video Clips | Fileora" />
         <meta name="twitter:description" content="Trim and cut video files online for free. Precise client-side video cutter—slice MP4, MOV, or WebM clips locally in-browser with zero limits." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -239,7 +241,7 @@ export default function TrimVideo() {
           <p>Cut and slice specific portions of your videos offline. Set start/end boundaries on a precise frame player—ideal for clipping social uploads or extracting key segments with zero cloud logging.</p>
         </section>
 
-        <section className="container" style={{ maxWidth: '800px', margin: '0 auto 4rem auto' }}>
+        <section className="container tool-description-section">
           {error && (
             <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderColor: 'var(--danger)', padding: '1rem', marginBottom: '1.5rem', background: 'rgba(239, 68, 68, 0.05)' }}>
               <AlertTriangle color="var(--danger)" size={20} style={{ flexShrink: 0 }} />
@@ -454,12 +456,12 @@ export default function TrimVideo() {
           )}
         </section>
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Precise Frame Slicing and Lossless Cutting</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Trimming large video recording payloads into short highlight clips, specific segments, or removing dead space is extremely standard for social sharing, presentations, or documentation. Fileora parses and cuts your video streams directly within your browser session using high-speed WebAssembly engines.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             Our dynamic routing algorithm attempts a **lossless stream split** first. By copying original H.264 video track packages without transcode calculations, clipping is finalized in a fraction of a second with zero visual resolution degradation. Fallbacks trigger only if mismatched stream properties require precise re-encoding.
           </p>
         </section>

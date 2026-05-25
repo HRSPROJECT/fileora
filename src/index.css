@@ -1489,3 +1489,79 @@ img {
   width: 250px;
   height: 54px;
 }
+
+/* ==========================================================================
+   W3C Validation & SEO Cleanup Classes
+   ========================================================================== */
+
+/* Narrow container for dropzones */
+.container-narrow {
+  max-width: 640px !important;
+}
+
+/* Technical guide description sections */
+.tool-description-section {
+  margin: 48px auto !important;
+  max-width: 800px !important;
+  line-height: 1.6 !important;
+}
+
+.tool-description-para {
+  color: var(--text-secondary) !important;
+  margin-bottom: 16px !important;
+}
+
+.tool-description-para-last {
+  color: var(--text-secondary) !important;
+  margin-bottom: 0 !important;
+}
+
+/* Related tools bottom directories */
+.related-tools-section {
+  margin-top: 48px !important;
+  border-top: 1px solid var(--border-color) !important;
+  padding-top: 32px !important;
+  text-align: center !important;
+  padding-bottom: 48px !important;
+}
+
+.related-tools-title {
+  margin-bottom: 16px !important;
+  font-size: 1.2rem !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.related-tools-links {
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+}
+
+.btn-related {
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+}
+
+/* Footer clean up */
+.footer-social-links {
+  display: flex !important;
+  gap: 12px !important;
+  font-size: 0.8rem !important;
+  margin-top: 4px !important;
+}
+
+.footer-social-link {
+  color: var(--text-secondary) !important;
+  text-decoration: none !important;
+}
+
+.footer-social-divider {
+  color: var(--text-tertiary) !important;
+}
+
+.footer-compliance-check {
+  margin-top: 8px !important;
+  display: block !important;
+}

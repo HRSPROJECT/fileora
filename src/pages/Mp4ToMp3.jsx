@@ -102,6 +102,8 @@ export default function Mp4ToMp3() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Extract Audio from Video Online — MP4 to MP3 | Fileora" />
         <meta name="twitter:description" content="Extract audio tracks from MP4, MOV, or WebM videos online for free. Convert video to high-fidelity MP3 locally and securely inside your browser." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -227,12 +229,12 @@ export default function Mp4ToMp3() {
           )}
         </section>
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>High-Fidelity Client-Side Audio Extraction</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Converting MP4 video clips into standalone MP3 audio formats is incredibly useful for extracting lecture recordings, podcast files, original movie soundtracks, or sound clips. However, cloud conversion platforms parse your files on remote systems, which compromises data sovereignty.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             Fileora demuxes the internal audio tracks and converts them to standard `libmp3lame` output files inside your local browser sandbox. This gives you high-speed, zero-upload processing at standard fidelity presets up to 320kbps. Keep your soundtrack local and completely private.
           </p>
         </section>

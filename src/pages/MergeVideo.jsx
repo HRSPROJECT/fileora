@@ -119,6 +119,8 @@ export default function MergeVideo() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Merge Videos Online — Combine Video Clips | Fileora" />
         <meta name="twitter:description" content="Combine and stitch multiple videos together online for free. In-browser client-side video merger—join MP4, MOV, or WebM clips locally and securely." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
@@ -279,12 +281,12 @@ export default function MergeVideo() {
           )}
         </section>
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>High-Speed Local Video Concatenation</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Merging raw recordings into cohesive presentation materials is typically a heavy compute process. Sending multiple gigs of clip files across standard cloud converters consumes immense bandwidth, takes substantial upload/download time, and leaks document metadata.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             Fileora solves this with a **lossless background concat demuxer**. If the audio-video layouts, frame dimensions, and frame rates of the loaded files align, the engine slices and bonds the packets in a fraction of a second without re-encoding! Re-encoding filter chains run only as a fallback to guarantee a successful merge for mismatched files.
           </p>
         </section>

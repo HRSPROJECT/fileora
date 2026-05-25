@@ -471,6 +471,12 @@ export default function PassportPhoto() {
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Passport Photo Maker Online - Free & Private | Fileora" />
+        <meta name="twitter:description" content="Create print-ready passport photos online for free. Visa templates for US, UK, EU, and India. Crop, edit backdrops, and layout photo print grids locally." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
       </Helmet>
 
       <main className="tool-main">
@@ -480,7 +486,7 @@ export default function PassportPhoto() {
         </section>
 
         {!file && (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="image/png,image/jpeg"
               maxSizeLabel="15MB"
@@ -730,13 +736,13 @@ export default function PassportPhoto() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Premium Client-Side Passport & Visa Photo Creator</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Perfectly crop and compile biometrically aligned passport, visa, or profile pictures. 
             Because this tool executes 100% inside your local browser memory space, your personal face profiles and ID structures remain fully private.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Professional oval biometric overlays · ✓ White/Blue chroma backdrop replacement · ✓ Standard multi-photo A4 sheet templates.
           </p>
         </section>

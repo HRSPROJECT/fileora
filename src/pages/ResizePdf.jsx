@@ -136,6 +136,11 @@ export default function ResizePdf() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Free PDF Resizer Online — Resize PDF Page Size | Fileora" />
+        <meta name="twitter:description" content="Resize PDF pages online for free. Change PDF page size to A4, Letter, A3 and more. Browser-based, no signup required." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
@@ -147,7 +152,7 @@ export default function ResizePdf() {
         </section>
 
         {!file ? (
-          <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="container container-narrow">
             <DropZone
               accept="application/pdf"
               maxSizeLabel="100MB"
@@ -179,7 +184,7 @@ export default function ResizePdf() {
                   style={{ width: '100%', height: '100%', flex: 1, border: 'none' }}
                 />
               ) : (
-                <div style={{ color: 'var(--text-secondary)' }}>Ready. Select layout options to resize.</div>
+                <div className="tool-description-para-last">Ready. Select layout options to resize.</div>
               )}
             </div>
 
@@ -284,13 +289,13 @@ export default function ResizePdf() {
           </section>
         )}
 
-        <section className="container" style={{ margin: '48px auto', maxWidth: '800px', lineHeight: '1.6' }}>
+        <section className="container tool-description-section">
           <h2>Proportional Scaling PDF Page Resizer</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p className="tool-description-para">
             Perfect for preparing documentation matching exact compliance regulations (such as A4 or Letter sizes). 
             Fileora applies affine content transformation matrix coordinates to preserve visual balance and margins.
           </p>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="tool-description-para-last">
             ✓ Advanced affine scaling · ✓ Support for Letter, A4, A3 Presets · ✓ Fluid orientation toggle.
           </p>
         </section>
@@ -302,12 +307,12 @@ export default function ResizePdf() {
         ]} />
         <FaqSection faqs={faqs} />
 
-        <section className="related-tools container" style={{ marginTop: '48px', borderTop: '1px solid var(--border-color)', paddingTop: '32px', textAlign: 'center', paddingBottom: '48px' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Related PDF Tools</h3>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/crop-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Crop PDF</a>
-            <a href="/compress-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>PDF Compressor</a>
-            <a href="/merge-pdf" className="btn btn-secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Merge PDF</a>
+        <section className="container related-tools-section">
+          <h3 className="related-tools-title">Related PDF Tools</h3>
+          <div className="related-tools-links">
+            <a href="/crop-pdf" className="btn btn-secondary btn-related">Crop PDF</a>
+            <a href="/compress-pdf" className="btn btn-secondary btn-related">PDF Compressor</a>
+            <a href="/merge-pdf" className="btn btn-secondary btn-related">Merge PDF</a>
           </div>
         </section>
       </main>
