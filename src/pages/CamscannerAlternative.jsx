@@ -29,7 +29,7 @@ export default function CamscannerAlternative() {
     { feature: 'Data Privacy Compliance', fileora: '100% Safe (Files never leave device)', competitor: 'Saves images to cloud databases', fileoraOk: true, compOk: false },
     { feature: 'Processing Cost', fileora: '$0 (Free Forever)', competitor: '$50+/yr or heavy watermark', fileoraOk: true, compOk: false },
     { feature: 'Watermarks on export', fileora: 'None (Clean professional PDFs)', competitor: '"Scanned with..." stamp on free', fileoraOk: true, compOk: false },
-    { feature: 'Auto-Crop & Filters', fileora: 'Yes (High-contrast B&W & Magic)', competitor: 'Yes (Locked behind ads/premium)', fileoraOk: true, compOk: false },
+    { feature: 'Auto-Crop & Filters', fileora: 'Yes (High-contrast B&W & Magic)', competitor: 'Yes (Locked behind premium)', fileoraOk: true, compOk: false },
     { feature: 'Mandatory Signups', fileora: 'No signup, instant utility access', competitor: 'Forces email capture & onboarding', fileoraOk: true, compOk: false },
   ]
 
@@ -68,7 +68,7 @@ export default function CamscannerAlternative() {
       <Navbar />
       <Helmet>
         <title>Best Free CamScanner Alternative: 100% Secure & Online | Fileora</title>
-        <meta name="description" content="Looking for a secure, ad-free CamScanner alternative? Scan documents securely in your browser with Fileora. Absolute privacy, automatic cropping, no watermarks." />
+        <meta name="description" content="Looking for a secure CamScanner alternative? Scan documents securely in your browser with Fileora. Absolute privacy, automatic cropping, no watermarks." />
         <link rel="canonical" href="https://fileora.tech/alternative/camscanner" data-rh="true" />
         <meta property="og:title" content="Best Free CamScanner Alternative: 100% Secure & Online | Fileora" />
         <meta property="og:description" content="Protect your personal data. Convert physical documents to optimized PDF scans directly in your browser. Automatic crop borders, perspective grids, no watermarks." />
@@ -79,7 +79,7 @@ export default function CamscannerAlternative() {
         <meta name="twitter:site" content="@fileora_tech" />
         <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Best Free CamScanner Alternative: 100% Secure & Online | Fileora" />
-        <meta name="twitter:description" content="Looking for a secure, ad-free CamScanner alternative? Scan documents securely in your browser with Fileora. Absolute privacy, automatic cropping, no watermarks." />
+        <meta name="twitter:description" content="Looking for a secure CamScanner alternative? Scan documents securely in your browser with Fileora. Absolute privacy, automatic cropping, no watermarks." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(appSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>

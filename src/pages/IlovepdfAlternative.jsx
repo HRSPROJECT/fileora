@@ -30,7 +30,7 @@ export default function IlovepdfAlternative() {
     { feature: 'Daily file limits', fileora: 'Unlimited (Free Forever)', competitor: 'Strict limits (Paid Upgrade)', fileoraOk: true, compOk: false },
     { feature: 'File size limits', fileora: 'Unlimited', competitor: 'Strict limits (e.g. 15MB/100MB)', fileoraOk: true, compOk: false },
     { feature: 'Speed', fileora: 'Instant (No upload wait)', competitor: 'Slow (Upload/Download bottleneck)', fileoraOk: true, compOk: false },
-    { feature: 'Mandatory Signup / Ads', fileora: 'No signup, Ad-free interface', competitor: 'Ads, Upsells & Popups', fileoraOk: true, compOk: false },
+    { feature: 'Mandatory Signup', fileora: 'No signup, clean interface', competitor: 'Upsells & Popups', fileoraOk: true, compOk: false },
   ]
 
   const relatedTools = [
@@ -136,7 +136,7 @@ export default function IlovepdfAlternative() {
               </div>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>No Paywalls or Signup</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                Forget daily quotas, paywalls, premium packages, or aggressive email subscriptions. Get unlimited, free access to all utility converters with an <strong>ad-free clean workspace.</strong>
+                Forget daily quotas, paywalls, premium packages, or aggressive email subscriptions. Get unlimited, free access to all utility converters with a <strong>clean workspace.</strong>
               </p>
             </div>
           </div>

@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     q: 'Do I need to sign up to use Fileora?',
-    a: 'No. Fileora does not require any account creation, email registration, or credit card signup. Simply open the tool you need, select your files, and obtain your results instantly in a completely ad-free workspace.'
+    a: 'No. Fileora does not require any account creation, email registration, or credit card signup. Simply open the tool you need, select your files, and obtain your results instantly in a clean workspace.'
   },
   {
     q: 'Is my data safe with browser-based PDF converters?',
