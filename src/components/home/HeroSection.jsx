@@ -28,7 +28,7 @@ export default function HeroSection() {
             className="hero-badge-link"
           >
             <img 
-              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1150733&theme=light&t=1779528462343" 
+              src="/product-hunt-badge.svg" 
               alt="Fileora — Free Online File Tools - Free file tools that run entirely in your browser  | Product Hunt" 
               width="250" 
               height="54" 
