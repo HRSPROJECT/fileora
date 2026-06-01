@@ -1,3 +1,8 @@
+# ==========================================
+# Fileora Cloudflare Pages HTTP Response Headers
+# ==========================================
+
+# 1. Global Security and Content Security Policy (CSP) Rules
 /*
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: require-corp
@@ -6,7 +11,115 @@
   X-Frame-Options: SAMEORIGIN
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://www.google-analytics.com; media-src 'self' blob:; connect-src 'self' blob: https://unpkg.com https://www.google-analytics.com https://www.google.com; worker-src 'self' blob:; child-src 'self' blob:; frame-ancestors 'none';
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://unpkg.com https://*.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.google-analytics.com https://*.analytics.google.com https://*.google.com https://*.googletagmanager.com; media-src 'self' blob:; connect-src 'self' blob: https://unpkg.com https://*.google-analytics.com https://*.analytics.google.com https://*.google.com; worker-src 'self' blob:; child-src 'self' blob:; frame-ancestors 'none';
 
+# 2. Immutable Cache Controls for Vite Assets
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# 3. Server-Side Robots Directives for Dead Pages
+/404
+  X-Robots-Tag: noindex, nofollow
+
+# 4. HTTP-Level Canonical Link Directives for Clean SEO Indexing
+/
+  Link: <https://fileora.tech/>; rel="canonical"
+
+/compress
+  Link: <https://fileora.tech/compress>; rel="canonical"
+
+/resize
+  Link: <https://fileora.tech/resize>; rel="canonical"
+
+/convert
+  Link: <https://fileora.tech/convert>; rel="canonical"
+
+/image-to-pdf
+  Link: <https://fileora.tech/image-to-pdf>; rel="canonical"
+
+/png-to-pdf
+  Link: <https://fileora.tech/png-to-pdf>; rel="canonical"
+
+/merge-pdf
+  Link: <https://fileora.tech/merge-pdf>; rel="canonical"
+
+/compress-pdf
+  Link: <https://fileora.tech/compress-pdf>; rel="canonical"
+
+/split-pdf
+  Link: <https://fileora.tech/split-pdf>; rel="canonical"
+
+/unlock-pdf
+  Link: <https://fileora.tech/unlock-pdf>; rel="canonical"
+
+/resize-pdf
+  Link: <https://fileora.tech/resize-pdf>; rel="canonical"
+
+/crop-pdf
+  Link: <https://fileora.tech/crop-pdf>; rel="canonical"
+
+/pdf-to-jpg
+  Link: <https://fileora.tech/pdf-to-jpg>; rel="canonical"
+
+/heic-to-jpg
+  Link: <https://fileora.tech/heic-to-jpg>; rel="canonical"
+
+/jpg-to-pdf
+  Link: <https://fileora.tech/jpg-to-pdf>; rel="canonical"
+
+/rotate-pdf
+  Link: <https://fileora.tech/rotate-pdf>; rel="canonical"
+
+/watermark-pdf
+  Link: <https://fileora.tech/watermark-pdf>; rel="canonical"
+
+/number-pdf
+  Link: <https://fileora.tech/number-pdf>; rel="canonical"
+
+/passport-photo
+  Link: <https://fileora.tech/passport-photo>; rel="canonical"
+
+/protect-pdf
+  Link: <https://fileora.tech/protect-pdf>; rel="canonical"
+
+/sign-pdf
+  Link: <https://fileora.tech/sign-pdf>; rel="canonical"
+
+/pdf-to-word
+  Link: <https://fileora.tech/pdf-to-word>; rel="canonical"
+
+/word-to-pdf
+  Link: <https://fileora.tech/word-to-pdf>; rel="canonical"
+
+/scanner
+  Link: <https://fileora.tech/scanner>; rel="canonical"
+
+/mov-to-mp4
+  Link: <https://fileora.tech/mov-to-mp4>; rel="canonical"
+
+/compress-video
+  Link: <https://fileora.tech/compress-video>; rel="canonical"
+
+/mp4-to-mp3
+  Link: <https://fileora.tech/mp4-to-mp3>; rel="canonical"
+
+/trim-video
+  Link: <https://fileora.tech/trim-video>; rel="canonical"
+
+/merge-video
+  Link: <https://fileora.tech/merge-video>; rel="canonical"
+
+/mov-to-mp3
+  Link: <https://fileora.tech/mov-to-mp3>; rel="canonical"
+
+/repeat-video
+  Link: <https://fileora.tech/repeat-video>; rel="canonical"
+
+/alternative/ilovepdf
+  Link: <https://fileora.tech/alternative/ilovepdf>; rel="canonical"
+
+/alternative/smallpdf
+  Link: <https://fileora.tech/alternative/smallpdf>; rel="canonical"
+
+/alternative/camscanner
+  Link: <https://fileora.tech/alternative/camscanner>; rel="canonical"

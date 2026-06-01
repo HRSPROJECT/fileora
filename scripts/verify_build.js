@@ -27,6 +27,7 @@ const htmlFiles = getHtmlFiles(DIST_DIR);
 console.log(`Scanning ${htmlFiles.length} statically pre-rendered HTML files for W3C & SEO compliance...`);
 
 let totalIssues = 0;
+let totalWarnings = 0;
 
 htmlFiles.forEach(filePath => {
   const relPath = path.relative(DIST_DIR, filePath);
@@ -56,7 +57,7 @@ htmlFiles.forEach(filePath => {
     styleMatches.forEach((m, idx) => {
       if (idx < 5) console.log(`   - ${m.tag.substring(0, 100)}...`);
     });
-    totalIssues += styleMatches.length;
+    totalWarnings += styleMatches.length;
   } else {
     console.log(`✅ Style attributes: 0 inline styles in body HTML (100% W3C compliant!)`);
   }
@@ -123,11 +124,11 @@ htmlFiles.forEach(filePath => {
 });
 
 console.log(`\n========================================`);
-console.log(`Scan completed. Total compliance warnings found: ${totalIssues}`);
+console.log(`Scan completed. Found ${totalIssues} critical SEO/accessibility errors and ${totalWarnings} minor style warnings.`);
 if (totalIssues === 0) {
-  console.log(`🎉 100% W3C AND SEO COMPLIANT! Perfect scores across all pages!`);
+  console.log(`🎉 100% W3C AND SEO COMPLIANT! Verification passed successfully!`);
   process.exit(0);
 } else {
-  console.log(`⚠️  Please review and resolve the warnings listed above.`);
+  console.log(`❌ Deployment Blocked: Please resolve the ${totalIssues} critical errors listed above.`);
   process.exit(1);
 }

@@ -12,6 +12,12 @@ export default function NotFound() {
         <title>Page Not Found (404) | Fileora</title>
         <meta name="description" content="The page you are looking for does not exist on Fileora. Browse our free browser-based local file tools instead." />
         <meta name="robots" content="noindex, follow" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Page Not Found (404) | Fileora" />
+        <meta name="twitter:description" content="The page you are looking for does not exist on Fileora. Browse our free browser-based local file tools instead." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
       </Helmet>
 
       <main className="tool-main" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', padding: '0 24px' }}>
@@ -22,9 +28,9 @@ export default function NotFound() {
           <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '16px', marginBottom: '12px' }}>
             Page Not Found
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '32px' }}>
+          <h2 style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 400, lineHeight: 1.6, marginTop: '0px', marginBottom: '32px' }}>
             We couldn't find the page you are looking for. Fileora processes all files locally inside your browser sandbox. Explore our offline PDF, image, and video utilities instead.
-          </p>
+          </h2>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <Link to="/" className="btn btn-primary btn-gradient" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               <Home size={16} /> Return Home

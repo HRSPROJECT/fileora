@@ -87,6 +87,8 @@ export default function Home() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://fileora.tech/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
         <meta name="twitter:title" content="Fileora - Browser Tools for PDF, Video, JPG, PNG Files" />
         <meta name="twitter:description" content="Free private browser tools by Fileora. Convert &amp; compress PDF, JPG, PNG images or edit MP4, MOV, WebM video files locally in your browser without uploading." />
         <meta name="twitter:image" content="https://fileora.tech/og-image.png" />

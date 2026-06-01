@@ -1,17 +1,57 @@
+# ==========================================
+# Fileora Cloudflare Pages Redirect Rules
+# ==========================================
+
+# 1. Domain Canonicalization & Redirects (301 Permanent)
 https://fileora-image-compressor.pages.dev/* https://fileora.tech/:splat 301
-# Cloudflare Pages Redirects
-# Redirect www to non-www
 https://www.fileora.tech/* https://fileora.tech/:splat 301
-# Fallback for non-prerendered routes (SPA routing)
-/* /index.html 200
 
-# Block Scanners (403 Forbidden)
-/wp-admin/* 403
-/.env 403
-/.docker/* 403
-/s3/* 403
-/.git/* 403
-
-# Force canonical tools to no trailing slash
+# 2. Page Trailing Slash Redirects (301 Permanent)
+# Explicitly redirects trailing slash URLs to clean canonical URLs to prevent redirect loops and SPA fallbacks
 /compress/ /compress 301
+/resize/ /resize 301
 /convert/ /convert 301
+/image-to-pdf/ /image-to-pdf 301
+/png-to-pdf/ /png-to-pdf 301
+/merge-pdf/ /merge-pdf 301
+/compress-pdf/ /compress-pdf 301
+/split-pdf/ /split-pdf 301
+/unlock-pdf/ /unlock-pdf 301
+/resize-pdf/ /resize-pdf 301
+/crop-pdf/ /crop-pdf 301
+/pdf-to-jpg/ /pdf-to-jpg 301
+/heic-to-jpg/ /heic-to-jpg 301
+/jpg-to-pdf/ /jpg-to-pdf 301
+/rotate-pdf/ /rotate-pdf 301
+/watermark-pdf/ /watermark-pdf 301
+/number-pdf/ /number-pdf 301
+/passport-photo/ /passport-photo 301
+/protect-pdf/ /protect-pdf 301
+/sign-pdf/ /sign-pdf 301
+/pdf-to-word/ /pdf-to-word 301
+/word-to-pdf/ /word-to-pdf 301
+/scanner/ /scanner 301
+/mov-to-mp4/ /mov-to-mp4 301
+/compress-video/ /compress-video 301
+/mp4-to-mp3/ /mp4-to-mp3 301
+/trim-video/ /trim-video 301
+/merge-video/ /merge-video 301
+/mov-to-mp3/ /mov-to-mp3 301
+/repeat-video/ /repeat-video 301
+
+# Alternative competitor landing page trailing slash redirects
+/alternative/ilovepdf/ /alternative/ilovepdf 301
+/alternative/smallpdf/ /alternative/smallpdf 301
+/alternative/camscanner/ /alternative/camscanner 301
+
+# 3. Security Shields & Scanner Blocking (403 Forbidden with valid destination)
+# Prevents routing engine errors and 5xx failures by specifying a valid destination route
+/wp-admin/* /404 403
+/.env /404 403
+/.docker/* /404 403
+/s3/* /404 403
+/.git/* /404 403
+
+# 4. Single-Page Application (SPA) Routing Catch-All
+# Rewrites unmatched non-prerendered client routes back to the main shell (must be placed last)
+/* /index.html 200
