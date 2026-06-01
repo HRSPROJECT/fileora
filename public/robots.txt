@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# Block hidden files, system configurations, and dynamic assets
+Disallow: /.*
+Disallow: /_headers
+Disallow: /_redirects
+Disallow: /verify_build.js
+
+# Explicitly link your clean sitemap path
 Sitemap: https://fileora.tech/sitemap.xml
