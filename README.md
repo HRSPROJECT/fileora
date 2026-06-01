@@ -4,7 +4,7 @@
   
   **Privacy-First, 100% Offline Client-Side Browser Utilities Suite**
   
-  [![Published Site](https://img.shields.io/badge/Live-https%3A%2F%2Ffileora.tech-059669?style=for-the-badge&logo=cloudflare&logoColor=white)](https://fileora.tech)
+  [![Published Site](https://img.shields.io/badge/Live-https%3A%2F%2Ffileora.tech-059669?style=for-the-badge&logoColor=white)](https://fileora.tech)
   [![License: MIT](https://img.shields.io/badge/License-MIT-3B82F6?style=for-the-badge)](LICENSE)
   [![Open Source](https://img.shields.io/badge/Open_Source-%E2%9D%A4-EF4444?style=for-the-badge)](https://github.com/HRSPROJECT/image-compressor)
 
@@ -13,6 +13,13 @@
   </p>
 
 </div>
+
+---
+
+## 🌐 Website & About
+Fileora is live and fully accessible at: **[https://fileora.tech](https://fileora.tech)**
+
+Feel free to visit, explore all the client-side document/media tools, and run secure, offline, high-performance file modifications directly in your browser.
 
 ---
 
@@ -49,7 +56,7 @@ Fileora implements low-level scientific algebra and signal processing in client-
 ### A. Perspective Projection Warping (Gaussian Elimination)
 To align and flatten skewed document scanner camera photos, Fileora solves an 8x8 linear system of equations in real-time to compute the homography matrix $H$:
 
-$$\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = \begin{bmatrix} a_0 & a_1 & a_2 \\ a_3 & a_4 & a_5 \\ a_6 & a_7 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}$$
+$$\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = H \begin{bmatrix} x \\ y \\ 1 \end{bmatrix} = \begin{bmatrix} a_0 & a_1 & a_2 \\ a_3 & a_4 & a_5 \\ a_6 & a_7 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}$$
 
 It performs **Gaussian Elimination with partial pivoting** in client-side JS to solve for the 8 mapping coefficients, map target coordinates back to the source image, and warp the document snapshot cleanly.
 
@@ -57,7 +64,7 @@ It performs **Gaussian Elimination with partial pivoting** in client-side JS to 
 To eliminate page shadows and uneven camera lighting, the Scanner uses the **Bradley-Roth adaptive thresholding algorithm** executed in $O(1)$ constant time per pixel using an **integral image** (Summed-Area Table). If a pixel is $12\%$ darker than its surrounding dynamic neighborhood window, it is mapped to text (black); otherwise, it is flattened to background (white).
 
 ### C. Origin Private File System (OPFS) & WASM Multithreading
-To prevent tab crashes and out-of-memory errors when processing massive video containers, Fileora pipes stream buffers into the browser's native **Origin Private File System (OPFS)**. It dynamically loadscompiled **FFmpeg WebAssembly** cores from unpkg CDN, mounts the OPFS files into virtual tracks, and utilizes isolated threads (`SharedArrayBuffer`) to transcode media at native performance.
+To prevent tab crashes and out-of-memory errors when processing massive video containers, Fileora pipes stream buffers into the browser's native **Origin Private File System (OPFS)**. It dynamically loads compiled **FFmpeg WebAssembly** cores from unpkg CDN, mounts the OPFS files into virtual tracks, and utilizes isolated threads (`SharedArrayBuffer`) to transcode media at native performance.
 
 ---
 
@@ -99,18 +106,7 @@ npm run build
 ### What this build script does:
 1. **SPA Bundler**: Compiles the React Router assets into the `dist/` directory.
 2. **Puppeteer Crawl (`prerender.js`)**: Starts a local Express server on port `54321` and spawns a headless Puppeteer browser to crawl all 35+ routes, saving them as pre-rendered static HTML files (e.g. `compress.html`, `scanner.html`). This ensures search bots (like Googlebot) read fully populated markup instantly.
-3. **Automated SEO/W3C Audit (`verify_build.js`)**: Scans all compiled static HTML files for skipped heading level outlines (accessibility check), missing Twitter/OpenGraph metadata tags, and exits with non-zero codes on critical failures to block buggy deployments.
-
----
-
-## ☁️ Cloudflare Pages Edge Deployment
-
-Fileora is fully optimized for **Cloudflare Pages** hosting using server-side redirects and headers:
-
-* **Trailing Slash Sanitizing (`_redirects`)**: Edge redirects (`301`) all trailing slash URLs to clean canonical formats (e.g. `/compress/` $\rightarrow$ `/compress`) to prevent duplicate indexing.
-* **Security Shielding**: Edge-level blocks return `403 Forbidden` for malicious crawlers and server directories (like `/wp-admin/` or `/.git/`).
-* **Canonical Headers (`_headers`)**: Serves absolute canonical response headers at the HTTP protocol level (`Link: <...>; rel="canonical"`) for every single route.
-* **COOP/COEP Policies**: Serves `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` headers, which isolates the page context and safely unlocks `SharedArrayBuffer` for hardware-accelerated multithreaded video processing.
+3. **Automated SEO/W3C Audit (`verify_build.js`)**: Scans all compiled static HTML files for skipped heading level outlines (accessibility check), missing Twitter/OpenGraph metadata tags, and exits with non-zero codes on critical failures to protect code quality.
 
 ---
 
