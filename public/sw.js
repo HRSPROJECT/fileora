@@ -16,7 +16,6 @@ const ASSETS_TO_CACHE = [
   '/sitemap.xml',
   
   // External WebAssembly & script dependencies
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
   'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs',
   'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
   'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
@@ -68,8 +67,18 @@ self.addEventListener('fetch', (event) => {
   // Skip chrome-extension:// schemes or dev server socket requests
   if (!event.request.url.startsWith('http') && !event.request.url.startsWith('https')) return;
 
-  // Bypass caching for PeerJS signaling server and third-party analytics API requests
-  if (event.request.url.includes('peerjs.com') || event.request.url.includes('google-analytics.com')) {
+  // Bypass caching for PeerJS signaling server, third-party analytics, tag managers, and external CDN resources
+  // These external origins should not be intercepted by the SW fetch handler to avoid CSP violations
+  const bypassDomains = [
+    'peerjs.com',
+    'google-analytics.com',
+    'analytics.google.com',
+    'googletagmanager.com',
+    'cloudflareinsights.com',
+    'fonts.googleapis.com',
+    'fonts.gstatic.com'
+  ];
+  if (bypassDomains.some(domain => event.request.url.includes(domain))) {
     return;
   }
 
