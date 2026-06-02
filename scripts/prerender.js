@@ -187,9 +187,8 @@ function generateServiceWorker() {
   // Read sw.js template
   let swContent = fs.readFileSync(SW_TEMPLATE_PATH, 'utf-8');
   
-  // CDN assets that must be pre-cached
+  // CDN assets that must be pre-cached (excluding fonts/analytics which the SW bypasses)
   const cdnAssets = [
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
     'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs',
     'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
     'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
