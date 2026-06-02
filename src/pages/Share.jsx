@@ -20,6 +20,7 @@ const loadQrGenerator = () => {
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js';
     script.async = true;
+    script.crossOrigin = 'anonymous';
     script.onload = () => resolve(window.qrcode);
     script.onerror = reject;
     document.head.appendChild(script);
@@ -32,6 +33,7 @@ const loadQrScanner = () => {
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
     script.async = true;
+    script.crossOrigin = 'anonymous';
     script.onload = () => resolve(window.jsQR);
     script.onerror = reject;
     document.head.appendChild(script);
@@ -60,10 +62,17 @@ export default function Share() {
   const [pinCode, setPinCode] = useState('')
   const [peerInstance, setPeerInstance] = useState(null)
   const [connectionState, setConnectionState] = useState('idle') // idle, registering, waiting, connecting, transferring, completed, error
+  const connectionStateRef = useRef('idle') // Mirror of connectionState for use in closures
   const [senderProgress, setSenderProgress] = useState(0)
   const [senderSpeed, setSenderSpeed] = useState('')
   const [isBrokerConnected, setIsBrokerConnected] = useState(false)
   const activeConnRef = useRef(null)
+  
+  // Helper to update both state and ref atomically (avoids stale closure bugs)
+  const updateConnectionState = (newState) => {
+    connectionStateRef.current = newState;
+    setConnectionState(newState);
+  };
   
   // P2P states (Receiver)
   const [targetPeerId, setTargetPeerId] = useState('')
@@ -164,7 +173,7 @@ export default function Share() {
       const file = e.dataTransfer.files[0];
       setSelectedFile(file);
       cleanupConnections();
-      setConnectionState('idle');
+      updateConnectionState('idle');
       setSenderProgress(0);
     }
   };
@@ -173,7 +182,7 @@ export default function Share() {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
       cleanupConnections();
-      setConnectionState('idle');
+      updateConnectionState('idle');
       setSenderProgress(0);
     }
   };
@@ -207,7 +216,7 @@ export default function Share() {
   const startCloudShare = async () => {
     if (!selectedFile) return;
     
-    setConnectionState('registering');
+    updateConnectionState('registering');
     setErrorMessage('');
     
     try {
@@ -219,7 +228,7 @@ export default function Share() {
       
       setPeerId(generatedPeerId);
       setPinCode(generatedPin);
-      setConnectionState('waiting'); // Transition instantly for zero-delay UX!
+      updateConnectionState('waiting'); // Transition instantly for zero-delay UX!
       setIsBrokerConnected(false);
       
       const peer = new PeerClass(generatedPeerId, {
@@ -244,7 +253,7 @@ export default function Share() {
 
         const handleConnOpen = () => {
           activeConnRef.current = conn;
-          setConnectionState('connecting');
+          updateConnectionState('connecting');
         };
 
         if (conn.open) {
@@ -258,7 +267,7 @@ export default function Share() {
             if (data.pin === generatedPin) {
               // PIN Verified! Notify receiver and start stream
               conn.send({ type: 'PAIRING_ACCEPTED', fileName: selectedFile.name, fileSize: selectedFile.size, fileType: selectedFile.type });
-              setConnectionState('transferring');
+              updateConnectionState('transferring');
               
               let startTime = Date.now();
               sendFileChunks(selectedFile, conn, (offset, total) => {
@@ -277,15 +286,15 @@ export default function Share() {
               conn.send({ type: 'PAIRING_REJECTED', reason: 'Invalid secure 4-digit PIN.' });
               conn.close();
               activeConnRef.current = null;
-              setConnectionState('waiting');
+              updateConnectionState('waiting');
             }
           }
         });
         
         conn.on('close', () => {
           activeConnRef.current = null;
-          if (connectionState !== 'completed') {
-            setConnectionState('waiting');
+          if (connectionStateRef.current !== 'completed') {
+            updateConnectionState('waiting');
           }
         });
       });
@@ -293,13 +302,13 @@ export default function Share() {
       peer.on('error', (err) => {
         console.error('PeerJS error:', err);
         setErrorMessage('Failed to connect to signaling broker. Try Offline Mode.');
-        setConnectionState('error');
+        updateConnectionState('error');
       });
       
     } catch (err) {
       console.error(err);
       setErrorMessage('P2P signaling error. Please try again.');
-      setConnectionState('error');
+      updateConnectionState('error');
     }
   };
 
@@ -312,7 +321,7 @@ export default function Share() {
       return;
     }
     
-    setConnectionState('connecting');
+    updateConnectionState('connecting');
     setErrorMessage('');
     setReceivedDataChunks([]);
     setReceivedSize(0);
@@ -347,11 +356,11 @@ export default function Share() {
         conn.on('data', (data) => {
           if (data && data.type === 'PAIRING_ACCEPTED') {
             fileMeta = data;
-            setConnectionState('transferring');
+            updateConnectionState('transferring');
             startTime = Date.now();
           } else if (data && data.type === 'PAIRING_REJECTED') {
             setErrorMessage(data.reason);
-            setConnectionState('error');
+            updateConnectionState('error');
             conn.close();
           } else if (
             (data && typeof data === 'string' && data.includes('TRANSFER_COMPLETE')) ||
@@ -367,7 +376,7 @@ export default function Share() {
               url: fileUrl
             });
             
-            setConnectionState('completed');
+            updateConnectionState('completed');
             
             // Auto download file
             const a = document.createElement('a');
@@ -382,7 +391,7 @@ export default function Share() {
           } else {
             // Binary chunk received
             incomingChunks.push(data);
-            bytesReceived += data.byteLength;
+            bytesReceived += (data.byteLength || data.size || data.length || 0);
             
             if (fileMeta) {
               const progress = Math.min(Math.round((bytesReceived / fileMeta.fileSize) * 100), 100);
@@ -398,29 +407,29 @@ export default function Share() {
         });
         
         conn.on('close', () => {
-          if (connectionState !== 'completed') {
+          if (connectionStateRef.current !== 'completed') {
             setErrorMessage('Connection closed by sender.');
-            setConnectionState('error');
+            updateConnectionState('error');
           }
         });
         
         conn.on('error', (err) => {
           console.error(err);
           setErrorMessage('Handshake connection failed. Check ID and PIN.');
-          setConnectionState('error');
+          updateConnectionState('error');
         });
       });
       
       peer.on('error', (err) => {
         console.error(err);
         setErrorMessage('Failed to connect to signaling cloud.');
-        setConnectionState('error');
+        updateConnectionState('error');
       });
       
     } catch (err) {
       console.error(err);
       setErrorMessage('P2P loading failed.');
-      setConnectionState('error');
+      updateConnectionState('error');
     }
   };
 
@@ -433,7 +442,7 @@ export default function Share() {
 
   const startOfflineSender = async () => {
     if (!selectedFile) return;
-    setConnectionState('connecting');
+    updateConnectionState('connecting');
     setErrorMessage('');
     setOfflineStep(1);
     
@@ -451,7 +460,7 @@ export default function Share() {
       dataChannelRef.current = dc;
       
       dc.onopen = () => {
-        setConnectionState('transferring');
+        updateConnectionState('transferring');
         let startTime = Date.now();
         sendFileChunks(selectedFile, dc, (offset, total) => {
           const progress = Math.min(Math.round((offset / total) * 100), 100);
@@ -466,8 +475,8 @@ export default function Share() {
       };
       
       dc.onclose = () => {
-        if (connectionState !== 'completed') {
-          setConnectionState('idle');
+        if (connectionStateRef.current !== 'completed') {
+          updateConnectionState('idle');
         }
       };
 
@@ -520,7 +529,7 @@ export default function Share() {
     
     try {
       stopScanning();
-      setConnectionState('connecting');
+      updateConnectionState('connecting');
       
       const offerData = await decompressSDP(scannedOfferBase64);
       
@@ -556,7 +565,7 @@ export default function Share() {
               size: offerData.fileSize,
               url: fileUrl
             });
-            setConnectionState('completed');
+            updateConnectionState('completed');
             
             // Auto download file
             const a = document.createElement('a');
@@ -583,7 +592,7 @@ export default function Share() {
         };
         
         dc.onopen = () => {
-          setConnectionState('transferring');
+          updateConnectionState('transferring');
           startTime = Date.now();
         };
       };
@@ -630,7 +639,7 @@ export default function Share() {
       console.error(err);
       setErrorMessage('Failed to decode Connection Offer. Ensure it is correct QR.');
       isProcessingOfferRef.current = false;
-      setConnectionState('error');
+      updateConnectionState('error');
     }
   };
 
@@ -799,7 +808,7 @@ export default function Share() {
                         </div>
                       </div>
                       <button 
-                        onClick={() => { setSelectedFile(null); cleanupConnections(); setConnectionState('idle'); }}
+                        onClick={() => { setSelectedFile(null); cleanupConnections(); updateConnectionState('idle'); }}
                         style={{ border: 'none', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
                       >
                         <X size={16} />
@@ -1005,7 +1014,7 @@ export default function Share() {
                           File has been securely chunked, piped, and reconstructed on the destination browser sandbox.
                         </p>
                         <button 
-                          onClick={() => { setSelectedFile(null); cleanupConnections(); setConnectionState('idle'); setSenderProgress(0); }} 
+                          onClick={() => { setSelectedFile(null); cleanupConnections(); updateConnectionState('idle'); setSenderProgress(0); }} 
                           className="btn-premium btn-premium-secondary"
                           style={{ padding: '10px 24px', borderRadius: '8px' }}
                         >
@@ -1212,7 +1221,7 @@ export default function Share() {
                         <span>Download Local Copy</span>
                       </a>
                       <button 
-                        onClick={() => { setReceivedFile(null); cleanupConnections(); setConnectionState('idle'); setReceiverProgress(0); }} 
+                        onClick={() => { setReceivedFile(null); cleanupConnections(); updateConnectionState('idle'); setReceiverProgress(0); }} 
                         className="btn-premium btn-premium-secondary"
                         style={{ padding: '10px 24px', borderRadius: '8px' }}
                       >
@@ -1229,7 +1238,7 @@ export default function Share() {
             {connectionState === 'error' && (
               <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
                 <button 
-                  onClick={() => { cleanupConnections(); setConnectionState('idle'); setSenderProgress(0); setReceiverProgress(0); }} 
+                  onClick={() => { cleanupConnections(); updateConnectionState('idle'); setSenderProgress(0); setReceiverProgress(0); }} 
                   className="btn-premium btn-premium-primary"
                   style={{ padding: '10px 24px', borderRadius: '8px' }}
                 >

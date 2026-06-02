@@ -13,7 +13,7 @@ const loadQrGenerator = () => {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js';
-    script.async = true;
+    script.crossOrigin = 'anonymous';
     script.onload = () => resolve(window.qrcode);
     script.onerror = reject;
     document.head.appendChild(script);
@@ -29,6 +29,7 @@ export default function SecureShareButton({ file, fileName }) {
   const [pinCode, setPinCode] = useState('')
   const [peerInstance, setPeerInstance] = useState(null)
   const [connectionState, setConnectionState] = useState('idle') // idle, registering, waiting, transferring, completed, error
+  const connectionStateRef = useRef('idle')
   const [transferProgress, setTransferProgress] = useState(0)
   const [transferSpeed, setTransferSpeed] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -36,6 +37,11 @@ export default function SecureShareButton({ file, fileName }) {
   
   const [copySuccess, setCopySuccess] = useState(false)
   const activeConnRef = useRef(null)
+  
+  const updateConnectionState = (newState) => {
+    connectionStateRef.current = newState;
+    setConnectionState(newState);
+  };
 
   // Initialize script loaders on mount
   useEffect(() => {
@@ -77,14 +83,14 @@ export default function SecureShareButton({ file, fileName }) {
   };
 
   const startP2PChannel = async () => {
-    setConnectionState('registering');
+    updateConnectionState('registering');
     setErrorMessage('');
     
     // Check for secure context / WebRTC support
     const RTCPeerConnectionClass = window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
     if (!RTCPeerConnectionClass) {
       setErrorMessage('Direct sharing requires a Secure Context (HTTPS or localhost). Please ensure your connection is secure.');
-      setConnectionState('error');
+      updateConnectionState('error');
       return;
     }
     
@@ -96,7 +102,7 @@ export default function SecureShareButton({ file, fileName }) {
       
       setPeerId(generatedPeerId);
       setPinCode(generatedPin);
-      setConnectionState('waiting'); // Transition instantly for zero-delay UX!
+      updateConnectionState('waiting'); // Transition instantly for zero-delay UX!
       setIsBrokerConnected(false);
       
       const peer = new PeerClass(generatedPeerId, {
@@ -138,7 +144,7 @@ export default function SecureShareButton({ file, fileName }) {
                 fileSize: file.size, 
                 fileType: file.type || 'application/octet-stream' 
               });
-              setConnectionState('transferring');
+              updateConnectionState('transferring');
               
               let startTime = Date.now();
               sendFileChunks(file, conn, (offset, total) => {
@@ -156,15 +162,15 @@ export default function SecureShareButton({ file, fileName }) {
               conn.send({ type: 'PAIRING_REJECTED', reason: 'Invalid secure 4-digit PIN.' });
               conn.close();
               activeConnRef.current = null;
-              setConnectionState('waiting');
+              updateConnectionState('waiting');
             }
           }
         });
         
         conn.on('close', () => {
           activeConnRef.current = null;
-          if (connectionState !== 'completed') {
-            setConnectionState('waiting');
+          if (connectionStateRef.current !== 'completed') {
+            updateConnectionState('waiting');
           }
         });
       });
@@ -172,13 +178,13 @@ export default function SecureShareButton({ file, fileName }) {
       peer.on('error', (err) => {
         console.error('PeerJS inside tool button error:', err);
         setErrorMessage('Failed to connect to signaling broker. Try again.');
-        setConnectionState('error');
+        updateConnectionState('error');
       });
       
     } catch (err) {
       console.error(err);
       setErrorMessage('P2P secure connection failed. Try again.');
-      setConnectionState('error');
+      updateConnectionState('error');
     }
   };
 

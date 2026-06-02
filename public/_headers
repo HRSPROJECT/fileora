@@ -5,7 +5,7 @@
 # 1. Global Security and Content Security Policy (CSP) Rules
 /*
   Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Embedder-Policy: credentialless
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
@@ -17,12 +17,6 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# 2b. Relax COEP for Share page so PeerJS can load from unpkg and connect to 0.peerjs.com
-# The share page does not use SharedArrayBuffer/WASM, so require-corp is not needed
-/share
-  Cross-Origin-Embedder-Policy: credentialless
-/share.html
-  Cross-Origin-Embedder-Policy: credentialless
 
 # 3. Server-Side Robots Directives for Dead Pages
 /404

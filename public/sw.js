@@ -3,7 +3,7 @@
  * Fully offline-first caching supporting multi-gigabyte client-side video/PDF operations.
  */
 
-const CACHE_NAME = 'fileora-cache-v3';
+const CACHE_NAME = 'fileora-cache-v4';
 
 // Core application and external dependency assets to pre-cache on install
 const ASSETS_TO_CACHE = [

@@ -17,6 +17,7 @@ export const loadPeerJS = async () => {
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
     script.async = true;
+    script.crossOrigin = 'anonymous';
     script.onload = () => {
       if (window.Peer) {
         resolve(window.Peer);
@@ -24,7 +25,10 @@ export const loadPeerJS = async () => {
         reject(new Error('PeerJS not found on window object after load.'));
       }
     };
-    script.onerror = (err) => reject(err);
+    script.onerror = (err) => {
+      console.error('Failed to load PeerJS script:', err);
+      reject(new Error('Failed to load PeerJS library. Check network and COEP/CSP headers.'));
+    };
     document.head.appendChild(script);
   });
 };
@@ -87,16 +91,42 @@ export const decompressSDP = async (compressedBase64) => {
 export const CHUNK_SIZE = 16384; // 16KB WebRTC packet limit (safe for iOS/Android/Chrome)
 
 /**
- * Sends a file over a WebRTC Data Channel with progressive progress logging
+ * Sends a file over a WebRTC Data Channel with progressive progress logging.
+ * Supports both PeerJS DataConnection (online) and native RTCDataChannel (offline).
  */
 export const sendFileChunks = async (file, dataChannel, onProgress) => {
   const fileReader = new FileReader();
   let offset = 0;
   
+  // Detect if this is a PeerJS DataConnection or native RTCDataChannel
+  const isPeerJS = typeof dataChannel.readyState === 'undefined' || typeof dataChannel.readyState !== 'string';
+  
+  const isChannelOpen = () => {
+    if (isPeerJS) {
+      return dataChannel.open === true;
+    }
+    return dataChannel.readyState === 'open';
+  };
+  
+  const getBufferedAmount = () => {
+    if (!isPeerJS && dataChannel.bufferedAmount !== undefined) {
+      return dataChannel.bufferedAmount;
+    }
+    // PeerJS DataConnection: try to access underlying data channel
+    try {
+      if (dataChannel._dc && dataChannel._dc.bufferedAmount !== undefined) {
+        return dataChannel._dc.bufferedAmount;
+      }
+      if (dataChannel.dataChannel && dataChannel.dataChannel.bufferedAmount !== undefined) {
+        return dataChannel.dataChannel.bufferedAmount;
+      }
+    } catch (e) {}
+    return 0;
+  };
+
   const sendNextChunk = () => {
-    const isOpen = dataChannel.readyState === 'open' || dataChannel.open === true;
-    if (!isOpen) {
-      console.warn('Data channel closed while sending chunks!');
+    if (!isChannelOpen()) {
+      console.warn('Data channel closed while sending chunks at offset:', offset);
       return;
     }
 
@@ -108,26 +138,37 @@ export const sendFileChunks = async (file, dataChannel, onProgress) => {
     const buffer = e.target.result;
     
     // Check bufferedAmount to avoid overwhelming the WebRTC socket buffer
-    const buffered = dataChannel.bufferedAmount !== undefined 
-      ? dataChannel.bufferedAmount 
-      : (dataChannel.dataChannel ? dataChannel.dataChannel.bufferedAmount : 0);
+    const buffered = getBufferedAmount();
       
     if (buffered > 8 * 1024 * 1024) { // 8MB safety threshold
       setTimeout(() => fileReader.onload(e), 100);
       return;
     }
 
-    dataChannel.send(buffer);
+    try {
+      dataChannel.send(buffer);
+    } catch (err) {
+      console.error('Failed to send chunk at offset:', offset, err);
+      return;
+    }
+    
     offset += buffer.byteLength;
-
     onProgress(offset, file.size);
 
     if (offset < file.size) {
       sendNextChunk();
     } else {
       // Send a complete signal string to tell receiver transfer is complete
-      dataChannel.send(JSON.stringify({ type: 'TRANSFER_COMPLETE' }));
+      try {
+        dataChannel.send(JSON.stringify({ type: 'TRANSFER_COMPLETE' }));
+      } catch (err) {
+        console.error('Failed to send TRANSFER_COMPLETE signal:', err);
+      }
     }
+  };
+
+  fileReader.onerror = (err) => {
+    console.error('FileReader error while reading chunk at offset:', offset, err);
   };
 
   // Start sending
