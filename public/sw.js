@@ -137,6 +137,10 @@ self.addEventListener('fetch', (event) => {
               return routeResponse || caches.match('/index.html');
             });
           }
+
+          // Re-throw the error so that the promise rejects cleanly, letting the browser handle it as a normal fetch error
+          // instead of resolving to 'undefined' and throwing "Failed to convert value to 'Response'"
+          throw err;
         });
     })
   );
