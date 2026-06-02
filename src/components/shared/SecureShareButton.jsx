@@ -109,7 +109,14 @@ export default function SecureShareButton({ file, fileName }) {
         host: '0.peerjs.com',
         secure: true,
         port: 443,
-        debug: 1
+        debug: 2,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' }
+          ]
+        }
       });
       
       setPeerInstance(peer);
@@ -135,8 +142,14 @@ export default function SecureShareButton({ file, fileName }) {
         }
         
         conn.on('data', (data) => {
-          if (data && data.type === 'PAIRING_REQUEST') {
-            if (data.pin === generatedPin) {
+          // Handle both object and string formats
+          let parsed = data;
+          if (typeof data === 'string') {
+            try { parsed = JSON.parse(data); } catch (e) { parsed = data; }
+          }
+          
+          if (parsed && parsed.type === 'PAIRING_REQUEST') {
+            if (parsed.pin === generatedPin) {
               // PIN Verified! Notify receiver and start stream
               conn.send({ 
                 type: 'PAIRING_ACCEPTED', 

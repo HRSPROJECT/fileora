@@ -53,6 +53,7 @@ export default function Share() {
   // File states
   const [selectedFile, setSelectedFile] = useState(null)
   const fileInputRef = useRef(null)
+  const selectedFileRef = useRef(null) // Ref mirror to avoid stale closure
   
   // QR generation/scanner scripts status
   const [scriptsLoaded, setScriptsLoaded] = useState(false)
@@ -172,6 +173,7 @@ export default function Share() {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       setSelectedFile(file);
+      selectedFileRef.current = file;
       cleanupConnections();
       updateConnectionState('idle');
       setSenderProgress(0);
@@ -181,6 +183,7 @@ export default function Share() {
   const handleFileSelect = (e) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
+      selectedFileRef.current = e.target.files[0];
       cleanupConnections();
       updateConnectionState('idle');
       setSenderProgress(0);
@@ -235,16 +238,25 @@ export default function Share() {
         host: '0.peerjs.com',
         secure: true,
         port: 443,
-        debug: 1
+        debug: 2,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' }
+          ]
+        }
       });
       
       setPeerInstance(peer);
       
-      peer.on('open', () => {
+      peer.on('open', (id) => {
+        console.log('[Sender] Registered on signaling server with ID:', id);
         setIsBrokerConnected(true);
       });
       
       peer.on('connection', (conn) => {
+        console.log('[Sender] Incoming connection from receiver');
         // Only accept one connection at a time
         if (activeConnRef.current) {
           conn.close();
@@ -252,6 +264,7 @@ export default function Share() {
         }
 
         const handleConnOpen = () => {
+          console.log('[Sender] Data channel open with receiver');
           activeConnRef.current = conn;
           updateConnectionState('connecting');
         };
@@ -263,16 +276,30 @@ export default function Share() {
         }
         
         conn.on('data', (data) => {
-          if (data && data.type === 'PAIRING_REQUEST') {
-            if (data.pin === generatedPin) {
+          console.log('[Sender] Received data:', typeof data, data?.type || '(binary)');
+          
+          // Handle both object and string formats for PAIRING_REQUEST
+          let parsed = data;
+          if (typeof data === 'string') {
+            try { parsed = JSON.parse(data); } catch (e) { parsed = data; }
+          }
+          
+          if (parsed && parsed.type === 'PAIRING_REQUEST') {
+            if (parsed.pin === generatedPin) {
+              const file = selectedFileRef.current || selectedFile;
+              console.log('[Sender] PIN verified! Starting transfer of:', file?.name);
               // PIN Verified! Notify receiver and start stream
-              conn.send({ type: 'PAIRING_ACCEPTED', fileName: selectedFile.name, fileSize: selectedFile.size, fileType: selectedFile.type });
+              conn.send({ type: 'PAIRING_ACCEPTED', fileName: file.name, fileSize: file.size, fileType: file.type });
               updateConnectionState('transferring');
               
               let startTime = Date.now();
-              sendFileChunks(selectedFile, conn, (offset, total) => {
+              sendFileChunks(file, conn, (offset, total) => {
                 const progress = Math.min(Math.round((offset / total) * 100), 100);
                 setSenderProgress(progress);
+                
+                if (progress === 100) {
+                  updateConnectionState('completed');
+                }
                 
                 // Calculate speed
                 const elapsed = (Date.now() - startTime) / 1000;
@@ -282,6 +309,7 @@ export default function Share() {
                 }
               });
             } else {
+              console.log('[Sender] PIN rejected');
               // Invalid PIN
               conn.send({ type: 'PAIRING_REJECTED', reason: 'Invalid secure 4-digit PIN.' });
               conn.close();
@@ -292,10 +320,15 @@ export default function Share() {
         });
         
         conn.on('close', () => {
+          console.log('[Sender] Connection closed');
           activeConnRef.current = null;
           if (connectionStateRef.current !== 'completed') {
             updateConnectionState('waiting');
           }
+        });
+        
+        conn.on('error', (err) => {
+          console.error('[Sender] Connection error:', err);
         });
       });
       
@@ -334,16 +367,25 @@ export default function Share() {
         host: '0.peerjs.com',
         secure: true,
         port: 443,
-        debug: 1
+        debug: 2,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' }
+          ]
+        }
       });
       
       setPeerInstance(peer);
       
-      peer.on('open', () => {
-        const conn = peer.connect(targetPeerId);
+      peer.on('open', (id) => {
+        console.log('[Receiver] Registered on signaling server with ID:', id);
+        const conn = peer.connect(targetPeerId, { reliable: true });
         activeConnRef.current = conn;
         
         conn.on('open', () => {
+          console.log('[Receiver] Data channel open! Sending pairing request...');
           // Send PIN challenge request
           conn.send({ type: 'PAIRING_REQUEST', pin: enteredPin });
         });
@@ -354,25 +396,35 @@ export default function Share() {
         let startTime = Date.now();
 
         conn.on('data', (data) => {
-          if (data && data.type === 'PAIRING_ACCEPTED') {
-            fileMeta = data;
+          console.log('[Receiver] Received data:', typeof data, data?.type || (data?.byteLength ? `binary ${data.byteLength}B` : ''));
+          
+          // Handle both object and string formats
+          let parsed = data;
+          if (typeof data === 'string') {
+            try { parsed = JSON.parse(data); } catch (e) { parsed = data; }
+          }
+          
+          if (parsed && parsed.type === 'PAIRING_ACCEPTED') {
+            console.log('[Receiver] Pairing accepted! File:', parsed.fileName, 'Size:', parsed.fileSize);
+            fileMeta = parsed;
             updateConnectionState('transferring');
             startTime = Date.now();
-          } else if (data && data.type === 'PAIRING_REJECTED') {
-            setErrorMessage(data.reason);
+          } else if (parsed && parsed.type === 'PAIRING_REJECTED') {
+            setErrorMessage(parsed.reason);
             updateConnectionState('error');
             conn.close();
           } else if (
-            (data && typeof data === 'string' && data.includes('TRANSFER_COMPLETE')) ||
-            (data && data.type === 'TRANSFER_COMPLETE')
+            (typeof parsed === 'string' && parsed.includes('TRANSFER_COMPLETE')) ||
+            (parsed && parsed.type === 'TRANSFER_COMPLETE')
           ) {
+            console.log('[Receiver] Transfer complete! Reassembling', incomingChunks.length, 'chunks,', bytesReceived, 'bytes');
             // Reassemble the file
-            const blob = new Blob(incomingChunks, { type: fileMeta.fileType });
+            const blob = new Blob(incomingChunks, { type: fileMeta?.fileType || 'application/octet-stream' });
             const fileUrl = URL.createObjectURL(blob);
             
             setReceivedFile({
-              name: fileMeta.fileName,
-              size: fileMeta.fileSize,
+              name: fileMeta?.fileName || 'received-file',
+              size: fileMeta?.fileSize || bytesReceived,
               url: fileUrl
             });
             
@@ -381,7 +433,7 @@ export default function Share() {
             // Auto download file
             const a = document.createElement('a');
             a.href = fileUrl;
-            a.download = fileMeta.fileName;
+            a.download = fileMeta?.fileName || 'received-file';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -407,6 +459,7 @@ export default function Share() {
         });
         
         conn.on('close', () => {
+          console.log('[Receiver] Connection closed');
           if (connectionStateRef.current !== 'completed') {
             setErrorMessage('Connection closed by sender.');
             updateConnectionState('error');
@@ -414,7 +467,7 @@ export default function Share() {
         });
         
         conn.on('error', (err) => {
-          console.error(err);
+          console.error('[Receiver] Connection error:', err);
           setErrorMessage('Handshake connection failed. Check ID and PIN.');
           updateConnectionState('error');
         });
@@ -808,7 +861,7 @@ export default function Share() {
                         </div>
                       </div>
                       <button 
-                        onClick={() => { setSelectedFile(null); cleanupConnections(); updateConnectionState('idle'); }}
+                        onClick={() => { setSelectedFile(null); selectedFileRef.current = null; cleanupConnections(); updateConnectionState('idle'); }}
                         style={{ border: 'none', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
                       >
                         <X size={16} />
@@ -1014,7 +1067,7 @@ export default function Share() {
                           File has been securely chunked, piped, and reconstructed on the destination browser sandbox.
                         </p>
                         <button 
-                          onClick={() => { setSelectedFile(null); cleanupConnections(); updateConnectionState('idle'); setSenderProgress(0); }} 
+                          onClick={() => { setSelectedFile(null); selectedFileRef.current = null; cleanupConnections(); updateConnectionState('idle'); setSenderProgress(0); }} 
                           className="btn-premium btn-premium-secondary"
                           style={{ padding: '10px 24px', borderRadius: '8px' }}
                         >
