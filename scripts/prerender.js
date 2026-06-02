@@ -115,9 +115,99 @@ async function prerender() {
     if (fs.existsSync(TEMPLATE_PATH)) {
       fs.unlinkSync(TEMPLATE_PATH);
     }
+    
+    // 3. Dynamically compile production asset pre-cache list and write to dist/sw.js
+    try {
+      generateServiceWorker();
+    } catch (swErr) {
+      console.error('❌ Failed to generate production Service Worker pre-cache list:', swErr);
+    }
+
     console.log('🎉 Prerendering completed successfully!');
     process.exit(0);
   });
+}
+
+function generateServiceWorker() {
+  console.log('Generating production Service Worker with dynamic pre-cache manifest...');
+  
+  const SW_TEMPLATE_PATH = path.join(__dirname, '../public/sw.js');
+  const SW_DIST_PATH = path.join(DIST_DIR, 'sw.js');
+  
+  if (!fs.existsSync(SW_TEMPLATE_PATH)) {
+    console.error('Service Worker template not found in public/sw.js!');
+    return;
+  }
+  
+  // Recursively find all files in dist/
+  const getFilesRecursively = (dir) => {
+    let results = [];
+    const list = fs.readdirSync(dir);
+    list.forEach((file) => {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+      if (stat && stat.isDirectory()) {
+        results = results.concat(getFilesRecursively(filePath));
+      } else {
+        results.push(filePath);
+      }
+    });
+    return results;
+  };
+  
+  const allFiles = getFilesRecursively(DIST_DIR);
+  
+  // Map files to root-relative URLs and filter them
+  const assetsToCache = allFiles
+    .map(file => {
+      const relativePath = path.relative(DIST_DIR, file);
+      return '/' + relativePath.replace(/\\/g, '/');
+    })
+    .filter(url => {
+      // Exclude service worker itself, cloudflare config files, and standard system garbage files
+      const excludePatterns = [
+        /^\/sw\.js$/,
+        /^\/_headers$/,
+        /^\/_redirects$/,
+        /\.DS_Store$/,
+        /^\/fileora\.code-workspace$/,
+        /^\/4bc7f66f2d2d48e7b2fdb759fb2eb4f5\.txt$/
+      ];
+      return !excludePatterns.some(pattern => pattern.test(url));
+    });
+    
+  // Let's add the root path '/' to ensure the main route is pre-cached explicitly
+  if (!assetsToCache.includes('/')) {
+    assetsToCache.unshift('/');
+  }
+  
+  console.log(`Found ${assetsToCache.length} local production assets to pre-cache.`);
+  
+  // Read sw.js template
+  let swContent = fs.readFileSync(SW_TEMPLATE_PATH, 'utf-8');
+  
+  // CDN assets that must be pre-cached
+  const cdnAssets = [
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
+    'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs',
+    'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
+    'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+    'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm'
+  ];
+  
+  const fullAssetsList = [...assetsToCache, ...cdnAssets];
+  
+  // Replace the ASSETS_TO_CACHE array in the template
+  const assetsArrayString = JSON.stringify(fullAssetsList, null, 2);
+  const regex = /const ASSETS_TO_CACHE = \[\s*[\s\S]*?\];/;
+  
+  if (regex.test(swContent)) {
+    swContent = swContent.replace(regex, `const ASSETS_TO_CACHE = ${assetsArrayString};`);
+    fs.writeFileSync(SW_DIST_PATH, swContent);
+    console.log('✅ Service Worker pre-cache manifest injected successfully in dist/sw.js!');
+  } else {
+    console.error('Could not find ASSETS_TO_CACHE placeholder in sw.js template!');
+  }
 }
 
 prerender().catch(err => {
