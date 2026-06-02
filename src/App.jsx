@@ -30,6 +30,8 @@ const SignPdf = React.lazy(() => import('./pages/SignPdf'))
 const PdfToWord = React.lazy(() => import('./pages/PdfToWord'))
 const WordToPdf = React.lazy(() => import('./pages/WordToPdf'))
 const Scanner = React.lazy(() => import('./pages/Scanner'))
+const Share = React.lazy(() => import('./pages/Share'))
+
 
 // Lazily load high-performance video utilities
 const MovToMp4 = React.lazy(() => import('./pages/MovToMp4'))
@@ -96,6 +98,7 @@ export default function App() {
               <Route path="/pdf-to-word" element={<PdfToWord />} />
               <Route path="/word-to-pdf" element={<WordToPdf />} />
               <Route path="/scanner" element={<Scanner />} />
+              <Route path="/share" element={<Share />} />
               
               {/* Dynamic Offline Video Processing Routes */}
               <Route path="/mov-to-mp4" element={<MovToMp4 />} />

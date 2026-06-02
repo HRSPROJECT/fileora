@@ -35,6 +35,7 @@ const routes = [
   '/pdf-to-word',
   '/word-to-pdf',
   '/scanner',
+  '/share',
   '/mov-to-mp4',
   '/compress-video',
   '/mp4-to-mp3',
@@ -192,7 +193,10 @@ function generateServiceWorker() {
     'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs',
     'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
     'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
-    'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm'
+    'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm',
+    'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',
+    'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js',
+    'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js'
   ];
   
   const fullAssetsList = [...assetsToCache, ...cdnAssets];

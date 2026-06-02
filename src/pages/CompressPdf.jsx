@@ -8,6 +8,8 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { PDFDocument } from 'pdf-lib'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
+
 
 const faqs = [
   { q: 'How does the PDF Compressor work without uploading?', a: 'Everything runs directly in your browser. We load the PDF structure and optimize page streams using Javascript so your data remains completely private.' },
@@ -266,14 +268,22 @@ export default function CompressPdf() {
                 </div>
               )}
 
-              <button
-                className="btn btn-primary btn-gradient"
-                onClick={handleDownload}
-                disabled={processing || !compressedBlob}
-                style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
-              >
-                <Download size={18} /> Download Optimized PDF
-              </button>
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                <button
+                  className="btn btn-primary btn-gradient"
+                  onClick={handleDownload}
+                  disabled={processing || !compressedBlob}
+                  style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
+                >
+                  <Download size={18} /> Download Optimized PDF
+                </button>
+                {compressedBlob && (
+                  <SecureShareButton 
+                    file={compressedBlob} 
+                    fileName={`${file ? file.name.replace(/\.pdf$/i, '') : 'document'}-compressed-${targetSize}.pdf`} 
+                  />
+                )}
+              </div>
             </div>
           </section>
         )}

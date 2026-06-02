@@ -20,7 +20,10 @@ const ASSETS_TO_CACHE = [
   'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs',
   'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
   'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
-  'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm'
+  'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm',
+  'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',
+  'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js',
+  'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js'
 ];
 
 // 1. Install Event: Cache all core files and WASM engines
@@ -64,6 +67,28 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension:// schemes or dev server socket requests
   if (!event.request.url.startsWith('http') && !event.request.url.startsWith('https')) return;
+
+  // Bypass caching for PeerJS signaling server and third-party analytics API requests
+  if (event.request.url.includes('peerjs.com') || event.request.url.includes('google-analytics.com')) {
+    return;
+  }
+
+  // Bypass caching for Vite Dev Server assets to prevent stale code issues during development
+  const url = new URL(event.request.url);
+  if (
+    url.hostname === 'localhost' || 
+    url.hostname === '127.0.0.1' || 
+    url.hostname === '0.0.0.0'
+  ) {
+    if (
+      url.pathname.startsWith('/@') || 
+      url.pathname.includes('/node_modules/') || 
+      url.searchParams.has('t') || 
+      url.pathname.startsWith('/src/')
+    ) {
+      return; // Direct network bypass for HMR & Dev modules
+    }
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

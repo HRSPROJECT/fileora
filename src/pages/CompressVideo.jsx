@@ -7,6 +7,7 @@ import DropZone from '../components/shared/DropZone';
 import { saveToOPFS, getFromOPFS, clearOPFSSandbox } from '../utils/opfsHelper';
 import { compressVideo } from '../utils/videoEngine';
 import { formatBytes } from '../utils/imageUtils';
+import SecureShareButton from '../components/shared/SecureShareButton';
 
 export default function CompressVideo() {
   const [file, setFile] = useState(null);
@@ -16,6 +17,8 @@ export default function CompressVideo() {
   const [progressPercent, setProgressPercent] = useState(0);
   const [resultUrl, setResultUrl] = useState('');
   const [resultSize, setResultSize] = useState(0);
+  const [resultBlob, setResultBlob] = useState(null);
+
 
   // Settings
   const [quality, setQuality] = useState(60);
@@ -74,6 +77,7 @@ export default function CompressVideo() {
       const outFile = await getFromOPFS('output_compressed.mp4');
       const url = URL.createObjectURL(outFile);
       
+      setResultBlob(outFile);
       setResultUrl(url);
       setResultSize(outFile.size);
       setProcessing(false);
@@ -90,6 +94,7 @@ export default function CompressVideo() {
     }
     setFile(null);
     setResultUrl('');
+    setResultBlob(null);
     setError('');
     setProcessing(false);
     clearOPFSSandbox();
@@ -175,9 +180,17 @@ export default function CompressVideo() {
                   <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{file.name.replace(/\.[^/.]+$/, '')}-optimized.mp4</h3>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Size: {formatBytes(resultSize)}</p>
                 </div>
-                <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}-optimized.mp4`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
-                  <Download size={18} /> Download Compressed Video
-                </a>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}-optimized.mp4`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', textDecoration: 'none' }}>
+                    <Download size={18} /> Download Compressed Video
+                  </a>
+                  {resultBlob && (
+                    <SecureShareButton 
+                      file={resultBlob} 
+                      fileName={`${file.name.replace(/\.[^/.]+$/, '')}-optimized.mp4`} 
+                    />
+                  )}
+                </div>
               </div>
             </div>
           ) : file ? (
