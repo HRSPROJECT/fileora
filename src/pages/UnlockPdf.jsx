@@ -6,7 +6,7 @@ import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
-import { decryptPDF, isEncrypted } from '@pdfsmaller/pdf-decrypt'
+import { decryptPDF, isEncrypted } from '../utils/pdfDecryptPatch'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
