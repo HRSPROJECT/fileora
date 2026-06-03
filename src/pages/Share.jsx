@@ -514,9 +514,16 @@ export default function Share() {
             </div>
 
             {errorMessage && isOnline && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
-                <AlertCircle size={16} />
-                <span>{errorMessage}</span>
+              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <span>{errorMessage}</span>
+                </div>
+                {(errorMessage.toLowerCase().includes('signaling') || errorMessage.toLowerCase().includes('connect') || errorMessage.toLowerCase().includes('insecure') || errorMessage.toLowerCase().includes('fail')) && (
+                  <div style={{ fontSize: '12px', opacity: 0.85, paddingLeft: '24px', borderTop: '1px solid rgba(239, 68, 68, 0.15)', paddingTop: '6px', marginTop: '4px', textAlign: 'left', lineHeight: '1.4' }}>
+                    💡 <strong>Tip:</strong> Ad blockers can sometimes block secure WebRTC signaling servers. If this persists, try disabling your ad blocker for Fileora, or switch to <strong>Local Offline Mode</strong>.
+                  </div>
+                )}
               </div>
             )}
 
