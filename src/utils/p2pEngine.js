@@ -12,12 +12,17 @@ export const makePeerId = () =>
 export const makePin = () =>
   Math.floor(1000 + Math.random() * 9000).toString();
 
-/** Create a PeerJS instance using the default 0.peerjs.com cloud server */
+/** Create a PeerJS instance with environment variable overrides or fallback to 0.peerjs.com */
 export const createPeer = (peerId) => {
+  const host = import.meta.env.VITE_PEER_HOST || '0.peerjs.com';
+  const path = import.meta.env.VITE_PEER_PATH || '/';
+  const port = import.meta.env.VITE_PEER_PORT ? Number(import.meta.env.VITE_PEER_PORT) : 443;
+
   const opts = {
-    host: '0.peerjs.com',
+    host,
+    path,
     secure: true,
-    port: 443,
+    port,
     debug: 2,
     config: {
       iceServers: [
