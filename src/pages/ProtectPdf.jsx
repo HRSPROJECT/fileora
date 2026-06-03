@@ -7,6 +7,7 @@ import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { PDFDocument } from 'pdf-lib'
+import { encryptPDF } from '@pdfsmaller/pdf-encrypt'
 import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
@@ -69,25 +70,17 @@ export default function ProtectPdf() {
     try {
       await new Promise((r) => setTimeout(r, 600))
       const arrayBuffer = await file.arrayBuffer()
-      const pdfDoc = await PDFDocument.load(arrayBuffer)
+      const uint8 = new Uint8Array(arrayBuffer)
       
-      // Setup permission configurations for encryption
-      const encryptOptions = {
-        userPassword: userPassword || undefined,
+      const encryptedBytes = await encryptPDF(uint8, userPassword || '', {
         ownerPassword: ownerPassword || undefined,
-        permissions: {
-          printing: allowPrinting ? 'highResolution' : 'none',
-          copying: allowCopying,
-          modifying: allowModifying,
-          annotating: allowModifying,
-          fillingForms: allowModifying
-        }
-      }
+        allowPrinting: allowPrinting,
+        allowCopying: allowCopying,
+        allowModifying: allowModifying,
+        algorithm: 'AES-256'
+      })
 
-      pdfDoc.encrypt(encryptOptions)
-
-      const pdfBytes = await pdfDoc.save()
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+      const blob = new Blob([encryptedBytes], { type: 'application/pdf' })
       setDownloadableBlob(blob)
     } catch (err) {
       console.error(err)

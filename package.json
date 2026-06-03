@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@pdfsmaller/pdf-decrypt": "^1.0.1",
+    "@pdfsmaller/pdf-encrypt": "^1.0.2",
     "browser-image-compression": "^2.0.2",
     "docx": "^9.6.1",
     "docx-preview": "^0.3.7",
