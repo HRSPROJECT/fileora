@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Crop, ArrowLeft, Shield, Download, Sparkles, Sliders, Check, Grid, RefreshCw, ZoomIn, ZoomOut, Paintbrush } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useShare } from '../context/ShareContext'
+import { Crop, ArrowLeft, Shield, Download, Sparkles, Sliders, Check, Grid, RefreshCw, ZoomIn, ZoomOut, Paintbrush, Share2 } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
@@ -49,6 +51,9 @@ export default function PassportPhoto() {
   
   const [error, setError] = useState('')
   const [downloadUrl, setDownloadUrl] = useState('')
+  const navigate = useNavigate()
+  const { setFileToShare } = useShare()
+  const [processing, setProcessing] = useState(false)
   
   const canvasRef = useRef(null)
 
@@ -427,6 +432,167 @@ export default function PassportPhoto() {
     }
   }
 
+  const handleShare = async () => {
+    if (!image || !canvasRef.current) return
+    setProcessing(true)
+    try {
+      let finalBlob
+      let finalName
+      
+      if (layoutMode === 'single') {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        let aspect = TEMPLATES[templateKey].ratio
+        if (templateKey === 'custom') {
+          aspect = customWidth / customHeight
+        }
+        const targetW = 600
+        const targetH = targetW / aspect
+        canvas.width = targetW
+        canvas.height = targetH
+        
+        if (bgColor !== 'original' && selectedBgKeyColor) {
+          const buffer = document.createElement('canvas')
+          buffer.width = targetW
+          buffer.height = targetH
+          const bCtx = buffer.getContext('2d')
+          drawSourceImage(bCtx, targetW, targetH)
+          
+          const imgData = bCtx.getImageData(0, 0, targetW, targetH)
+          const data = imgData.data
+          const hexColor = hexToRgb(bgColor)
+          const kr = selectedBgKeyColor.r
+          const kg = selectedBgKeyColor.g
+          const kb = selectedBgKeyColor.b
+          const tol = bgTolerance * 1.5
+          for (let i = 0; i < data.length; i += 4) {
+            const diff = Math.sqrt(
+              Math.pow(data[i] - kr, 2) +
+              Math.pow(data[i+1] - kg, 2) +
+              Math.pow(data[i+2] - kb, 2)
+            )
+            if (diff < tol) {
+              data[i] = hexColor.r
+              data[i+1] = hexColor.g
+              data[i+2] = hexColor.b
+            }
+          }
+          bCtx.putImageData(imgData, 0, 0)
+          ctx.drawImage(buffer, 0, 0)
+        } else {
+          drawSourceImage(ctx, targetW, targetH)
+        }
+        
+        finalBlob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.95))
+        finalName = `${basename(file.name)}-passport.jpg`
+      } else {
+        const a4Canvas = document.createElement('canvas')
+        a4Canvas.width = 2480
+        a4Canvas.height = 3508
+        const a4Ctx = a4Canvas.getContext('2d')
+        a4Ctx.fillStyle = '#FFFFFF'
+        a4Ctx.fillRect(0, 0, 2480, 3508)
+        
+        const singleCropCanvas = document.createElement('canvas')
+        const scCtx = singleCropCanvas.getContext('2d')
+        let aspect = TEMPLATES[templateKey].ratio
+        if (templateKey === 'custom') {
+          aspect = customWidth / customHeight
+        }
+        const scW = 600
+        const scH = scW / aspect
+        singleCropCanvas.width = scW
+        singleCropCanvas.height = scH
+        
+        if (bgColor !== 'original' && selectedBgKeyColor) {
+          const buffer = document.createElement('canvas')
+          buffer.width = scW
+          buffer.height = scH
+          const bCtx = buffer.getContext('2d')
+          drawSourceImage(bCtx, scW, scH)
+          
+          const imgData = bCtx.getImageData(0, 0, scW, scH)
+          const data = imgData.data
+          const hexColor = hexToRgb(bgColor)
+          const kr = selectedBgKeyColor.r
+          const kg = selectedBgKeyColor.g
+          const kb = selectedBgKeyColor.b
+          const tol = bgTolerance * 1.5
+          for (let i = 0; i < data.length; i += 4) {
+            const diff = Math.sqrt(
+              Math.pow(data[i] - kr, 2) +
+              Math.pow(data[i+1] - kg, 2) +
+              Math.pow(data[i+2] - kb, 2)
+            )
+            if (diff < tol) {
+              data[i] = hexColor.r
+              data[i+1] = hexColor.g
+              data[i+2] = hexColor.b
+            }
+          }
+          bCtx.putImageData(imgData, 0, 0)
+          scCtx.drawImage(buffer, 0, 0)
+        } else {
+          drawSourceImage(scCtx, scW, scH)
+        }
+        
+        let mmW = templateKey === 'us' ? 51 : 35
+        let mmH = templateKey === 'us' ? 51 : 45
+        if (templateKey === 'custom') {
+          mmW = customWidth
+          mmH = customHeight
+        }
+        const pxW = Math.round(mmW * (300 / 25.4))
+        const pxH = Math.round(mmH * (300 / 25.4))
+        const cols = gridCount <= 4 ? 2 : gridCount <= 8 ? 4 : 4
+        const rows = Math.ceil(gridCount / cols)
+        const gap = 60
+        const totalGridWidth = cols * pxW + (cols - 1) * gap
+        const startX = (2480 - totalGridWidth) / 2
+        const startY = 400
+        
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const index = r * cols + c
+            if (index >= gridCount) break
+            const x = startX + c * (pxW + gap)
+            const y = startY + r * (pxH + gap)
+            a4Ctx.drawImage(singleCropCanvas, x, y, pxW, pxH)
+            a4Ctx.strokeStyle = '#D1D5DB'
+            a4Ctx.lineWidth = 2
+            a4Ctx.strokeRect(x, y, pxW, pxH)
+            a4Ctx.strokeStyle = '#1F2937'
+            a4Ctx.lineWidth = 3
+            a4Ctx.beginPath(); a4Ctx.moveTo(x - 15, y); a4Ctx.lineTo(x, y); a4Ctx.stroke()
+            a4Ctx.beginPath(); a4Ctx.moveTo(x, y - 15); a4Ctx.lineTo(x, y); a4Ctx.stroke()
+            a4Ctx.beginPath(); a4Ctx.moveTo(x + pxW, y); a4Ctx.lineTo(x + pxW + 15, y); a4Ctx.stroke()
+            a4Ctx.beginPath(); a4Ctx.moveTo(x + pxW, y - 15); a4Ctx.lineTo(x + pxW, y); a4Ctx.stroke()
+            a4Ctx.beginPath(); a4Ctx.moveTo(x - 15, y + pxH); a4Ctx.lineTo(x, y + pxH); a4Ctx.stroke()
+            a4Ctx.beginPath(); a4Ctx.moveTo(x, y + pxH); a4Ctx.lineTo(x, y + pxH + 15); a4Ctx.stroke()
+            a4Ctx.beginPath(); a4Ctx.moveTo(x + pxW, y + pxH); a4Ctx.lineTo(x + pxW + 15, y + pxH); a4Ctx.stroke()
+            a4Ctx.beginPath(); a4Ctx.moveTo(x + pxW, y + pxH); a4Ctx.lineTo(x + pxW + 15, y + pxH + 15); a4Ctx.stroke()
+          }
+        }
+        
+        a4Ctx.fillStyle = '#9CA3AF'
+        a4Ctx.font = '36px Helvetica'
+        a4Ctx.textAlign = 'center'
+        a4Ctx.fillText('Created securely on Fileora.tech — Free local passport generator.', 1240, 3350)
+        
+        finalBlob = await new Promise((resolve) => a4Canvas.toBlob(resolve, 'image/jpeg', 0.95))
+        finalName = `${basename(file.name)}-passport-A4-sheet.jpg`
+      }
+      
+      const fileObj = new File([finalBlob], finalName, { type: 'image/jpeg' })
+      setFileToShare(fileObj)
+      navigate('/share')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
   const handleReset = () => {
     setFile(null)
     setImage(null)
@@ -725,13 +891,35 @@ export default function PassportPhoto() {
                 </div>
               )}
 
-              <button
-                className="btn btn-primary btn-gradient"
-                onClick={runCompile}
-                style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
-              >
-                <Download size={18} /> {layoutMode === 'single' ? 'Download Crop' : 'Download Print A4 Sheet'}
-              </button>
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                <button
+                  className="btn btn-primary btn-gradient"
+                  onClick={runCompile}
+                  disabled={processing}
+                  style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
+                >
+                  <Download size={18} /> {processing ? 'Compiling...' : (layoutMode === 'single' ? 'Download Crop' : 'Download Print A4 Sheet')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  disabled={processing}
+                  className="btn btn-secondary"
+                  style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    gap: '8px', 
+                    padding: '14px', 
+                    borderRadius: '6px', 
+                    cursor: 'pointer', 
+                    fontWeight: 600
+                  }}
+                >
+                  <Share2 size={16} style={{ color: 'var(--accent-primary)' }} />
+                  <span>Share Directly (P2P)</span>
+                </button>
+              </div>
             </div>
           </section>
         )}

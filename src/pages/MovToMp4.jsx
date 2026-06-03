@@ -7,6 +7,7 @@ import DropZone from '../components/shared/DropZone';
 import { saveToOPFS, getFromOPFS, clearOPFSSandbox } from '../utils/opfsHelper';
 import { remuxMovToMp4 } from '../utils/videoEngine';
 import { formatBytes } from '../utils/imageUtils';
+import SecureShareButton from '../components/shared/SecureShareButton';
 
 export default function MovToMp4() {
   const [file, setFile] = useState(null);
@@ -16,6 +17,7 @@ export default function MovToMp4() {
   const [progressPercent, setProgressPercent] = useState(0);
   const [resultUrl, setResultUrl] = useState('');
   const [resultSize, setResultSize] = useState(0);
+  const [resultBlob, setResultBlob] = useState(null);
   const [compress, setCompress] = useState(false);
   const [quality, setQuality] = useState(50);
   const [scale, setScale] = useState(100);
@@ -74,6 +76,7 @@ export default function MovToMp4() {
       const outFile = await getFromOPFS('output_mp4.mp4');
       const url = URL.createObjectURL(outFile);
       
+      setResultBlob(outFile);
       setResultUrl(url);
       setResultSize(outFile.size);
       setProcessing(false);
@@ -90,6 +93,7 @@ export default function MovToMp4() {
     }
     setFile(null);
     setResultUrl('');
+    setResultBlob(null);
     setError('');
     setProcessing(false);
     setCompress(false);
@@ -180,9 +184,18 @@ export default function MovToMp4() {
                   <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{file.name.replace(/\.[^/.]+$/, '')}.mp4</h3>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Size: {formatBytes(resultSize)}</p>
                 </div>
-                <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}.mp4`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
-                  <Download size={18} /> Download MP4 Video
-                </a>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}.mp4`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
+                    <Download size={18} /> Download MP4 Video
+                  </a>
+                  {resultBlob && (
+                    <SecureShareButton 
+                      file={resultBlob} 
+                      fileName={`${file.name.replace(/\.[^/.]+$/, '')}.mp4`} 
+                      style={{ padding: '10px 20px' }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           ) : file ? (

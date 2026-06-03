@@ -8,6 +8,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { PDFDocument } from 'pdf-lib'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
   { q: 'Why resize PDF page dimensions?', a: 'Portals often mandate A4 paper dimensions for forms and Letter size for American corporate submissions. Resizing rescales the content layout into standardized dimensions.' },
@@ -277,14 +278,22 @@ export default function ResizePdf() {
 
               {error && <p className="error-message">{error}</p>}
 
-              <button
-                className="btn btn-primary btn-gradient"
-                onClick={handleDownload}
-                disabled={processing || !resultBlob}
-                style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
-              >
-                <Download size={18} /> Download Resized PDF
-              </button>
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                <button
+                  className="btn btn-primary btn-gradient"
+                  onClick={handleDownload}
+                  disabled={processing || !resultBlob}
+                  style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
+                >
+                  <Download size={18} /> Download Resized PDF
+                </button>
+                {resultBlob && (
+                  <SecureShareButton 
+                    file={resultBlob} 
+                    fileName={`${file ? file.name.replace(/\.pdf$/i, '') : 'document'}-resized-${pageSize}-${orientation}.pdf`} 
+                  />
+                )}
+              </div>
             </div>
           </section>
         )}

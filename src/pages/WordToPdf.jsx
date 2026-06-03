@@ -10,6 +10,7 @@ import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
 import { renderAsync } from 'docx-preview'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
   { q: 'How does client-side Word to PDF conversion work?', a: 'Fileora uses docx-preview to parse the binary structures, formatting, headings, and color tables of your Word document (.docx) entirely in JavaScript. It translates the document layout to high-fidelity isolated HTML, renders it inside a sandboxed rendering container, and compiles it directly to a vector PDF using jsPDF. No data is sent to external servers.' },
@@ -476,13 +477,21 @@ export default function WordToPdf() {
                     <div style={{ padding: '12px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '6px', border: '1px solid var(--border-color)', textAlign: 'center', fontSize: '13px', color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                       <CheckCircle size={16} /> PDF Rendered Perfectly!
                     </div>
-                    <button
-                      className="btn btn-primary btn-gradient"
-                      onClick={handleDownload}
-                      style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
-                    >
-                      <Download size={18} /> Download PDF File
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                      <button
+                        className="btn btn-primary btn-gradient"
+                        onClick={handleDownload}
+                        style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
+                      >
+                        <Download size={18} /> Download PDF File
+                      </button>
+                      {resultBlob && (
+                        <SecureShareButton 
+                          file={resultBlob} 
+                          fileName={`${basename(file.name)}.pdf`} 
+                        />
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

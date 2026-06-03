@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Camera, Upload, Trash2, Plus, Download, Sparkles, Settings, Eye, CheckCircle, RotateCw, Check, ChevronLeft, ChevronRight, Image as ImageIcon, FileText, Layers, Video, Shield, Smartphone, AlertTriangle, RefreshCw, GripVertical, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useShare } from '../context/ShareContext'
+import { Camera, Upload, Trash2, Plus, Download, Sparkles, Settings, Eye, CheckCircle, RotateCw, Check, ChevronLeft, ChevronRight, Image as ImageIcon, FileText, Layers, Video, Shield, Smartphone, AlertTriangle, RefreshCw, GripVertical, X, Share2 } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
@@ -280,6 +282,8 @@ function getPerceptualSignature(dataUrl) {
 }
 
 export default function Scanner() {
+  const navigate = useNavigate();
+  const { setFileToShare } = useShare();
   const [pages, setPages] = useState([]); // array of page objects: { id, originalSrc, originalWidth, originalHeight, corners, filter, rotation, signature }
   const [currentPageIdx, setCurrentPageIdx] = useState(-1);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -1253,6 +1257,135 @@ export default function Scanner() {
     }
   };
 
+  const handleShare = async () => {
+    if (pages.length === 0) return;
+    setIsCompiling(true);
+
+    try {
+      let firstPageWidth = 595.28;
+      let firstPageHeight = 841.89;
+
+      if (pageSize === 'fit' && pages[0]) {
+        const page = pages[0];
+        const scaleCorners = page.corners.map(c => ({
+          x: c.x * page.originalWidth,
+          y: c.y * page.originalHeight
+        }));
+        const side1 = Math.hypot(scaleCorners[1].x - scaleCorners[0].x, scaleCorners[1].y - scaleCorners[0].y);
+        const side2 = Math.hypot(scaleCorners[2].x - scaleCorners[3].x, scaleCorners[2].y - scaleCorners[3].y);
+        const topBottomRatio = Math.max(side1, side2);
+        const side3 = Math.hypot(scaleCorners[3].x - scaleCorners[0].x, scaleCorners[3].y - scaleCorners[0].y);
+        const side4 = Math.hypot(scaleCorners[2].x - scaleCorners[1].x, scaleCorners[2].y - scaleCorners[1].y);
+        const leftRightRatio = Math.max(side3, side4);
+        const aspect = leftRightRatio / topBottomRatio;
+        const warpedAspect = isNaN(aspect) || aspect <= 0 ? 1.414 : aspect;
+
+        firstPageWidth = 595.28;
+        firstPageHeight = 595.28 * warpedAspect;
+      }
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'pt',
+        format: pageSize === 'fit' ? [firstPageWidth, firstPageHeight] : pageSize
+      });
+
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        
+        const img = await new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = (err) => reject(err);
+          image.src = page.originalSrc;
+        });
+
+        const srcCanvas = document.createElement('canvas');
+        srcCanvas.width = page.originalWidth;
+        srcCanvas.height = page.originalHeight;
+        const srcCtx = srcCanvas.getContext('2d');
+        srcCtx.drawImage(img, 0, 0);
+
+        const scaleCorners = page.corners.map(c => ({
+          x: c.x * page.originalWidth,
+          y: c.y * page.originalHeight
+        }));
+
+        const targetWidth = pdfQuality === 'high' ? 1200 : 800;
+        
+        const side1 = Math.hypot(scaleCorners[1].x - scaleCorners[0].x, scaleCorners[1].y - scaleCorners[0].y);
+        const side2 = Math.hypot(scaleCorners[2].x - scaleCorners[3].x, scaleCorners[2].y - scaleCorners[3].y);
+        const topBottomRatio = Math.max(side1, side2);
+        
+        const side3 = Math.hypot(scaleCorners[3].x - scaleCorners[0].x, scaleCorners[3].y - scaleCorners[0].y);
+        const side4 = Math.hypot(scaleCorners[2].x - scaleCorners[1].x, scaleCorners[2].y - scaleCorners[1].y);
+        const leftRightRatio = Math.max(side3, side4);
+
+        const aspect = leftRightRatio / topBottomRatio;
+        const warpedAspect = isNaN(aspect) || aspect <= 0 ? 1.414 : aspect;
+        const targetHeight = Math.round(targetWidth * warpedAspect);
+
+        const warpedCanvas = applyPerspectiveWarp(srcCtx, page.originalWidth, page.originalHeight, scaleCorners, targetWidth, targetHeight);
+        const warpedCtx = warpedCanvas.getContext('2d');
+
+        applyImageFilter(warpedCtx, targetWidth, targetHeight, page.filter);
+
+        let pageWidth = pdf.internal.pageSize.getWidth();
+        let pageHeight = pdf.internal.pageSize.getHeight();
+
+        if (pageSize === 'fit') {
+          pageWidth = 595.28;
+          pageHeight = 595.28 * warpedAspect;
+        }
+
+        if (i > 0) {
+          if (pageSize === 'fit') {
+            pdf.addPage([pageWidth, pageHeight], 'portrait');
+          } else {
+            pdf.addPage();
+          }
+        }
+
+        let printWidth, printHeight, xOffset, yOffset;
+        
+        if (pageSize === 'fit') {
+          printWidth = pageWidth;
+          printHeight = pageHeight;
+          xOffset = 0;
+          yOffset = 0;
+        } else {
+          const imgRatio = targetWidth / targetHeight;
+          const pageRatio = pageWidth / pageHeight;
+          
+          if (imgRatio > pageRatio) {
+            printWidth = pageWidth;
+            printHeight = pageWidth / imgRatio;
+            xOffset = 0;
+            yOffset = (pageHeight - printHeight) / 2;
+          } else {
+            printHeight = pageHeight;
+            printWidth = pageHeight * imgRatio;
+            xOffset = (pageWidth - printWidth) / 2;
+            yOffset = 0;
+          }
+        }
+
+        const docJpgData = warpedCanvas.toDataURL('image/jpeg', pdfQuality === 'high' ? 0.90 : 0.75);
+        pdf.addImage(docJpgData, 'JPEG', xOffset, yOffset, printWidth, printHeight, `page_${i}`, 'FAST');
+      }
+
+      const pdfBlob = pdf.output('blob');
+      const finalName = `fileora_scan_${Date.now()}.pdf`;
+      const fileObj = new File([pdfBlob], finalName, { type: 'application/pdf' });
+      setFileToShare(fileObj);
+      navigate('/share');
+    } catch (err) {
+      console.error('PDF sharing generation error:', err);
+    } finally {
+      setIsCompiling(false);
+    }
+  };
+
   const activePage = pages[currentPageIdx];
 
   const appSchema = {
@@ -1388,23 +1521,44 @@ export default function Scanner() {
                     </select>
                   </div>
 
-                  <button 
-                    disabled={isCompiling}
-                    className="btn btn-primary btn-gradient" 
-                    onClick={compileAndDownloadPDF} 
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '6px', fontSize: '14px' }}
-                  >
-                    {isCompiling ? (
-                      <>
-                        <div className="loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
-                        Compiling PDF...
-                      </>
-                    ) : (
-                      <>
-                        <Download size={16} /> Compile & Download PDF
-                      </>
-                    )}
-                  </button>
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '12px' }}>
+                    <button 
+                      disabled={isCompiling}
+                      className="btn btn-primary btn-gradient" 
+                      onClick={compileAndDownloadPDF} 
+                      style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '6px', fontSize: '14px' }}
+                    >
+                      {isCompiling ? (
+                        <>
+                          <div className="loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+                          Compiling...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={16} /> Compile & Download PDF
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleShare}
+                      disabled={isCompiling}
+                      className="btn btn-secondary"
+                      style={{ 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: '8px', 
+                        padding: '12px', 
+                        borderRadius: '6px', 
+                        cursor: 'pointer', 
+                        fontWeight: 600
+                      }}
+                    >
+                      <Share2 size={16} style={{ color: 'var(--accent-primary)' }} />
+                      <span>Share Directly (P2P)</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

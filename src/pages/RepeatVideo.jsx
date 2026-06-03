@@ -7,6 +7,7 @@ import DropZone from '../components/shared/DropZone';
 import { saveToOPFS, getFromOPFS, clearOPFSSandbox } from '../utils/opfsHelper';
 import { repeatVideo } from '../utils/videoEngine';
 import { formatBytes } from '../utils/imageUtils';
+import SecureShareButton from '../components/shared/SecureShareButton';
 
 export default function RepeatVideo() {
   const [file, setFile] = useState(null);
@@ -16,6 +17,7 @@ export default function RepeatVideo() {
   const [progressPercent, setProgressPercent] = useState(0);
   const [resultUrl, setResultUrl] = useState('');
   const [resultSize, setResultSize] = useState(0);
+  const [resultBlob, setResultBlob] = useState(null);
 
   // Settings
   const [repeats, setRepeats] = useState(3);
@@ -82,6 +84,7 @@ export default function RepeatVideo() {
       const outFile = await getFromOPFS('output_repeated.mp4');
       const url = URL.createObjectURL(outFile);
       
+      setResultBlob(outFile);
       setResultUrl(url);
       setResultSize(outFile.size);
       setProcessing(false);
@@ -102,6 +105,7 @@ export default function RepeatVideo() {
     }
     setFile(null);
     setResultUrl('');
+    setResultBlob(null);
     setError('');
     setProcessing(false);
     setRepeats(3);
@@ -182,9 +186,18 @@ export default function RepeatVideo() {
                   <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{file.name.replace(/\.[^/.]+$/, '')}-repeated.mp4</h3>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Size: {formatBytes(resultSize)} · Loops: {repeats}x</p>
                 </div>
-                <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}-repeated.mp4`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
-                  <Download size={18} /> Download Looped Video
-                </a>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}-repeated.mp4`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
+                    <Download size={18} /> Download Looped Video
+                  </a>
+                  {resultBlob && (
+                    <SecureShareButton 
+                      file={resultBlob} 
+                      fileName={`${file.name.replace(/\.[^/.]+$/, '')}-repeated.mp4`} 
+                      style={{ padding: '10px 20px' }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           ) : file ? (

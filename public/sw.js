@@ -1,156 +1,150 @@
 /**
- * Fileora Service Worker - High-Performance PWA Cache Engine
- * Fully offline-first caching supporting multi-gigabyte client-side video/PDF operations.
+ * Fileora Service Worker - PWA cache for production static deploys.
+ * Local Vite dev (localhost:5173) is never intercepted — see shouldBypassFetch().
  */
 
-const CACHE_NAME = 'fileora-cache-v4';
+const CACHE_NAME = 'fileora-cache-v5';
 
-// Core application and external dependency assets to pre-cache on install
 const ASSETS_TO_CACHE = [
-  // Local app assets
   '/',
   '/index.html',
   '/favicon.svg',
   '/icons.svg',
   '/robots.txt',
   '/sitemap.xml',
-  
-  // External WebAssembly & script dependencies
   'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs',
   'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
   'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
   'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm',
   'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',
   'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js',
-  'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js'
+  'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',
 ];
 
-// 1. Install Event: Cache all core files and WASM engines
+const BYPASS_DOMAINS = [
+  'peerjs.com',
+  'google-analytics.com',
+  'analytics.google.com',
+  'googletagmanager.com',
+  'cloudflareinsights.com',
+  'fonts.googleapis.com',
+  'fonts.gstatic.com',
+  'unpkg.com',
+];
+
+const isLocalDevHost = (hostname) =>
+  hostname === 'localhost' ||
+  hostname === '127.0.0.1' ||
+  hostname === '0.0.0.0' ||
+  hostname.endsWith('.localhost');
+
+/** Never intercept Vite dev server or signaling/analytics hosts */
+const shouldBypassFetch = (request) => {
+  const url = new URL(request.url);
+
+  if (!url.protocol.startsWith('http')) return true;
+  if (isLocalDevHost(url.hostname)) return true;
+  if (BYPASS_DOMAINS.some((d) => url.hostname.includes(d))) return true;
+
+  if (
+    url.pathname.startsWith('/@') ||
+    url.pathname.includes('/node_modules/') ||
+    url.pathname.startsWith('/src/') ||
+    url.searchParams.has('t')
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
+const isNavigationRequest = (request) =>
+  request.mode === 'navigate' ||
+  (request.method === 'GET' && request.headers.get('accept')?.includes('text/html'));
+
+/** SPA shell fallback: prerendered route file, then index.html */
+const spaNavigationFallback = async (pathname) => {
+  let pathName = pathname;
+  if (pathName.endsWith('/')) pathName = pathName.slice(0, -1);
+
+  const routeHtml = pathName && pathName !== '' ? `${pathName}.html` : '/index.html';
+  const routeResponse = await caches.match(routeHtml);
+  if (routeResponse) return routeResponse;
+
+  const indexResponse = await caches.match('/index.html');
+  if (indexResponse) return indexResponse;
+
+  return caches.match('/');
+};
+
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Pre-caching core shell and heavy WASM engines...');
-      // Use addAll with error resilience: cache what we can, don't let one bad URL block the entire install
-      return Promise.allSettled(
-        ASSETS_TO_CACHE.map((url) => {
-          return cache.add(new Request(url, { mode: url.includes('unpkg.com') || url.includes('fonts.gstatic.com') ? 'cors' : 'no-cors' }))
-            .then(() => console.log(`[Service Worker] Pre-cached: ${url}`))
-            .catch((err) => console.error(`[Service Worker] Pre-cache failed for ${url}:`, err));
-        })
-      );
-    })
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(
+        ASSETS_TO_CACHE.map((url) =>
+          cache
+            .add(new Request(url, { mode: url.includes('unpkg.com') ? 'cors' : 'same-origin' }))
+            .catch((err) => console.warn('[SW] Pre-cache skip:', url, err))
+        )
+      )
+    )
   );
 });
 
-// 2. Activate Event: Perform cache sweep and release outdated versions
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log('[Service Worker] Cleaning up outdated cache:', key);
-            return caches.delete(key);
-          }
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    )
   );
   self.clients.claim();
 });
 
-// 3. Fetch Event: Intercept network requests and serve from Cache (Stale-While-Revalidate)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  if (shouldBypassFetch(event.request)) return;
 
-  // Skip chrome-extension:// schemes or dev server socket requests
-  if (!event.request.url.startsWith('http') && !event.request.url.startsWith('https')) return;
+  const url = new URL(event.request.url);
 
-  // Bypass caching for PeerJS signaling server, third-party analytics, tag managers, and external CDN resources
-  // These external origins should not be intercepted by the SW fetch handler to avoid CSP violations
-  const bypassDomains = [
-    'peerjs.com',
-    'google-analytics.com',
-    'analytics.google.com',
-    'googletagmanager.com',
-    'cloudflareinsights.com',
-    'fonts.googleapis.com',
-    'fonts.gstatic.com'
-  ];
-  if (bypassDomains.some(domain => event.request.url.includes(domain))) {
+  // HTML navigations: network-first so SPA routes (/share, etc.) always work in dev-like deploys
+  if (isNavigationRequest(event.request)) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => spaNavigationFallback(url.pathname))
+    );
     return;
   }
 
-  // Bypass caching for Vite Dev Server assets to prevent stale code issues during development
-  const url = new URL(event.request.url);
-  if (
-    url.hostname === 'localhost' || 
-    url.hostname === '127.0.0.1' || 
-    url.hostname === '0.0.0.0'
-  ) {
-    if (
-      url.pathname.startsWith('/@') || 
-      url.pathname.includes('/node_modules/') || 
-      url.searchParams.has('t') || 
-      url.pathname.startsWith('/src/')
-    ) {
-      return; // Direct network bypass for HMR & Dev modules
-    }
-  }
-
+  // Static assets: stale-while-revalidate
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Serve from Cache immediately for near-zero loading latency, but fetch in background to refresh the cache
-        fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(event.request, networkResponse);
-              });
-            }
-          })
-          .catch(() => {/* Ignore background errors when offline */});
+    caches.match(event.request).then((cached) => {
+      const networkFetch = fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => null);
 
-        return cachedResponse;
+      if (cached) {
+        networkFetch.catch(() => {});
+        return cached;
       }
 
-      // If the asset is not in cache, fetch it from the network and cache it dynamically
-      return fetch(event.request)
-        .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200) {
-            return networkResponse;
-          }
-
-          // Cache standard successful responses (including CORS opaque assets)
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-
-          return networkResponse;
-        })
-        .catch((err) => {
-          console.warn('[Service Worker] Fetch failed (possibly offline). Serving fallback:', event.request.url, err);
-
-          // If offline and requesting an HTML page route, map clean path to its pre-rendered .html file in cache
-          if (event.request.headers.get('accept')?.includes('text/html')) {
-            const url = new URL(event.request.url);
-            let pathName = url.pathname;
-            if (pathName.endsWith('/')) {
-              pathName = pathName.slice(0, -1);
-            }
-            const fallbackKey = pathName === '' ? '/index.html' : pathName + '.html';
-            return caches.match(fallbackKey).then((routeResponse) => {
-              return routeResponse || caches.match('/index.html');
-            });
-          }
-
-          // Re-throw the error so that the promise rejects cleanly, letting the browser handle it as a normal fetch error
-          // instead of resolving to 'undefined' and throwing "Failed to convert value to 'Response'"
-          throw err;
-        });
+      return networkFetch.then((response) => {
+        if (response) return response;
+        return caches.match('/index.html');
+      });
     })
   );
 });

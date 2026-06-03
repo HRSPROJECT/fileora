@@ -2,6 +2,7 @@ import React, { Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ThemeProvider } from './context/ThemeContext'
+import { ShareProvider } from './context/ShareContext'
 
 // Eagerly load Home (most visited page)
 import Home from './pages/Home'
@@ -69,8 +70,9 @@ function ScrollToTop() {
 export default function App() {
   return (
     <HelmetProvider>
-      <ThemeProvider>
-        <BrowserRouter>
+      <ShareProvider>
+        <ThemeProvider>
+          <BrowserRouter>
           <ScrollToTop />
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
@@ -118,9 +120,9 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
-        </BrowserRouter>
-      </ThemeProvider>
+          </BrowserRouter>
+        </ThemeProvider>
+      </ShareProvider>
     </HelmetProvider>
   )
 }
-

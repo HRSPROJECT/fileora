@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download, Image as ImageIcon, Lock, Unlock } from 'lucide-react'
 import { basename, downloadBlob, formatBytes, resizeImage } from '../../utils/imageUtils'
 import { readImageDimensions } from '../../utils/canvasUtils'
+import SecureShareButton from '../shared/SecureShareButton'
 
 const presets = [
   ['Custom', null],
@@ -118,17 +119,24 @@ export default function ResizeWorkspace({ file, onReset }) {
           </div>
         )}
         
-        <div className="action-row">
-          <button className="btn btn-secondary" style={{ flex: 1 }} type="button" onClick={onReset}>Choose another</button>
+        <div className="action-row" style={{ display: 'flex', gap: '12px', width: '100%', flexWrap: 'wrap' }}>
+          <button className="btn btn-secondary" style={{ flex: 1, minWidth: '100px' }} type="button" onClick={onReset}>Choose another</button>
           <button
             className="btn btn-primary btn-gradient"
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(to right, #6EE7B7, #3B82F6)', color: '#000', fontWeight: 'bold' }}
+            style={{ flex: 1, minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(to right, #6EE7B7, #3B82F6)', color: '#000', fontWeight: 'bold' }}
             type="button"
             disabled={!result || processing}
             onClick={() => downloadBlob(result, `${basename(file.name)}-${width}x${height}.${format}`)}
           >
             <Download size={18} /> Download
           </button>
+          {result && !processing && (
+            <SecureShareButton 
+              file={result} 
+              fileName={`${basename(file.name)}-${width}x${height}.${format}`} 
+              style={{ flex: 1, minWidth: '160px', padding: '14px' }}
+            />
+          )}
         </div>
       </div>
     </section>

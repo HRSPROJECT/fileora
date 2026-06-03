@@ -7,6 +7,7 @@ import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 import * as pdfjsLib from 'pdfjs-dist'
 import { Document, Packer, Paragraph, TextRun, AlignmentType, ImageRun } from 'docx'
 import { renderAsync } from 'docx-preview'
@@ -633,13 +634,21 @@ export default function PdfToWord() {
                     <div style={{ padding: '12px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '6px', border: '1px solid var(--border-color)', textAlign: 'center', fontSize: '13px', color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                       <CheckCircle size={16} /> Conversion Completed!
                     </div>
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
                     <button
                       className="btn btn-primary btn-gradient"
                       onClick={handleDownload}
-                      style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
+                      style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
                     >
                       <Download size={18} /> Download Word Document
                     </button>
+                    {resultBlob && (
+                      <SecureShareButton 
+                        file={resultBlob} 
+                        fileName={`${basename(file.name)}.docx`} 
+                      />
+                    )}
+                  </div>
                   </div>
                 )}
               </div>

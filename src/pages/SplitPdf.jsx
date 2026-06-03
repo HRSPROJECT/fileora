@@ -8,6 +8,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { PDFDocument } from 'pdf-lib'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
   { q: 'Can I split a PDF visually?', a: 'Yes. Fileora renders a list of all pages in your PDF. You can check the boxes of the pages you want to keep or remove and preview the result immediately.' },
@@ -284,13 +285,19 @@ export default function SplitPdf() {
                 </button>
 
                 {resultBlob && (
-                  <button
-                    className="btn btn-primary btn-gradient animate-fade-in"
-                    onClick={handleDownload}
-                    style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
-                  >
-                    <Download size={18} /> Download Split PDF ({formatBytes(resultBlob.size)})
-                  </button>
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '8px' }} className="animate-fade-in">
+                    <button
+                      className="btn btn-primary btn-gradient"
+                      onClick={handleDownload}
+                      style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
+                    >
+                      <Download size={18} /> Download Split PDF ({formatBytes(resultBlob.size)})
+                    </button>
+                    <SecureShareButton 
+                      file={resultBlob} 
+                      fileName={`${file ? file.name.replace(/\.pdf$/i, '') : 'document'}-${mode}ed.pdf`} 
+                    />
+                  </div>
                 )}
               </div>
             </div>

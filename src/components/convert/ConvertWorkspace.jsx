@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { basename, convertImage, downloadBlob, formatBytes } from '../../utils/imageUtils'
 import JSZip from 'jszip'
+import SecureShareButton from '../shared/SecureShareButton'
 
 export default function ConvertWorkspace({ file, onReset }) {
   const preview = useMemo(() => URL.createObjectURL(file), [file])
@@ -48,19 +49,27 @@ export default function ConvertWorkspace({ file, onReset }) {
         )}
         {error && <p className="error-message">{error}</p>}
         {result && <p className="success-message">Ready: {formatBytes(result.size)}</p>}
-        <div className="action-row">
-          <button className="btn btn-secondary" type="button" onClick={onReset}>Choose another</button>
-          <button className="btn btn-primary" type="button" onClick={process} disabled={processing}>
+        <div className="action-row" style={{ display: 'flex', gap: '12px', width: '100%', flexWrap: 'wrap' }}>
+          <button className="btn btn-secondary" style={{ flex: 1, minWidth: '100px' }} type="button" onClick={onReset}>Choose another</button>
+          <button className="btn btn-primary" style={{ flex: 1, minWidth: '120px' }} type="button" onClick={process} disabled={processing}>
             {processing ? 'Converting...' : 'Convert image'}
           </button>
           <button
-            className="btn btn-primary"
+            className="btn btn-primary btn-gradient"
             type="button"
             disabled={!result}
             onClick={() => downloadBlob(result, `${basename(file.name)}.${format}`)}
+            style={{ flex: 1, minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
           >
             <Download size={18} /> Download
           </button>
+          {result && (
+            <SecureShareButton 
+              file={result} 
+              fileName={`${basename(file.name)}.${format}`} 
+              style={{ flex: 1, minWidth: '160px', padding: '14px' }}
+            />
+          )}
         </div>
       </div>
     </section>

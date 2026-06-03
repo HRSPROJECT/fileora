@@ -8,6 +8,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { imagesToPdf } from '../utils/pdfUtils'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
   { q: 'Can I convert multiple PNGs to a single PDF?', a: 'Yes. Upload all your PNG files and we will compile them into one PDF in your chosen page order.' },
@@ -266,14 +267,22 @@ export default function PngToPdf() {
 
               {error && <p className="error-message">{error}</p>}
 
-              <button
-                className="btn btn-primary btn-gradient"
-                onClick={handleDownload}
-                disabled={processing || !resultBlob}
-                style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
-              >
-                <Download size={18} /> Download Generated PDF
-              </button>
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                <button
+                  className="btn btn-primary btn-gradient"
+                  onClick={handleDownload}
+                  disabled={processing || !resultBlob}
+                  style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
+                >
+                  <Download size={18} /> Download Generated PDF
+                </button>
+                {resultBlob && (
+                  <SecureShareButton 
+                    file={resultBlob} 
+                    fileName={`${files.length > 0 ? files[0].name.replace(/\.[^/.]+$/, '') : 'document'}-png-to-pdf.pdf`} 
+                  />
+                )}
+              </div>
             </div>
           </section>
         )}

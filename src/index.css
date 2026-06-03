@@ -1599,6 +1599,67 @@ img {
   }
 }
 
+/* Share page & P2P modal */
+.glass-card-premium {
+  background: var(--glass-bg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.container-premium {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.main-content-premium {
+  min-height: 60vh;
+}
+
+.h1-premium {
+  color: var(--text-primary);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.drop-zone-premium:hover {
+  border-color: var(--accent-hover) !important;
+  background: rgba(56, 189, 248, 0.06) !important;
+}
+
+.btn-premium {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.btn-premium:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-premium:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.btn-premium-primary {
+  background: linear-gradient(135deg, #38bdf8, #34d399);
+  color: #04111f;
+}
+
+.btn-premium-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
 .mode-btn {
   background: rgba(15, 23, 42, 0.4);
   border: 1px solid var(--border-color);

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { FileImage, ArrowLeft, Shield, Download, Sparkles, Layers, Settings, Eye, HelpCircle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useShare } from '../context/ShareContext'
+import { FileImage, ArrowLeft, Shield, Download, Sparkles, Layers, Settings, Eye, HelpCircle, Share2 } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
@@ -21,6 +23,8 @@ const faqs = [
 ]
 
 export default function PdfToJpg() {
+  const navigate = useNavigate()
+  const { setFileToShare } = useShare()
   const [file, setFile] = useState(null)
   const [pdfDoc, setPdfDoc] = useState(null)
   const [error, setError] = useState('')
@@ -172,6 +176,37 @@ export default function PdfToJpg() {
     } catch (err) {
       console.error(err)
       setError('Could not package zip archive.')
+    } finally {
+      setProcessing(false)
+      setProgressText('')
+    }
+  }
+
+  const handleShare = async () => {
+    if (results.length === 0) return
+    setProcessing(true)
+    setProgressText('Preparing files for secure direct share...')
+    try {
+      let finalBlob
+      let finalName
+      if (results.length === 1) {
+        finalBlob = results[0].blob
+        finalName = results[0].name
+      } else {
+        const zip = new JSZip()
+        results.forEach((res) => {
+          zip.file(res.name, res.blob)
+        })
+        finalBlob = await zip.generateAsync({ type: 'blob' })
+        finalName = `${basename(file.name)}-images.zip`
+      }
+      
+      const fileObj = new File([finalBlob], finalName, { type: finalBlob.type || 'application/octet-stream' })
+      setFileToShare(fileObj)
+      navigate('/share')
+    } catch (err) {
+      console.error(err)
+      setError('Could not prepare files for sharing.')
     } finally {
       setProcessing(false)
       setProgressText('')
@@ -537,14 +572,35 @@ export default function PdfToJpg() {
                     ✓ Conversion Completed!
                   </div>
                   
-                  <button
-                    className="btn btn-primary btn-gradient"
-                    onClick={handleDownloadAll}
-                    disabled={processing}
-                    style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
-                  >
-                    <Download size={18} /> {results.length === 1 ? 'Download JPG' : 'Download Images (ZIP)'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                    <button
+                      className="btn btn-primary btn-gradient"
+                      onClick={handleDownloadAll}
+                      disabled={processing}
+                      style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
+                    >
+                      <Download size={18} /> {results.length === 1 ? 'Download JPG' : 'Download Images (ZIP)'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleShare}
+                      disabled={processing}
+                      className="btn btn-secondary"
+                      style={{ 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: '8px', 
+                        padding: '14px', 
+                        borderRadius: '6px', 
+                        cursor: 'pointer', 
+                        fontWeight: 600
+                      }}
+                    >
+                      <Share2 size={16} style={{ color: 'var(--accent-primary)' }} />
+                      <span>Share Directly (P2P)</span>
+                    </button>
+                  </div>
 
                   <button
                     className="btn btn-ghost"

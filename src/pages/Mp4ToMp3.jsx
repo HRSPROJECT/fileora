@@ -7,6 +7,7 @@ import DropZone from '../components/shared/DropZone';
 import { saveToOPFS, getFromOPFS, clearOPFSSandbox } from '../utils/opfsHelper';
 import { extractAudioToMp3 } from '../utils/videoEngine';
 import { formatBytes } from '../utils/imageUtils';
+import SecureShareButton from '../components/shared/SecureShareButton';
 
 export default function Mp4ToMp3() {
   const [file, setFile] = useState(null);
@@ -16,6 +17,7 @@ export default function Mp4ToMp3() {
   const [progressPercent, setProgressPercent] = useState(0);
   const [resultUrl, setResultUrl] = useState('');
   const [resultSize, setResultSize] = useState(0);
+  const [resultBlob, setResultBlob] = useState(null);
 
   // Settings
   const [bitrate, setBitrate] = useState(192);
@@ -68,6 +70,7 @@ export default function Mp4ToMp3() {
       const outFile = await getFromOPFS('output_audio.mp3');
       const url = URL.createObjectURL(outFile);
       
+      setResultBlob(outFile);
       setResultUrl(url);
       setResultSize(outFile.size);
       setProcessing(false);
@@ -84,6 +87,7 @@ export default function Mp4ToMp3() {
     }
     setFile(null);
     setResultUrl('');
+    setResultBlob(null);
     setError('');
     setProcessing(false);
     clearOPFSSandbox();
@@ -164,9 +168,18 @@ export default function Mp4ToMp3() {
                   <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{file.name.replace(/\.[^/.]+$/, '')}.mp3</h3>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Size: {formatBytes(resultSize)} · {bitrate}kbps MP3</p>
                 </div>
-                <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}.mp3`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
-                  <Download size={18} /> Download MP3 Audio
-                </a>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <a href={resultUrl} download={`${file.name.replace(/\.[^/.]+$/, '')}.mp3`} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
+                    <Download size={18} /> Download MP3 Audio
+                  </a>
+                  {resultBlob && (
+                    <SecureShareButton 
+                      file={resultBlob} 
+                      fileName={`${file.name.replace(/\.[^/.]+$/, '')}.mp3`} 
+                      style={{ padding: '10px 20px' }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           ) : file ? (

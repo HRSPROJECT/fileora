@@ -8,6 +8,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { PDFDocument } from 'pdf-lib'
 import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
   { q: 'What is the difference between a user password and an owner password?', a: 'A user password (open password) restricts who can open and view the PDF. An owner password restricts document permissions such as high-resolution printing, copy-pasting content, and page editing.' },
@@ -333,6 +334,13 @@ export default function ProtectPdf() {
                     <button onClick={handleDownload} className="btn btn-primary btn-gradient" style={{ flex: 1, padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <Download size={16} /> Download Protected PDF
                     </button>
+                    {downloadableBlob && (
+                      <SecureShareButton 
+                        file={downloadableBlob} 
+                        fileName={`${basename(file.name)}-protected.pdf`} 
+                        style={{ padding: '12px' }}
+                      />
+                    )}
                   </div>
                   <button onClick={() => setDownloadableBlob(null)} className="btn btn-ghost" style={{ fontSize: '12px' }}>
                     Adjust Security Settings

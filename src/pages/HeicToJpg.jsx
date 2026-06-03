@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { FileImage, ArrowLeft, Shield, Download, Sparkles, FolderSync, Settings, Check } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useShare } from '../context/ShareContext'
+import { FileImage, ArrowLeft, Shield, Download, Sparkles, FolderSync, Settings, Check, Share2 } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
@@ -18,6 +20,8 @@ const faqs = [
 ]
 
 export default function HeicToJpg() {
+  const navigate = useNavigate()
+  const { setFileToShare } = useShare()
   const [files, setFiles] = useState([])
   const [error, setError] = useState('')
   const [format, setFormat] = useState('jpeg') // 'jpeg', 'png', 'webp'
@@ -102,6 +106,37 @@ export default function HeicToJpg() {
     } catch (err) {
       console.error(err)
       setError('Could not package ZIP folder.')
+    } finally {
+      setProcessing(false)
+      setProgressText('')
+    }
+  }
+
+  const handleShare = async () => {
+    if (results.length === 0) return
+    setProcessing(true)
+    setProgressText('Preparing files for secure direct share...')
+    try {
+      let finalBlob
+      let finalName
+      if (results.length === 1) {
+        finalBlob = results[0].blob
+        finalName = results[0].name
+      } else {
+        const zip = new JSZip()
+        results.forEach((res) => {
+          zip.file(res.name, res.blob)
+        })
+        finalBlob = await zip.generateAsync({ type: 'blob' })
+        finalName = 'fileora-heic-converted.zip'
+      }
+      
+      const fileObj = new File([finalBlob], finalName, { type: finalBlob.type || 'application/octet-stream' })
+      setFileToShare(fileObj)
+      navigate('/share')
+    } catch (err) {
+      console.error(err)
+      setError('Could not prepare files for sharing.')
     } finally {
       setProcessing(false)
       setProgressText('')
@@ -359,14 +394,35 @@ export default function HeicToJpg() {
                     Conversion Succeeded!
                   </div>
                   
-                  <button
-                    className="btn btn-primary btn-gradient"
-                    onClick={handleDownloadAll}
-                    disabled={processing}
-                    style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
-                  >
-                    <Download size={18} /> {results.length === 1 ? 'Download Photo' : 'Download Photos (ZIP)'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                    <button
+                      className="btn btn-primary btn-gradient"
+                      onClick={handleDownloadAll}
+                      disabled={processing}
+                      style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
+                    >
+                      <Download size={18} /> {results.length === 1 ? 'Download Photo' : 'Download Photos (ZIP)'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleShare}
+                      disabled={processing}
+                      className="btn btn-secondary"
+                      style={{ 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: '8px', 
+                        padding: '14px', 
+                        borderRadius: '6px', 
+                        cursor: 'pointer', 
+                        fontWeight: 600
+                      }}
+                    >
+                      <Share2 size={16} style={{ color: 'var(--accent-primary)' }} />
+                      <span>Share Directly (P2P)</span>
+                    </button>
+                  </div>
 
                   <button
                     className="btn btn-ghost"

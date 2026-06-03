@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Download, GripVertical, FileText } from 'lucide-react'
 import { downloadBlob, formatBytes } from '../../utils/imageUtils'
 import { countPdfPages, mergePdfFiles } from '../../utils/pdfUtils'
+import SecureShareButton from '../shared/SecureShareButton'
 
 export default function MergePdfWorkspace({ files, setFiles, onReset }) {
   const [pageCounts, setPageCounts] = useState({})
@@ -88,11 +89,18 @@ export default function MergePdfWorkspace({ files, setFiles, onReset }) {
             Merged PDF ready: {formatBytes(result.size)} {processing && <span style={{ opacity: 0.5 }}>(Updating...)</span>}
           </div>
         )}
-        <div className="action-row">
-          <button className="btn btn-secondary" style={{ flex: 1 }} type="button" onClick={onReset}>Choose PDFs</button>
-          <button className="btn btn-primary btn-gradient" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(to right, #6EE7B7, #3B82F6)', color: '#000', fontWeight: 'bold' }} type="button" disabled={!result || processing} onClick={() => downloadBlob(result, 'fileora-merged.pdf')}>
+        <div className="action-row" style={{ display: 'flex', gap: '12px', width: '100%', flexWrap: 'wrap' }}>
+          <button className="btn btn-secondary" style={{ flex: 1, minWidth: '120px' }} type="button" onClick={onReset}>Choose PDFs</button>
+          <button className="btn btn-primary btn-gradient" style={{ flex: 1, minWidth: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(to right, #6EE7B7, #3B82F6)', color: '#000', fontWeight: 'bold' }} type="button" disabled={!result || processing} onClick={() => downloadBlob(result, 'fileora-merged.pdf')}>
             <Download size={18} /> Download
           </button>
+          {result && !processing && (
+            <SecureShareButton 
+              file={result} 
+              fileName="fileora-merged.pdf" 
+              style={{ flex: 1, minWidth: '160px', padding: '14px' }}
+            />
+          )}
         </div>
       </div>
     </section>

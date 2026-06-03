@@ -8,6 +8,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { imagesToPdf } from '../utils/pdfUtils'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
   { q: 'Can I combine multiple JPG files into a single PDF?', a: 'Yes. You can upload dozens of JPG files at once, easily rearrange their page sequence, and compile them into a single high-quality PDF document.' },
@@ -359,14 +360,22 @@ export default function JpgToPdf() {
 
               {error && <p className="error-message">{error}</p>}
 
-              <button
-                className="btn btn-primary btn-gradient"
-                onClick={handleDownload}
-                disabled={processing || !resultBlob}
-                style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
-              >
-                <Download size={18} /> Download Compiled PDF
-              </button>
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                <button
+                  className="btn btn-primary btn-gradient"
+                  onClick={handleDownload}
+                  disabled={processing || !resultBlob}
+                  style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
+                >
+                  <Download size={18} /> Download Compiled PDF
+                </button>
+                {resultBlob && (
+                  <SecureShareButton 
+                    file={resultBlob} 
+                    fileName={`${files.length > 0 ? files[0].file.name.replace(/\.[^/.]+$/, '') : 'document'}-converted.pdf`} 
+                  />
+                )}
+              </div>
             </div>
           </section>
         )}

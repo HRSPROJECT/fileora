@@ -9,6 +9,7 @@ import FaqSection from '../components/home/FaqSection'
 import * as pdfjsLib from 'pdfjs-dist'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs'
 
@@ -514,13 +515,21 @@ export default function NumberPdf() {
                     ✓ Page Numbers Added!
                   </div>
                   
-                  <button
-                    className="btn btn-primary btn-gradient"
-                    onClick={handleDownload}
-                    style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
-                  >
-                    <Download size={18} /> Download Numbered PDF
-                  </button>
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                    <button
+                      className="btn btn-primary btn-gradient"
+                      onClick={handleDownload}
+                      style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '15px' }}
+                    >
+                      <Download size={18} /> Download Numbered PDF
+                    </button>
+                    {downloadableBlob && (
+                      <SecureShareButton 
+                        file={downloadableBlob} 
+                        fileName={`${basename(file.name)}-numbered.pdf`} 
+                      />
+                    )}
+                  </div>
 
                   <button
                     className="btn btn-ghost"

@@ -8,6 +8,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { decryptPDF, isEncrypted } from '@pdfsmaller/pdf-decrypt'
 import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
   { q: 'Is it safe to unlock confidential files on Fileora?', a: 'Completely. The decryption is performed 100% locally inside your web browser. The password and PDF contents are never transmitted across the internet.' },
@@ -205,13 +206,21 @@ export default function UnlockPdf() {
                   <div style={{ padding: '12px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '6px', border: '1px solid var(--border-color)', textAlign: 'center', fontSize: '14px', color: 'var(--success)', fontWeight: 600 }}>
                     Successfully Decrypted!
                   </div>
-                  <button
-                    className="btn btn-primary btn-gradient"
-                    onClick={handleDownload}
-                    style={{ width: '100%', padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
-                  >
-                    <Download size={18} /> Download Decrypted PDF
-                  </button>
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '16px' }}>
+                    <button
+                      className="btn btn-primary btn-gradient"
+                      onClick={handleDownload}
+                      style={{ flex: 1, padding: '14px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '16px' }}
+                    >
+                      <Download size={18} /> Download Decrypted PDF
+                    </button>
+                    {unlockedBlob && (
+                      <SecureShareButton 
+                        file={unlockedBlob} 
+                        fileName={`${file.name.replace(/\.pdf$/i, '')}-unlocked.pdf`} 
+                      />
+                    )}
+                  </div>
                 </div>
               )}
             </div>

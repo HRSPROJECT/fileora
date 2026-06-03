@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Shield, Settings, FileImage, ArrowLeft, Trash2, CheckCircle2, Share } from 'lucide-react';
+import { Download, Shield, Settings, FileImage, ArrowLeft, Trash2, CheckCircle2, Share, Share2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import JSZip from 'jszip';
 import { compressImage, formatBytes } from '../../utils/imageUtils';
+import { useShare } from '../../context/ShareContext';
 import ImageComparisonSlider from './ImageComparisonSlider';
 
 const Workspace = ({ files, setFiles, onReset }) => {
+  const navigate = useNavigate();
+  const { setFileToShare } = useShare();
   const [activeFileIndex, setActiveFileIndex] = useState(0);
   
   // Global Settings
@@ -128,6 +132,47 @@ const Workspace = ({ files, setFiles, onReset }) => {
         console.error('Clipboard copy failed', err);
         alert("Direct file sharing is not supported on this browser. Please download the image instead.");
       }
+    }
+  };
+
+  const [isSharing, setIsSharing] = useState(false);
+
+  const handleShareDirectly = async () => {
+    if (Object.keys(results).length === 0) return;
+    setIsSharing(true);
+    try {
+      let finalBlob;
+      let finalName;
+
+      if (files.length === 1) {
+        const res = results[0];
+        if (!res || !res.blob) return;
+        const nameWithoutExt = files[0].name.substring(0, files[0].name.lastIndexOf('.')) || files[0].name;
+        const ext = format.toLowerCase() === 'jpeg' ? 'jpg' : format.toLowerCase();
+        finalBlob = res.blob;
+        finalName = `${nameWithoutExt}-optimized.${ext}`;
+      } else {
+        const zip = new JSZip();
+        Object.keys(results).forEach(index => {
+          const res = results[index];
+          const file = files[index];
+          if (res && res.blob) {
+            const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            const ext = format.toLowerCase() === 'jpeg' ? 'jpg' : format.toLowerCase();
+            zip.file(`${nameWithoutExt}-optimized.${ext}`, res.blob);
+          }
+        });
+        finalBlob = await zip.generateAsync({ type: 'blob' });
+        finalName = `fileora-optimized-batch.zip`;
+      }
+
+      const fileObj = new File([finalBlob], finalName, { type: finalBlob.type || 'application/octet-stream' });
+      setFileToShare(fileObj);
+      navigate('/share');
+    } catch (err) {
+      console.error('P2P Share preparation failed', err);
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -422,31 +467,55 @@ const Workspace = ({ files, setFiles, onReset }) => {
             )}
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button 
-              className="btn btn-primary" 
-              style={{ flex: 1, padding: '1rem', fontSize: '1rem', borderRadius: 'var(--radius-lg)' }}
-              onClick={handleDownloadAll}
-              disabled={Object.keys(results).length === 0 || isProcessing}
-            >
-              {isProcessing ? (
-                <span>Processing...</span>
-              ) : (
-                <>
-                  <Download size={20} /> {files.length > 1 ? 'Download ZIP' : 'Download Image'}
-                </>
-              )}
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button 
+                className="btn btn-primary btn-gradient" 
+                style={{ flex: 1, padding: '1rem', fontSize: '1rem', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'linear-gradient(to right, #6EE7B7, #3B82F6)', color: '#000', fontWeight: 'bold' }}
+                onClick={handleDownloadAll}
+                disabled={Object.keys(results).length === 0 || isProcessing}
+              >
+                {isProcessing ? (
+                  <span>Processing...</span>
+                ) : (
+                  <>
+                    <Download size={20} /> {files.length > 1 ? 'Download ZIP' : 'Download Image'}
+                  </>
+                )}
+              </button>
+              
+              <button 
+                className="btn btn-secondary" 
+                style={{ padding: '1rem', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)' }}
+                onClick={handleShareActiveFile}
+                disabled={!activeResult || isProcessing}
+                title="Share active image"
+              >
+                <Share size={20} />
+              </button>
+            </div>
             
-            <button 
-              className="btn btn-secondary" 
-              style={{ padding: '1rem', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)' }}
-              onClick={handleShareActiveFile}
-              disabled={!activeResult || isProcessing}
-              title="Share active image"
-            >
-              <Share size={20} />
-            </button>
+            {Object.keys(results).length > 0 && !isProcessing && (
+              <button 
+                className="btn btn-secondary" 
+                style={{ 
+                  padding: '1rem', 
+                  fontSize: '1rem', 
+                  borderRadius: 'var(--radius-lg)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+                onClick={handleShareDirectly}
+                disabled={isSharing}
+              >
+                <Share2 size={20} style={{ color: 'var(--accent-primary)' }} />
+                <span>{isSharing ? 'Preparing Share...' : (files.length > 1 ? 'Share ZIP Directly (P2P)' : 'Share Directly (P2P)')}</span>
+              </button>
+            )}
           </div>
 
         </div>
