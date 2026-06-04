@@ -26,11 +26,14 @@ export default function RepeatVideo() {
   const videoRef = useRef(null);
 
   useEffect(() => {
+    clearOPFSSandbox();
+  }, []);
+
+  useEffect(() => {
     return () => {
-      clearOPFSSandbox();
       if (tempUrl) URL.revokeObjectURL(tempUrl);
     };
-  }, []);
+  }, [tempUrl]);
 
   const handleFileSelect = async (filesList) => {
     const selected = filesList[0];

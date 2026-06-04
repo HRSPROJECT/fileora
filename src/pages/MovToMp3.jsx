@@ -23,9 +23,7 @@ export default function MovToMp3() {
   const [bitrate, setBitrate] = useState(192);
 
   useEffect(() => {
-    return () => {
-      clearOPFSSandbox();
-    };
+    clearOPFSSandbox();
   }, []);
 
   const handleFileSelect = async (filesList) => {

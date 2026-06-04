@@ -23,10 +23,8 @@ export default function MovToMp4() {
   const [scale, setScale] = useState(100);
 
   useEffect(() => {
-    // Clear storage on unmount to save space
-    return () => {
-      clearOPFSSandbox();
-    };
+    // Clear storage on mount
+    clearOPFSSandbox();
   }, []);
 
   const handleFileSelect = async (filesList) => {

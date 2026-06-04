@@ -30,12 +30,14 @@ export default function TrimVideo() {
   const videoRef = useRef(null);
 
   useEffect(() => {
+    clearOPFSSandbox();
+  }, []);
+
+  useEffect(() => {
     return () => {
-      clearOPFSSandbox();
-      // Revoke the preview URL on unmount to prevent leaks
       if (tempUrl) URL.revokeObjectURL(tempUrl);
     };
-  }, []);
+  }, [tempUrl]);
 
   // Convert float seconds to HH:MM:SS.SS or MM:SS.SS
   const secondsToTimestamp = (secs) => {

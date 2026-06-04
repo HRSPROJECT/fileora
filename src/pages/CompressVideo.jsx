@@ -25,9 +25,7 @@ export default function CompressVideo() {
   const [scale, setScale] = useState(100);
 
   useEffect(() => {
-    return () => {
-      clearOPFSSandbox();
-    };
+    clearOPFSSandbox();
   }, []);
 
   const handleFileSelect = async (filesList) => {

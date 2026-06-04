@@ -20,9 +20,7 @@ export default function MergeVideo() {
   const [resultBlob, setResultBlob] = useState(null);
 
   useEffect(() => {
-    return () => {
-      clearOPFSSandbox();
-    };
+    clearOPFSSandbox();
   }, []);
 
   const handleFileSelect = async (filesList) => {
