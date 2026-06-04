@@ -10,7 +10,7 @@ import Footer from '../components/shared/Footer'
 import { 
   createPeer, waitForPeerOpen, waitForConnOpen,
   sendFileChunks, normalizePeerId,
-  makePeerId, makePin
+  makePeerId, makePin, CHUNK_SIZE
 } from '../utils/p2pEngine'
 import { makeQrDataUrl, isQrFriendlyPayload } from '../utils/shareQr'
 import { useShare } from '../context/ShareContext'
@@ -152,7 +152,28 @@ export default function Share() {
     setTransferStatus('');
   };
 
-  useEffect(() => () => cleanupConnections(), []);
+  const cleanupOpfsFiles = async () => {
+    if (typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.getDirectory === 'function') {
+      try {
+        const root = await navigator.storage.getDirectory();
+        for await (const name of root.keys()) {
+          if (name.startsWith('fileora_receive_')) {
+            await root.removeEntry(name).catch(() => {});
+          }
+        }
+      } catch (e) {
+        console.warn('[Share] Failed to cleanup temp OPFS files:', e);
+      }
+    }
+  };
+
+  useEffect(() => {
+    cleanupOpfsFiles();
+    return () => {
+      cleanupConnections();
+      cleanupOpfsFiles();
+    };
+  }, []);
 
   // Drag and Drop handlers
   const handleDragOver = (e) => {
@@ -363,6 +384,12 @@ export default function Share() {
       let bytesReceived = 0;
       let startTime = Date.now();
 
+      let opfsFileHandle = null;
+      let opfsWritable = null;
+      let opfsWriteQueue = Promise.resolve();
+      let useOpfs = false;
+      let opfsFileName = '';
+
       conn.on('data', (data) => {
         if (data && typeof data === 'object' && data.type) {
           if (data.type === 'AUTH_OK') {
@@ -378,41 +405,102 @@ export default function Share() {
             setStatus(`Receiving ${data.name}...`);
             setTransferStatus('Pipelining chunks...');
             startTime = Date.now();
+
+            // Initialize OPFS storage asynchronously
+            useOpfs = false;
+            if (typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.getDirectory === 'function') {
+              opfsFileName = `fileora_receive_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+              opfsWriteQueue = (async () => {
+                try {
+                  const root = await navigator.storage.getDirectory();
+                  opfsFileHandle = await root.getFileHandle(opfsFileName, { create: true });
+                  opfsWritable = await opfsFileHandle.createWritable();
+                  useOpfs = true;
+                  console.log('[P2P Receiver] OPFS initialized successfully:', opfsFileName);
+                } catch (err) {
+                  console.warn('[P2P Receiver] OPFS initialization failed, falling back to RAM:', err);
+                  useOpfs = false;
+                }
+              })();
+            }
           } else if (data.type === 'TRANSFER_COMPLETE') {
-            const blob = new Blob(incomingChunks, { type: fileMeta?.mime || 'application/octet-stream' });
-            const fileUrl = URL.createObjectURL(blob);
-            setReceivedFile({
-              name: fileMeta?.name || 'received-file',
-              size: fileMeta?.size || bytesReceived,
-              url: fileUrl
+            setStatus('Assembling received file...');
+            setTransferStatus('Finalizing stream...');
+
+            opfsWriteQueue.then(async () => {
+              try {
+                let fileUrl = '';
+                if (useOpfs && opfsWritable && opfsFileHandle) {
+                  await opfsWritable.close();
+                  const file = await opfsFileHandle.getFile();
+                  // Re-wrap to ensure metadata properties (name and type) are fully preserved
+                  const metaFile = new File([file], fileMeta?.name || 'received-file', {
+                    type: fileMeta?.mime || 'application/octet-stream'
+                  });
+                  fileUrl = URL.createObjectURL(metaFile);
+                  console.log('[P2P Receiver] Assembly from OPFS completed.');
+                } else {
+                  const blob = new Blob(incomingChunks, { type: fileMeta?.mime || 'application/octet-stream' });
+                  fileUrl = URL.createObjectURL(blob);
+                  console.log('[P2P Receiver] Assembly from RAM completed.');
+                }
+
+                setReceivedFile({
+                  name: fileMeta?.name || 'received-file',
+                  size: fileMeta?.size || bytesReceived,
+                  url: fileUrl,
+                  opfsFileName: useOpfs ? opfsFileName : null
+                });
+
+                updateConnectionState('completed');
+                setStatus('Transfer complete!');
+                setTransferStatus('Assembly finished!');
+
+                // Auto download
+                const a = document.createElement('a');
+                a.href = fileUrl;
+                a.download = fileMeta?.name || 'received-file';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                cleanupConnections();
+              } catch (err) {
+                console.error('[P2P Receiver] Failed to finalize P2P assembly:', err);
+                setErrorMessage('Failed to assemble the received file.');
+                updateConnectionState('error');
+                cleanupConnections();
+              }
             });
-            updateConnectionState('completed');
-            setStatus('Transfer complete!');
-            setTransferStatus('Assembly finished!');
-            
-            // Auto download
-            const a = document.createElement('a');
-            a.href = fileUrl;
-            a.download = fileMeta?.name || 'received-file';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            cleanupConnections();
           }
         } else {
           if (data) {
-            incomingChunks.push(data);
             bytesReceived += data.byteLength || data.size || 0;
+
+            const chunkData = data;
+            opfsWriteQueue = opfsWriteQueue.then(async () => {
+              if (useOpfs && opfsWritable) {
+                try {
+                  await opfsWritable.write(chunkData);
+                } catch (err) {
+                  console.error('[P2P Receiver] OPFS write failed, falling back to RAM:', err);
+                  useOpfs = false;
+                  incomingChunks.push(chunkData);
+                }
+              } else {
+                incomingChunks.push(chunkData);
+              }
+            });
+
             if (fileMeta && fileMeta.size) {
               const progress = Math.min(Math.round((bytesReceived / fileMeta.size) * 100), 100);
               setReceiverProgress(progress);
-              
+
               const elapsed = (Date.now() - startTime) / 1000;
               if (elapsed > 0.5) {
                 const speedBytesSec = bytesReceived / elapsed;
                 const speedMb = (speedBytesSec / (1024 * 1024)).toFixed(1);
                 setReceiverSpeed(speedMb + ' MB/s');
-                
+
                 const remainingBytes = fileMeta.size - bytesReceived;
                 if (speedBytesSec > 0) {
                   const etaSecs = Math.ceil(remainingBytes / speedBytesSec);
@@ -664,7 +752,7 @@ export default function Share() {
                           <div>&gt; Status: {transferStatus || 'Negotiating RTC connection'}</div>
                           {senderSpeed && <div>&gt; Current Speed: {senderSpeed}</div>}
                           {senderEta && <div>&gt; Time Remaining: {senderEta}</div>}
-                          <div>&gt; Chunks Transferred: {Math.ceil(selectedFile.size * (senderProgress / 100) / (selectedFile.size > 500 * 1024 * 1024 ? 256 * 1024 : (selectedFile.size > 100 * 1024 * 1024 ? 128 * 1024 : 64 * 1024)))}</div>
+                          <div>&gt; Chunks Transferred: {Math.ceil(selectedFile.size * (senderProgress / 100) / CHUNK_SIZE)}</div>
                         </div>
                       </div>
                     )}
@@ -810,7 +898,19 @@ export default function Share() {
                         <span>Download Local Copy</span>
                       </a>
                       <button 
-                        onClick={() => { setReceivedFile(null); cleanupConnections(); updateConnectionState('idle'); }} 
+                        onClick={async () => {
+                          if (receivedFile?.opfsFileName) {
+                            try {
+                              const root = await navigator.storage.getDirectory();
+                              await root.removeEntry(receivedFile.opfsFileName).catch(() => {});
+                            } catch (e) {
+                              console.warn('OPFS: Failed to delete temporary file:', e);
+                            }
+                          }
+                          setReceivedFile(null); 
+                          cleanupConnections(); 
+                          updateConnectionState('idle'); 
+                        }} 
                         className="btn-premium btn-premium-secondary"
                         style={{ padding: '10px 24px', borderRadius: '8px' }}
                       >

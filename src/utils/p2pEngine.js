@@ -4,7 +4,7 @@
  */
 import Peer from 'peerjs';
 
-export const CHUNK_SIZE = 64 * 1024; // 64 KB chunks
+export const CHUNK_SIZE = 256 * 1024; // 256 KB chunks
 
 export const makePeerId = () =>
   `fileora-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -70,31 +70,13 @@ export const sendFileChunks = (file, conn, onProgress, onStatus) => {
   const channel = conn.dataChannel || conn; // If PeerJS, conn.dataChannel. If raw RTCDataChannel, conn itself.
   const isPeerJS = !!conn.dataChannel;
   const fileSize = file.size;
-
-  // Dynamic chunk sizing based on file size:
-  // - > 500 MB: 256 KB chunks
-  // - > 100 MB: 128 KB chunks
-  // - Otherwise: 64 KB chunks
-  const chunkSize = fileSize > 500 * 1024 * 1024 
-    ? 256 * 1024 
-    : (fileSize > 100 * 1024 * 1024 ? 128 * 1024 : 64 * 1024);
-
-  const reader = new FileReader();
-  let offset = 0;
-  let paused = false;
+  const chunkSize = CHUNK_SIZE;
 
   const BACKPRESSURE_THRESHOLD = 1024 * 1024; // 1 MB high threshold
   const LOW_THRESHOLD = 256 * 1024; // 256 KB low threshold
 
   if (channel) {
     channel.bufferedAmountLowThreshold = LOW_THRESHOLD;
-    channel.onbufferedamountlow = () => {
-      if (paused) {
-        paused = false;
-        if (onStatus) onStatus('Streaming chunks (buffer drained)...');
-        next();
-      }
-    };
   }
 
   const sendMsg = (msg) => {
@@ -109,48 +91,93 @@ export const sendFileChunks = (file, conn, onProgress, onStatus) => {
     }
   };
 
-  const next = () => {
-    const isOpen = isPeerJS ? conn.open : (channel && channel.readyState === 'open');
-    if (!isOpen) return;
+  const prefetchQueue = [];
+  const MAX_PREFETCH = 8;
+  let readOffset = 0;
 
-    if (channel && channel.bufferedAmount > BACKPRESSURE_THRESHOLD) {
-      paused = true;
-      if (onStatus) onStatus('Throttling transfer (network buffer full)...');
-      return;
+  const startPrefetch = () => {
+    while (prefetchQueue.length < MAX_PREFETCH && readOffset < fileSize) {
+      const start = readOffset;
+      const end = Math.min(readOffset + chunkSize, fileSize);
+      readOffset = end;
+      // Slice and read as arrayBuffer asynchronously
+      const promise = file.slice(start, end).arrayBuffer();
+      prefetchQueue.push(promise);
     }
-
-    reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize));
   };
 
-  reader.onload = (e) => {
-    const buf = e.target.result;
-    if (!buf) return;
+  const waitLowBuffer = (chan) => {
+    return new Promise((resolve) => {
+      const cleanUp = () => {
+        chan.removeEventListener('bufferedamountlow', handleLow);
+        chan.removeEventListener('close', handleClose);
+      };
+      const handleLow = () => {
+        cleanUp();
+        resolve();
+      };
+      const handleClose = () => {
+        cleanUp();
+        resolve();
+      };
+      chan.addEventListener('bufferedamountlow', handleLow);
+      chan.addEventListener('close', handleClose);
+    });
+  };
 
-    try {
-      sendMsg(buf);
-      offset += buf.byteLength;
-      onProgress(offset, fileSize);
+  const sendLoop = async () => {
+    let sentOffset = 0;
+    if (onStatus) onStatus('Pipelining chunks...');
 
-      if (offset < fileSize) {
-        next();
-      } else {
-        sendMsg({ type: 'TRANSFER_COMPLETE' });
-        onProgress(fileSize, fileSize);
-        if (onStatus) onStatus('Transfer complete!');
+    // Trigger initial prefetch
+    startPrefetch();
+
+    while (sentOffset < fileSize) {
+      const isOpen = isPeerJS ? conn.open : (channel && channel.readyState === 'open');
+      if (!isOpen) {
+        console.warn('[P2P] Connection closed during send loop.');
+        break;
       }
-    } catch (err) {
-      console.error('[P2P] Send error:', err);
-      if (onStatus) onStatus('Error sending chunk.');
+
+      if (channel && channel.bufferedAmount > BACKPRESSURE_THRESHOLD) {
+        if (onStatus) onStatus('Throttling transfer (network buffer full)...');
+        await waitLowBuffer(channel);
+        if (onStatus) onStatus('Streaming chunks (buffer drained)...');
+        continue;
+      }
+
+      if (prefetchQueue.length === 0) {
+        break;
+      }
+
+      const chunkPromise = prefetchQueue.shift();
+      
+      // Immediately queue another slice read to keep pipeline full
+      startPrefetch();
+
+      try {
+        const buf = await chunkPromise;
+        if (!buf) continue;
+
+        sendMsg(buf);
+        sentOffset += buf.byteLength;
+        onProgress(sentOffset, fileSize);
+      } catch (err) {
+        console.error('[P2P] Send error:', err);
+        if (onStatus) onStatus('Error sending chunk.');
+        break;
+      }
+    }
+
+    const isOpen = isPeerJS ? conn.open : (channel && channel.readyState === 'open');
+    if (isOpen && sentOffset >= fileSize) {
+      sendMsg({ type: 'TRANSFER_COMPLETE' });
+      onProgress(fileSize, fileSize);
+      if (onStatus) onStatus('Transfer complete!');
     }
   };
 
-  reader.onerror = (e) => {
-    console.error('[P2P] FileReader error', e);
-    if (onStatus) onStatus('File read error.');
-  };
-
-  if (onStatus) onStatus('Pipelining chunks...');
-  next();
+  sendLoop();
 };
 
 /** Create a raw WebRTC RTCPeerConnection for offline direct sharing */
