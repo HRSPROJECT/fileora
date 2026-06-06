@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import { Helmet } from 'react-helmet-async'
@@ -33,6 +33,16 @@ export default function MergePdf() {
     onFile: onHandoffFile,
     onFiles: onHandoffFiles,
   })
+  const workspaceRef = useRef(null)
+
+  useEffect(() => {
+    if (!handoffNotice || files.length === 0) return
+    const frame = requestAnimationFrame(() => {
+      const controls = workspaceRef.current?.querySelector('.workspace-controls')
+      ;(controls || workspaceRef.current)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [handoffNotice, files.length])
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) }
   const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Fileora PDF Merger', url: 'https://fileora.tech/merge-pdf', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }
 
@@ -63,7 +73,11 @@ export default function MergePdf() {
           <p>Merge multiple PDF files in your chosen order without uploads or quality loss. Enjoy 100% private, instantaneous client-side stitching.</p>
         </section>
         <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
-        {files.length ? <MergePdfWorkspace files={files} setFiles={setFiles} onReset={() => setFiles([])} /> : <MergePdfLanding error={error} onFiles={(nextFiles) => {
+        {files.length ? (
+          <div ref={workspaceRef}>
+            <MergePdfWorkspace files={files} setFiles={setFiles} onReset={() => setFiles([])} />
+          </div>
+        ) : <MergePdfLanding error={error} onFiles={(nextFiles) => {
           const total = nextFiles.reduce((sum, item) => sum + item.size, 0)
           const accepted = nextFiles.filter((next) => next.type === 'application/pdf')
           if (accepted.length < 2 || total > 100 * 1024 * 1024) {

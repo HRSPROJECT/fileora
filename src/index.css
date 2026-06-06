@@ -632,6 +632,44 @@ img {
   gap: 0.65rem;
 }
 
+.file-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+}
+
+.file-order-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.file-order-row .file-order-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.file-order-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
 .sortable-row {
   min-height: 60px;
   display: grid;

@@ -70,15 +70,15 @@ export default function MergePdfWorkspace({ files, setFiles, onReset }) {
       </div>
       <div className="workspace-controls">
         <label>Files & Ordering</label>
-        <div className="file-list-panel" style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '16px', background: 'var(--bg-tertiary)', borderRadius: '8px', padding: '8px' }}>
+        <div className="file-order-list">
           {files.map((file, index) => (
-            <div className="sortable-row" key={`${file.name}-${index}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', background: 'var(--bg-secondary)', borderRadius: '4px', marginBottom: '4px' }}>
-              <GripVertical size={18} style={{ cursor: 'grab', opacity: 0.5 }} />
-              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '14px' }}>{index + 1}. {file.name}</span>
-              <small style={{ color: 'var(--text-tertiary)' }}>{pageCounts[index] ?? '...'} pages · {formatBytes(file.size)}</small>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                <button className="mini-button" type="button" onClick={() => move(index, index - 1)} disabled={index === 0}>↑</button>
-                <button className="mini-button" type="button" onClick={() => move(index, index + 1)} disabled={index === files.length - 1}>↓</button>
+            <div className="file-order-row" key={`${file.name}-${index}`}>
+              <GripVertical size={18} style={{ cursor: 'grab', opacity: 0.5, flexShrink: 0 }} />
+              <span className="file-order-name">{index + 1}. {file.name}</span>
+              <small style={{ color: 'var(--text-tertiary)', flexShrink: 0, fontSize: '12px' }}>{pageCounts[index] ?? '...'} pg</small>
+              <div className="file-order-actions">
+                <button className="mini-button" type="button" onClick={() => move(index, index - 1)} disabled={index === 0} aria-label={`Move ${file.name} up`}>↑</button>
+                <button className="mini-button" type="button" onClick={() => move(index, index + 1)} disabled={index === files.length - 1} aria-label={`Move ${file.name} down`}>↓</button>
               </div>
             </div>
           ))}

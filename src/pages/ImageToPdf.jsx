@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import { Helmet } from 'react-helmet-async'
@@ -33,6 +33,16 @@ export default function ImageToPdf() {
     onFile: onHandoffFile,
     onFiles: onHandoffFiles,
   })
+  const workspaceRef = useRef(null)
+
+  useEffect(() => {
+    if (!handoffNotice || files.length === 0) return
+    const frame = requestAnimationFrame(() => {
+      const controls = workspaceRef.current?.querySelector('.workspace-controls')
+      ;(controls || workspaceRef.current)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [handoffNotice, files.length])
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) }
   const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Fileora Image to PDF Converter', url: 'https://fileora.tech/image-to-pdf', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }
 
@@ -63,7 +73,11 @@ export default function ImageToPdf() {
           <p>Turn JPG, PNG and WebP images into a single PDF with page size and margin controls. Absolutely private execution in your browser.</p>
         </section>
         <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
-        {files.length ? <ImageToPdfWorkspace files={files} setFiles={setFiles} onReset={() => setFiles([])} /> : <ImageToPdfLanding error={error} onFiles={(nextFiles) => {
+        {files.length ? (
+          <div ref={workspaceRef}>
+            <ImageToPdfWorkspace files={files} setFiles={setFiles} onReset={() => setFiles([])} />
+          </div>
+        ) : <ImageToPdfLanding error={error} onFiles={(nextFiles) => {
           const supported = ['image/jpeg', 'image/png', 'image/webp']
           const accepted = nextFiles.filter((next) => supported.includes(next.type) && next.size <= 50 * 1024 * 1024)
           if (!accepted.length) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useWorkflow } from '../context/WorkflowContext'
 
@@ -13,11 +13,11 @@ export function useWorkflowHandoff(toolId, { onFile, onFiles, onSnapshot } = {})
   const [notice, setNotice] = useState(null)
   const appliedOnMountRef = useRef(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     appliedOnMountRef.current = false
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const workflowNav = location.state?.workflowHandoff === true
 
     if (!workflowNav && !handoff) {
