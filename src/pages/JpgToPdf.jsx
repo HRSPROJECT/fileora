@@ -30,8 +30,21 @@ export default function JpgToPdf() {
   const [resultBlob, setResultBlob] = useState(null)
   const [resultUrl, setResultUrl] = useState(null)
 
-  const onHandoffFile = useCallback((file) => { setFiles([file]); setError('') }, [])
-  const onHandoffFiles = useCallback((nextFiles) => { setFiles(nextFiles); setError('') }, [])
+  const wrapHandoffFiles = useCallback((incoming) =>
+    incoming.map((item) =>
+      item instanceof File
+        ? { file: item, thumb: URL.createObjectURL(item) }
+        : item
+    ), [])
+
+  const onHandoffFile = useCallback((file) => {
+    setFiles(wrapHandoffFiles([file]))
+    setError('')
+  }, [wrapHandoffFiles])
+  const onHandoffFiles = useCallback((nextFiles) => {
+    setFiles(wrapHandoffFiles(nextFiles))
+    setError('')
+  }, [wrapHandoffFiles])
   const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('jpg-to-pdf', { onFile: onHandoffFile, onFiles: onHandoffFiles })
 
   const runConvert = async () => {
@@ -42,7 +55,7 @@ export default function JpgToPdf() {
       // Small timeout to give DOM time to update spinner
       await new Promise((r) => setTimeout(r, 600))
       
-      const fileObjects = files.map(f => f.file)
+      const fileObjects = files.map((f) => (f instanceof File ? f : f.file))
       const blob = await imagesToPdf(fileObjects, { pageSize, orientation, margin })
       
       if (resultUrl) URL.revokeObjectURL(resultUrl)

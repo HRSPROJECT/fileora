@@ -180,14 +180,21 @@ const Workspace = ({ files, setFiles, onReset }) => {
 
   const activeResult = results[activeFileIndex];
 
-  const getActiveHandoffFile = () => {
-    const res = results[activeFileIndex];
-    const source = files[activeFileIndex];
+  const buildHandoffFile = (index) => {
+    const res = results[index];
+    const source = files[index];
     if (!res?.blob || !source) return null;
     const nameWithoutExt = source.name.substring(0, source.name.lastIndexOf('.')) || source.name;
     const ext = format.toLowerCase() === 'jpeg' ? 'jpg' : format.toLowerCase();
     return blobToHandoffFile(res.blob, `${nameWithoutExt}-optimized.${ext}`, res.blob.type);
   };
+
+  const getActiveHandoffFile = () => buildHandoffFile(activeFileIndex);
+
+  const getAllHandoffFiles = () =>
+    Object.keys(results)
+      .map((key) => buildHandoffFile(Number(key)))
+      .filter(Boolean);
 
   const totals = React.useMemo(() => {
     let orig = 0;
@@ -530,8 +537,9 @@ const Workspace = ({ files, setFiles, onReset }) => {
 
             <ContinueWithPanel
               sourceToolId="compress"
-              file={getActiveHandoffFile()}
-              disabled={!activeResult || isProcessing}
+              file={files.length === 1 ? getActiveHandoffFile() : null}
+              files={files.length > 1 ? getAllHandoffFiles() : null}
+              disabled={Object.keys(results).length === 0 || isProcessing}
             />
           </div>
 

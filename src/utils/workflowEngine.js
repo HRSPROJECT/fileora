@@ -10,6 +10,7 @@ export const TOOLS = {
     title: 'Image Compressor',
     category: 'image',
     acceptsMime: ['image/'],
+    acceptsMultiple: true,
     offline: true,
   },
   resize: {
@@ -18,6 +19,7 @@ export const TOOLS = {
     title: 'Image Resizer',
     category: 'image',
     acceptsMime: ['image/'],
+    multiMode: 'first-only',
     offline: true,
   },
   convert: {
@@ -26,6 +28,7 @@ export const TOOLS = {
     title: 'Image Converter',
     category: 'image',
     acceptsMime: ['image/'],
+    multiMode: 'first-only',
     offline: true,
   },
   'image-to-pdf': {
@@ -34,6 +37,7 @@ export const TOOLS = {
     title: 'Image to PDF',
     category: 'image',
     acceptsMime: ['image/'],
+    acceptsMultiple: true,
     offline: true,
   },
   'png-to-pdf': {
@@ -42,6 +46,7 @@ export const TOOLS = {
     title: 'PNG to PDF',
     category: 'image',
     acceptsMime: ['image/png'],
+    acceptsMultiple: true,
     offline: true,
   },
   'jpg-to-pdf': {
@@ -50,6 +55,7 @@ export const TOOLS = {
     title: 'JPG to PDF',
     category: 'image',
     acceptsMime: ['image/jpeg', 'image/jpg', 'image/webp', 'image/png'],
+    acceptsMultiple: true,
     offline: true,
   },
   'heic-to-jpg': {
@@ -58,6 +64,7 @@ export const TOOLS = {
     title: 'HEIC to JPG',
     category: 'image',
     acceptsMime: ['image/heic', 'image/heif'],
+    acceptsMultiple: true,
     offline: true,
   },
   'passport-photo': {
@@ -74,6 +81,7 @@ export const TOOLS = {
     title: 'AI Document Scanner',
     category: 'scanner',
     acceptsMime: ['image/', 'application/pdf'],
+    acceptsMultiple: true,
     offline: true,
   },
   'merge-pdf': {
@@ -82,6 +90,8 @@ export const TOOLS = {
     title: 'Merge PDF',
     category: 'pdf',
     acceptsMime: ['application/pdf'],
+    acceptsMultiple: true,
+    minFiles: 2,
     offline: true,
   },
   'compress-pdf': {
@@ -238,6 +248,8 @@ export const TOOLS = {
     title: 'Merge Video',
     category: 'video',
     acceptsMime: ['video/'],
+    acceptsMultiple: true,
+    minFiles: 2,
     offline: true,
   },
   'mov-to-mp3': {
@@ -308,33 +320,60 @@ export const toolAcceptsFile = (toolId, file) => {
   return mimeMatches(file.type || '', tool.acceptsMime)
 }
 
+export const toHandoffFile = (file) => {
+  if (!file) return null
+  if (file instanceof File) return file
+  return new File([file], 'fileora-output', { type: file.type || 'application/octet-stream' })
+}
+
+export const normalizeFileList = (file, files) => {
+  const raw = files?.length ? files : file ? [file] : []
+  return raw.map(toHandoffFile).filter(Boolean)
+}
+
 /**
  * @param {string} sourceToolId
- * @param {File|Blob} file
+ * @param {File|Blob|null} file
  * @param {boolean} isOnline
+ * @param {File[]|null} files
  */
-export const getContinueOptions = (sourceToolId, file, isOnline = true) => {
-  const ordered = CONTINUE_GRAPH[sourceToolId] || []
-  const fileObj = file instanceof File
-    ? file
-    : file
-      ? new File([file], 'fileora-output', { type: file.type || 'application/octet-stream' })
-      : null
+export const getContinueOptions = (sourceToolId, file, isOnline = true, files = null) => {
+  const fileList = normalizeFileList(file, files)
+  if (!fileList.length) return []
 
-  if (!fileObj) return []
+  const isMulti = fileList.length > 1
+  const ordered = CONTINUE_GRAPH[sourceToolId] || []
 
   return ordered
     .filter((id) => id !== sourceToolId && TOOLS[id])
-    .filter((id) => toolAcceptsFile(id, fileObj))
+    .filter((id) => fileList.every((f) => toolAcceptsFile(id, f)))
+    .filter((id) => {
+      const tool = TOOLS[id]
+      if (tool.minFiles && fileList.length < tool.minFiles) return false
+      if (isMulti && !tool.acceptsMultiple && tool.multiMode !== 'first-only' && tool.id !== 'share') {
+        return false
+      }
+      return true
+    })
     .filter((id) => {
       if (TOOLS[id].needsNetwork && !isOnline) return false
       return true
     })
-    .map((id) => ({
-      ...TOOLS[id],
-      disabled: TOOLS[id].needsNetwork && !isOnline,
-      hint: TOOLS[id].needsNetwork ? 'Wi‑Fi required' : null,
-    }))
+    .map((id) => {
+      const tool = TOOLS[id]
+      let hint = tool.needsNetwork ? 'Wi‑Fi required' : null
+      if (isMulti && tool.multiMode === 'first-only') {
+        hint = hint ? `${hint} · First file only` : 'First file only'
+      }
+      if (isMulti && tool.acceptsMultiple) {
+        hint = hint ? `${hint} · All ${fileList.length} files` : `All ${fileList.length} files`
+      }
+      return {
+        ...tool,
+        disabled: tool.needsNetwork && !isOnline,
+        hint,
+      }
+    })
 }
 
 export const blobToHandoffFile = (blob, name, type) => {

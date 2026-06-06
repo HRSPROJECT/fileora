@@ -445,9 +445,11 @@ export default function HeicToJpg() {
 
                   <ContinueWithBlob
                     sourceToolId="heic-to-jpg"
-                    blob={results[0]?.blob}
-                    fileName={results[0]?.name}
-                    mimeType={results[0]?.blob?.type}
+                    fileEntries={results.map((res) => ({
+                      blob: res.blob,
+                      fileName: res.name,
+                      mimeType: res.blob?.type,
+                    }))}
                     disabled={results.length === 0 || processing}
                   />
 

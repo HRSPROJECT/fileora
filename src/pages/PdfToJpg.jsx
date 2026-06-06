@@ -615,9 +615,11 @@ export default function PdfToJpg() {
 
                   <ContinueWithBlob
                     sourceToolId="pdf-to-jpg"
-                    blob={results[0]?.blob}
-                    fileName={results[0]?.name}
-                    mimeType={format === 'png' ? 'image/png' : 'image/jpeg'}
+                    fileEntries={results.map((res) => ({
+                      blob: res.blob,
+                      fileName: res.name,
+                      mimeType: format === 'png' ? 'image/png' : 'image/jpeg',
+                    }))}
                     disabled={results.length === 0 || processing}
                   />
 

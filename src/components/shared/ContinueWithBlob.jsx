@@ -8,20 +8,34 @@ export default function ContinueWithBlob({
   fileName,
   mimeType,
   disabled = false,
-  files,
+  files: fileEntries,
   className = '',
 }) {
-  const file = useMemo(() => {
-    if (!blob) return null
-    return blobToHandoffFile(blob, fileName, mimeType || blob.type)
-  }, [blob, fileName, mimeType])
+  const handoffFiles = useMemo(() => {
+    if (fileEntries?.length) {
+      return fileEntries
+        .map((entry) => {
+          if (entry instanceof File) return entry
+          if (entry?.blob) {
+            return blobToHandoffFile(entry.blob, entry.fileName || entry.name, entry.mimeType || entry.blob.type)
+          }
+          return null
+        })
+        .filter(Boolean)
+    }
+    if (!blob) return []
+    return [blobToHandoffFile(blob, fileName, mimeType || blob.type)]
+  }, [blob, fileName, mimeType, fileEntries])
+
+  const singleFile = handoffFiles.length === 1 ? handoffFiles[0] : null
+  const multiFiles = handoffFiles.length > 1 ? handoffFiles : null
 
   return (
     <ContinueWithPanel
       sourceToolId={sourceToolId}
-      file={file}
-      files={files}
-      disabled={disabled || !file}
+      file={singleFile}
+      files={multiFiles}
+      disabled={disabled || handoffFiles.length === 0}
       className={className}
     />
   )
