@@ -213,6 +213,7 @@ export default function MovToMp4() {
                   blob={resultBlob}
                   fileName={`${file.name.replace(/\.[^/.]+$/, '')}.mp4`}
                   mimeType="video/mp4"
+                    restoreFile={file}
                   disabled={processing}
                 />
               )}

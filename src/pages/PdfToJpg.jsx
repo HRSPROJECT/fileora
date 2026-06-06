@@ -620,6 +620,7 @@ export default function PdfToJpg() {
                       fileName: res.name,
                       mimeType: format === 'png' ? 'image/png' : 'image/jpeg',
                     }))}
+                    restoreFile={file}
                     disabled={results.length === 0 || processing}
                   />
 

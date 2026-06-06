@@ -198,6 +198,7 @@ export default function MovToMp3() {
                   blob={resultBlob}
                   fileName={`${file.name.replace(/\.[^/.]+$/, '')}.mp3`}
                   mimeType="audio/mpeg"
+                    restoreFile={file}
                   disabled={processing}
                 />
               )}

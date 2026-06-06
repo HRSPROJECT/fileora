@@ -402,6 +402,7 @@ export default function JpgToPdf() {
                 blob={resultBlob}
                 fileName={files.length > 0 ? `${basename(files[0].file.name)}-converted.pdf` : 'converted.pdf'}
                 mimeType="application/pdf"
+                restoreFiles={files.map((item) => (item instanceof File ? item : item.file))}
                 disabled={processing || !resultBlob}
               />
             </div>

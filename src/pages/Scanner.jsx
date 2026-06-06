@@ -987,9 +987,17 @@ export default function Scanner() {
     const images = files.filter((f) => f.type.startsWith('image/'));
     if (images.length) handleFileUpload(images);
   }, []);
+  const onHandoffSnapshot = useCallback((snapshot) => {
+    if (!snapshot?.pages?.length) return
+    setPages(snapshot.pages)
+    setCurrentPageIdx(snapshot.currentPageIdx ?? 0)
+    setCompiledPdfBlob(null)
+    setIsCompiling(false)
+  }, [])
   const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('scanner', {
     onFile: onHandoffFile,
     onFiles: onHandoffFiles,
+    onSnapshot: onHandoffSnapshot,
   });
 
   // Page removal
@@ -1597,6 +1605,7 @@ export default function Scanner() {
                       blob={compiledPdfBlob}
                       fileName="fileora-scan.pdf"
                       mimeType="application/pdf"
+                      restoreSnapshot={{ pages, currentPageIdx }}
                       disabled={isCompiling}
                     />
                   )}

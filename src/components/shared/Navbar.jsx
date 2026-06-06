@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Menu, X, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../../context/ThemeContext'
+import { WorkflowBackBar } from './ContinueWithPanel'
 
 function Logo() {
   return (
@@ -74,6 +75,7 @@ export default function Navbar() {
   ]
 
   return (
+    <>
     <header className="site-header site-header-sticky">
       <nav className="site-nav" aria-label="Primary navigation">
         <Link to="/" className="brand" onClick={close}>
@@ -355,6 +357,8 @@ export default function Navbar() {
         }
       `}</style>
     </header>
+    <WorkflowBackBar />
+    </>
   )
 }
 

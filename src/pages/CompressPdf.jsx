@@ -296,6 +296,7 @@ export default function CompressPdf() {
                 blob={compressedBlob}
                 fileName={file ? `${basename(file.name)}-compressed-${targetSize}.pdf` : 'compressed.pdf'}
                 mimeType="application/pdf"
+                    restoreFile={file}
                 disabled={processing || !compressedBlob}
               />
             </div>

@@ -312,6 +312,7 @@ export default function SplitPdf() {
                     blob={resultBlob}
                     fileName={file ? `${basename(file.name)}-${mode}ed.pdf` : 'split.pdf'}
                     mimeType="application/pdf"
+                    restoreFile={file}
                     disabled={processing || !resultBlob}
                   />
                 )}

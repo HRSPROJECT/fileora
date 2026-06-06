@@ -539,6 +539,7 @@ const Workspace = ({ files, setFiles, onReset }) => {
               sourceToolId="compress"
               file={files.length === 1 ? getActiveHandoffFile() : null}
               files={files.length > 1 ? getAllHandoffFiles() : null}
+              restoreFiles={files}
               disabled={Object.keys(results).length === 0 || isProcessing}
             />
           </div>

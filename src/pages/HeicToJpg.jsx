@@ -450,6 +450,7 @@ export default function HeicToJpg() {
                       fileName: res.name,
                       mimeType: res.blob?.type,
                     }))}
+                restoreFiles={files}
                     disabled={results.length === 0 || processing}
                   />
 

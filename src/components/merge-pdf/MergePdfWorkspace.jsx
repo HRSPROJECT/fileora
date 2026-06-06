@@ -110,6 +110,7 @@ export default function MergePdfWorkspace({ files, setFiles, onReset }) {
           blob={result}
           fileName="fileora-merged.pdf"
           mimeType="application/pdf"
+          restoreFiles={files}
           disabled={!result || processing}
         />
       </div>

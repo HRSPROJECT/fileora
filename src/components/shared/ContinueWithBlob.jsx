@@ -9,6 +9,9 @@ export default function ContinueWithBlob({
   mimeType,
   disabled = false,
   files: fileEntries,
+  restoreFile,
+  restoreFiles,
+  restoreSnapshot,
   className = '',
 }) {
   const handoffFiles = useMemo(() => {
@@ -35,6 +38,9 @@ export default function ContinueWithBlob({
       sourceToolId={sourceToolId}
       file={singleFile}
       files={multiFiles}
+      restoreFile={restoreFile}
+      restoreFiles={restoreFiles}
+      restoreSnapshot={restoreSnapshot}
       disabled={disabled || handoffFiles.length === 0}
       className={className}
     />

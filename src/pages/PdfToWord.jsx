@@ -661,6 +661,7 @@ export default function PdfToWord() {
                     blob={resultBlob}
                     fileName={`${basename(file.name)}.docx`}
                     mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    restoreFile={file}
                     disabled={processing || !resultBlob}
                   />
                   </div>

@@ -296,6 +296,7 @@ export default function PngToPdf() {
                 blob={resultBlob}
                 fileName={files.length > 0 ? `${basename(files[0].name)}-png-to-pdf.pdf` : 'png-to-pdf.pdf'}
                 mimeType="application/pdf"
+                restoreFiles={files}
                 disabled={processing || !resultBlob}
               />
             </div>

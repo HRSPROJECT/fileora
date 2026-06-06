@@ -217,6 +217,7 @@ export default function MergeVideo() {
                   blob={resultBlob}
                   fileName="combined-video.mp4"
                   mimeType="video/mp4"
+                restoreFiles={clips}
                   disabled={processing}
                 />
               )}

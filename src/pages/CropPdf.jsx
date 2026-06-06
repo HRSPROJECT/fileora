@@ -296,6 +296,7 @@ export default function CropPdf() {
                 blob={resultBlob}
                 fileName={file ? `${basename(file.name)}-cropped.pdf` : 'cropped.pdf'}
                 mimeType="application/pdf"
+                    restoreFile={file}
                 disabled={processing || !resultBlob}
               />
             </div>

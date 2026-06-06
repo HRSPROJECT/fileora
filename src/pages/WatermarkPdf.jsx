@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { useFileLoaderHandoff } from '../hooks/useWorkflowHandoff'
+import { useState, useRef, useCallback } from 'react'
+import { useFileLoaderHandoff, restorePdfOutputSnapshot } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -89,7 +89,20 @@ export default function WatermarkPdf() {
     }
   }
 
-  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('watermark-pdf', handleFile)
+  const onRestoreSnapshot = useCallback((snap) => {
+    const restored = restorePdfOutputSnapshot(snap, {
+      setFile,
+      setDownloadableBlob,
+      setError,
+      setProcessing,
+      resetPreview: () => setPreviewPageUrl(''),
+    })
+    if (!restored && snap?.file) void handleFile(snap.file)
+  }, [handleFile])
+
+  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('watermark-pdf', handleFile, {
+    onSnapshot: onRestoreSnapshot,
+  })
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
@@ -704,6 +717,8 @@ export default function WatermarkPdf() {
                     blob={downloadableBlob}
                     fileName={`${basename(file.name)}-watermarked.pdf`}
                     mimeType="application/pdf"
+                    restoreFile={file}
+                    restoreSnapshot={downloadableBlob ? { file, downloadableBlob } : null}
                     disabled={processing || !downloadableBlob}
                   />
 

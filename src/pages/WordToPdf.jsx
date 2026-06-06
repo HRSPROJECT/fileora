@@ -504,6 +504,7 @@ export default function WordToPdf() {
                       blob={resultBlob}
                       fileName={`${basename(file.name)}.pdf`}
                       mimeType="application/pdf"
+                    restoreFile={file}
                       disabled={processing || !resultBlob}
                     />
                   </div>

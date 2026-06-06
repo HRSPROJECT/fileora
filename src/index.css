@@ -844,6 +844,50 @@ img {
   padding: 0 0.25rem;
 }
 
+.workflow-back-bar {
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.workflow-back-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0;
+}
+
+.workflow-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--text-primary);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.workflow-back-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: var(--accent-primary);
+}
+
+.workflow-back-btn strong {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.workflow-back-hint {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
 @media (max-width: 640px) {
   .continue-with-chip {
     flex: 1 1 calc(50% - 0.5rem);

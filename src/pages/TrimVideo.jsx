@@ -325,6 +325,7 @@ export default function TrimVideo() {
                   blob={resultBlob}
                   fileName={`${file.name.replace(/\.[^/.]+$/, '')}-trimmed.mp4`}
                   mimeType="video/mp4"
+                    restoreFile={file}
                   disabled={processing}
                 />
               )}

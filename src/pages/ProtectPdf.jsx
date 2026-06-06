@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { useWorkflowHandoff, restorePdfOutputSnapshot } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -38,8 +38,26 @@ export default function ProtectPdf() {
   const [progressText, setProgressText] = useState('')
   const [downloadableBlob, setDownloadableBlob] = useState(null)
 
-  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
-  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('protect-pdf', { onFile: onHandoffFile })
+  const onHandoffFile = useCallback((next) => {
+    setFile(next)
+    setError('')
+    setDownloadableBlob(null)
+  }, [])
+
+  const onRestoreSnapshot = useCallback((snap) => {
+    const restored = restorePdfOutputSnapshot(snap, {
+      setFile,
+      setDownloadableBlob,
+      setError,
+      setProcessing,
+    })
+    if (!restored && snap?.file) onHandoffFile(snap.file)
+  }, [onHandoffFile])
+
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('protect-pdf', {
+    onFile: onHandoffFile,
+    onSnapshot: onRestoreSnapshot,
+  })
 
   const handleFile = (selectedFile) => {
     setError('')
@@ -347,6 +365,8 @@ export default function ProtectPdf() {
                     blob={downloadableBlob}
                     fileName={`${basename(file.name)}-protected.pdf`}
                     mimeType="application/pdf"
+                    restoreFile={file}
+                    restoreSnapshot={downloadableBlob ? { file, downloadableBlob } : null}
                     disabled={processing || !downloadableBlob}
                   />
                   <button onClick={() => setDownloadableBlob(null)} className="btn btn-ghost" style={{ fontSize: '12px' }}>

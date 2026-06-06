@@ -197,6 +197,7 @@ export default function Mp4ToMp3() {
                   blob={resultBlob}
                   fileName={`${file.name.replace(/\.[^/.]+$/, '')}.mp3`}
                   mimeType="audio/mpeg"
+                    restoreFile={file}
                   disabled={processing}
                 />
               )}

@@ -113,6 +113,7 @@ export default function ImageToPdfWorkspace({ files, setFiles, onReset }) {
           blob={result}
           fileName="fileora-images.pdf"
           mimeType="application/pdf"
+          restoreFiles={files}
           disabled={!result || processing}
         />
       </div>

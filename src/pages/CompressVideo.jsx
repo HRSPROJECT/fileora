@@ -208,6 +208,7 @@ export default function CompressVideo() {
                   blob={resultBlob}
                   fileName={`${file.name.replace(/\.[^/.]+$/, '')}-optimized.mp4`}
                   mimeType="video/mp4"
+                    restoreFile={file}
                   disabled={processing}
                 />
               )}

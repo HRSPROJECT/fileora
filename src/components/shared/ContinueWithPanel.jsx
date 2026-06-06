@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import JSZip from 'jszip'
-import { ArrowRight, ChevronDown, ChevronUp, Wifi } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Wifi } from 'lucide-react'
 import { useWorkflow } from '../../context/WorkflowContext'
 import { useShare } from '../../context/ShareContext'
 import { useNetworkStatus } from '../../utils/useNetworkStatus'
@@ -14,17 +14,33 @@ async function zipFilesForShare(files) {
   return new File([blob], 'fileora-files.zip', { type: 'application/zip' })
 }
 
+function buildRestorePayload(restoreFile, restoreFiles, restoreSnapshot, fallbackFile, fallbackFiles) {
+  const payload = {}
+  if (restoreFiles?.length) payload.files = restoreFiles
+  else if (restoreFile) payload.file = restoreFile
+  else if (fallbackFiles?.length) payload.files = fallbackFiles
+  else if (fallbackFile) payload.file = fallbackFile
+
+  if (restoreSnapshot != null) payload.snapshot = restoreSnapshot
+
+  if (!payload.file && !payload.files?.length && payload.snapshot == null) return null
+  return payload
+}
+
 export default function ContinueWithPanel({
   sourceToolId,
   file,
   files,
+  restoreFile,
+  restoreFiles,
+  restoreSnapshot,
   disabled = false,
   className = '',
 }) {
   const [expanded, setExpanded] = useState(false)
   const [sharing, setSharing] = useState(false)
   const navigate = useNavigate()
-  const { startHandoff } = useWorkflow()
+  const { startHandoff, pushWorkflowStep } = useWorkflow()
   const { setFileToShare } = useShare()
   const isOnline = useNetworkStatus()
 
@@ -46,6 +62,19 @@ export default function ContinueWithPanel({
     return { file: primaryFile, files: null }
   }
 
+  const recordWorkflowStep = (handoffPayload) => {
+    const restore = buildRestorePayload(
+      restoreFile,
+      restoreFiles,
+      restoreSnapshot,
+      handoffPayload.file,
+      handoffPayload.files
+    )
+    if (restore) {
+      pushWorkflowStep({ sourceToolId, restore })
+    }
+  }
+
   const handleContinue = async (target) => {
     if (target.id === 'share') {
       if (!isOnline || sharing) return
@@ -56,12 +85,14 @@ export default function ContinueWithPanel({
           : primaryFile
         if (!shareFile) return
         setFileToShare(shareFile)
+        const handoffPayload = { file: shareFile, files: null }
+        recordWorkflowStep(handoffPayload)
         startHandoff({
-          file: shareFile,
+          ...handoffPayload,
           sourceToolId,
           targetToolId: 'share',
         })
-        navigate('/share')
+        navigate('/share', { state: { workflowHandoff: true } })
       } finally {
         setSharing(false)
       }
@@ -69,12 +100,13 @@ export default function ContinueWithPanel({
     }
 
     const payload = resolveHandoffPayload(target)
+    recordWorkflowStep(payload)
     startHandoff({
       ...payload,
       sourceToolId,
       targetToolId: target.id,
     })
-    navigate(target.route)
+    navigate(target.route, { state: { workflowHandoff: true } })
   }
 
   return (
@@ -120,6 +152,35 @@ export default function ContinueWithPanel({
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+export function WorkflowBackBar() {
+  const navigate = useNavigate()
+  const { canGoBack, getBackTarget, goBack } = useWorkflow()
+  const target = getBackTarget()
+
+  if (!canGoBack || !target) return null
+
+  return (
+    <div className="workflow-back-bar">
+      <div className="container workflow-back-inner">
+        <button
+          type="button"
+          className="workflow-back-btn"
+          onClick={() => {
+            const route = goBack()
+            if (route) navigate(route, { state: { workflowHandoff: true } })
+          }}
+        >
+          <ArrowLeft size={18} />
+          <span>
+            Back to <strong>{target.title}</strong>
+          </span>
+        </button>
+        <span className="workflow-back-hint">Your files and progress are kept in this browser.</span>
+      </div>
     </div>
   )
 }

@@ -220,6 +220,7 @@ export default function RepeatVideo() {
                   blob={resultBlob}
                   fileName={`${file.name.replace(/\.[^/.]+$/, '')}-repeated.mp4`}
                   mimeType="video/mp4"
+                    restoreFile={file}
                   disabled={processing}
                 />
               )}

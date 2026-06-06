@@ -76,6 +76,7 @@ export default function ConvertWorkspace({ file, onReset }) {
           sourceToolId="convert"
           blob={result}
           fileName={`${basename(file.name)}.${format}`}
+          restoreFile={file}
           disabled={!result || processing}
         />
       </div>

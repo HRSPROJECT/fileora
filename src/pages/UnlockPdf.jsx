@@ -233,6 +233,7 @@ export default function UnlockPdf() {
                     blob={unlockedBlob}
                     fileName={`${basename(file.name)}-unlocked.pdf`}
                     mimeType="application/pdf"
+                    restoreFile={file}
                     disabled={processing || !unlockedBlob}
                   />
                 </div>

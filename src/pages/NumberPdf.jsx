@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useFileLoaderHandoff } from '../hooks/useWorkflowHandoff'
+import { useState, useEffect, useCallback } from 'react'
+import { useFileLoaderHandoff, restorePdfOutputSnapshot } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -81,7 +81,23 @@ export default function NumberPdf() {
     }
   }
 
-  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('number-pdf', handleFile)
+  const onRestoreSnapshot = useCallback((snap) => {
+    const restored = restorePdfOutputSnapshot(snap, {
+      setFile,
+      setDownloadableBlob,
+      setError,
+      setProcessing,
+      resetPreview: () => {
+        setPdfDocJS(null)
+        setPreviewPageUrl('')
+      },
+    })
+    if (!restored && snap?.file) void handleFile(snap.file)
+  }, [handleFile])
+
+  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('number-pdf', handleFile, {
+    onSnapshot: onRestoreSnapshot,
+  })
 
   // Monitor cover page exclusions and swap preview page
   useEffect(() => {
@@ -537,6 +553,8 @@ export default function NumberPdf() {
                     blob={downloadableBlob}
                     fileName={`${basename(file.name)}-numbered.pdf`}
                     mimeType="application/pdf"
+                    restoreFile={file}
+                    restoreSnapshot={downloadableBlob ? { file, downloadableBlob } : null}
                     disabled={processing || !downloadableBlob}
                   />
 

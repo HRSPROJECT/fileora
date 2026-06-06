@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useFileLoaderHandoff } from '../hooks/useWorkflowHandoff'
+import { useState, useCallback } from 'react'
+import { useFileLoaderHandoff, restorePdfOutputSnapshot } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -91,7 +91,28 @@ export default function RotatePdf() {
     }
   }
 
-  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('rotate-pdf', handleFile)
+  const onRestoreSnapshot = useCallback((snap) => {
+    const restored = restorePdfOutputSnapshot(snap, {
+      setFile,
+      setDownloadableBlob,
+      setError,
+      setProcessing,
+      resetPreview: () => {
+        setPdfDocJS(null)
+        setThumbnails([])
+      },
+      extra: (payload) => {
+        if (payload.rotations) setRotations(payload.rotations)
+        if (payload.thumbnails) setThumbnails(payload.thumbnails)
+        if (payload.totalPages) setTotalPages(payload.totalPages)
+      },
+    })
+    if (!restored && snap?.file) void handleFile(snap.file)
+  }, [handleFile])
+
+  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('rotate-pdf', handleFile, {
+    onSnapshot: onRestoreSnapshot,
+  })
 
   const rotatePage = (pageNum, direction = 90) => {
     setRotations((prev) => {
@@ -406,6 +427,12 @@ export default function RotatePdf() {
                     blob={downloadableBlob}
                     fileName={`${basename(file.name)}-rotated.pdf`}
                     mimeType="application/pdf"
+                    restoreFile={file}
+                    restoreSnapshot={
+                      downloadableBlob
+                        ? { file, downloadableBlob, rotations, thumbnails, totalPages }
+                        : null
+                    }
                     disabled={processing || !downloadableBlob}
                   />
 

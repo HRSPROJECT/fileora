@@ -145,6 +145,7 @@ export default function ResizeWorkspace({ file, onReset }) {
           sourceToolId="resize"
           blob={result}
           fileName={`${basename(file.name)}-${width}x${height}.${format}`}
+          restoreFile={file}
           disabled={!result || processing}
         />
       </div>

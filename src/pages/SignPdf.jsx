@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { useFileLoaderHandoff } from '../hooks/useWorkflowHandoff'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useFileLoaderHandoff, restorePdfOutputSnapshot } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -118,7 +118,23 @@ export default function SignPdf() {
     }
   }
 
-  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('sign-pdf', handleFile)
+  const onRestoreSnapshot = useCallback((snap) => {
+    const restored = restorePdfOutputSnapshot(snap, {
+      setFile,
+      setDownloadableBlob,
+      setError,
+      setProcessing,
+      resetPreview: () => {
+        setPdfDocJS(null)
+        setPreviewPageUrl('')
+      },
+    })
+    if (!restored && snap?.file) void handleFile(snap.file)
+  }, [handleFile])
+
+  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('sign-pdf', handleFile, {
+    onSnapshot: onRestoreSnapshot,
+  })
 
   // Watch page changes
   useEffect(() => {
@@ -766,6 +782,8 @@ export default function SignPdf() {
                     blob={downloadableBlob}
                     fileName={`${basename(file.name)}-signed.pdf`}
                     mimeType="application/pdf"
+                    restoreFile={file}
+                    restoreSnapshot={downloadableBlob ? { file, downloadableBlob } : null}
                     disabled={processing || !downloadableBlob}
                   />
 

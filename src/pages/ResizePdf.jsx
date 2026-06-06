@@ -306,6 +306,7 @@ export default function ResizePdf() {
                 blob={resultBlob}
                 fileName={file ? `${basename(file.name)}-resized-${pageSize}-${orientation}.pdf` : 'resized.pdf'}
                 mimeType="application/pdf"
+                    restoreFile={file}
                 disabled={processing || !resultBlob}
               />
             </div>

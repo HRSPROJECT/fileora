@@ -944,6 +944,7 @@ export default function PassportPhoto() {
                   blob={outputBlob}
                   fileName={outputFileName}
                   mimeType="image/jpeg"
+                    restoreFile={file}
                   disabled={processing}
                 />
               )}
