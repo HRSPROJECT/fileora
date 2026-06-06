@@ -67,6 +67,14 @@ const mountFileFromOPFSToFFmpeg = async (ffmpeg, opfsName, ffmpegName) => {
   ffmpeg.FS('writeFile', ffmpegName, new Uint8Array(buffer));
 };
 
+const safeFfmpegUnlink = (ffmpeg, fileName) => {
+  try {
+    ffmpeg.FS('unlink', fileName);
+  } catch {
+    // FFmpeg may already remove temp files after a successful run
+  }
+};
+
 /**
  * Helper to read from FFmpeg FS and save into OPFS
  */
@@ -74,8 +82,7 @@ const exportFileFromFFmpegToOPFS = async (ffmpeg, ffmpegName, opfsName, mimeType
   const data = ffmpeg.FS('readFile', ffmpegName);
   const blob = new Blob([data.buffer], { type: mimeType });
   await saveToOPFS(opfsName, blob);
-  // Clean up virtual file
-  ffmpeg.FS('unlink', ffmpegName);
+  safeFfmpegUnlink(ffmpeg, ffmpegName);
 };
 
 /**
@@ -143,8 +150,7 @@ export const remuxMovToMp4 = async (inputOpfsName, outputOpfsName, settingsOrPro
   onProgress({ message: 'Saving processed MP4 output...', progress: 90 });
   await exportFileFromFFmpegToOPFS(ffmpeg, 'output.mp4', outputOpfsName, 'video/mp4');
   
-  // Clean up input
-  ffmpeg.FS('unlink', 'input.mov');
+  safeFfmpegUnlink(ffmpeg, 'input.mov');
 };
 
 /**
@@ -190,7 +196,7 @@ export const compressVideo = async (inputOpfsName, outputOpfsName, settings, onP
   onProgress({ message: 'Saving compressed output package...', progress: 90 });
   await exportFileFromFFmpegToOPFS(ffmpeg, 'output_compressed.mp4', outputOpfsName, 'video/mp4');
   
-  ffmpeg.FS('unlink', 'input_raw.mp4');
+  safeFfmpegUnlink(ffmpeg, 'input_raw.mp4');
 };
 
 /**
@@ -214,7 +220,7 @@ export const extractAudioToMp3 = async (inputOpfsName, outputOpfsName, bitrate =
   onProgress({ message: 'Exporting MP3 output...', progress: 90 });
   await exportFileFromFFmpegToOPFS(ffmpeg, 'output_audio.mp3', outputOpfsName, 'audio/mp3');
   
-  ffmpeg.FS('unlink', 'input_video.mp4');
+  safeFfmpegUnlink(ffmpeg, 'input_video.mp4');
 };
 
 /**
@@ -257,7 +263,7 @@ export const trimVideo = async (inputOpfsName, outputOpfsName, startSeconds, end
   onProgress({ message: 'Buffering trimmed segment...', progress: 90 });
   await exportFileFromFFmpegToOPFS(ffmpeg, 'output_trim.mp4', outputOpfsName, 'video/mp4');
   
-  ffmpeg.FS('unlink', 'input_trim.mp4');
+  safeFfmpegUnlink(ffmpeg, 'input_trim.mp4');
 };
 
 /**
@@ -322,10 +328,9 @@ export const mergeVideos = async (inputOpfsNames, outputOpfsName, onProgress) =>
   onProgress({ message: 'Building output video stream...', progress: 90 });
   await exportFileFromFFmpegToOPFS(ffmpeg, 'output_merge.mp4', outputOpfsName, 'video/mp4');
   
-  // Cleanup virtual files
-  ffmpeg.FS('unlink', 'concat_list.txt');
+  safeFfmpegUnlink(ffmpeg, 'concat_list.txt');
   for (let i = 0; i < inputOpfsNames.length; i++) {
-    ffmpeg.FS('unlink', `clip_${i}.mp4`);
+    safeFfmpegUnlink(ffmpeg, `clip_${i}.mp4`);
   }
 };
 
@@ -384,7 +389,6 @@ export const repeatVideo = async (inputOpfsName, outputOpfsName, repeatsCount, o
   onProgress({ message: 'Exporting compiled loop track...', progress: 90 });
   await exportFileFromFFmpegToOPFS(ffmpeg, 'output_repeated.mp4', outputOpfsName, 'video/mp4');
   
-  // Clean up
-  ffmpeg.FS('unlink', 'repeat_list.txt');
-  ffmpeg.FS('unlink', 'input_repeat.mp4');
+  safeFfmpegUnlink(ffmpeg, 'repeat_list.txt');
+  safeFfmpegUnlink(ffmpeg, 'input_repeat.mp4');
 };

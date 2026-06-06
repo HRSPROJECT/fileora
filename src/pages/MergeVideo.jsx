@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
 import ContinueWithBlob from '../components/shared/ContinueWithBlob';
@@ -21,10 +21,6 @@ export default function MergeVideo() {
   const [resultUrl, setResultUrl] = useState('');
   const [resultSize, setResultSize] = useState(0);
   const [resultBlob, setResultBlob] = useState(null);
-
-  useEffect(() => {
-    clearOPFSSandbox();
-  }, []);
 
   const handleFileSelect = async (filesList) => {
     const validFiles = filesList.filter(file => file.type.startsWith('video/') || file.name.toLowerCase().endsWith('.mov'));

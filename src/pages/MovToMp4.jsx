@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
 import ContinueWithBlob from '../components/shared/ContinueWithBlob';
@@ -24,11 +24,6 @@ export default function MovToMp4() {
   const [compress, setCompress] = useState(false);
   const [quality, setQuality] = useState(50);
   const [scale, setScale] = useState(100);
-
-  useEffect(() => {
-    // Clear storage on mount
-    clearOPFSSandbox();
-  }, []);
 
   const handleFileSelect = async (filesList) => {
     const selected = filesList[0];

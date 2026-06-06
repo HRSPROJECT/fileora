@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
 import ContinueWithBlob from '../components/shared/ContinueWithBlob';
@@ -24,10 +24,6 @@ export default function Mp4ToMp3() {
 
   // Settings
   const [bitrate, setBitrate] = useState(192);
-
-  useEffect(() => {
-    clearOPFSSandbox();
-  }, []);
 
   const handleFileSelect = async (filesList) => {
     const selected = filesList[0];

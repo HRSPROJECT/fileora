@@ -33,10 +33,6 @@ export default function TrimVideo() {
   const videoRef = useRef(null);
 
   useEffect(() => {
-    clearOPFSSandbox();
-  }, []);
-
-  useEffect(() => {
     return () => {
       if (tempUrl) URL.revokeObjectURL(tempUrl);
     };
