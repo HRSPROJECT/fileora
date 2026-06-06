@@ -3,7 +3,7 @@
  * Local Vite dev (localhost:5173) is never intercepted — see shouldBypassFetch().
  */
 
-const CACHE_NAME = 'fileora-cache-v7';
+const CACHE_NAME = 'fileora-cache-v8';
 
 const ASSETS_TO_CACHE = [
   '/',
@@ -83,18 +83,32 @@ const spaNavigationFallback = async (pathname) => {
   return caches.match('/');
 };
 
+const PRECACHE_BATCH_SIZE = 8;
+
+const precacheAsset = async (cache, url) => {
+  const mode = url.includes('unpkg.com') ? 'cors' : 'same-origin';
+  const response = await fetch(new Request(url, { mode }));
+  if (!response || !response.ok) {
+    throw new Error(`HTTP ${response?.status || 'error'}`);
+  }
+  await cache.put(url, response);
+};
+
+const precacheInBatches = async (cache, urls) => {
+  for (let i = 0; i < urls.length; i += PRECACHE_BATCH_SIZE) {
+    const batch = urls.slice(i, i + PRECACHE_BATCH_SIZE);
+    await Promise.allSettled(
+      batch.map((url) =>
+        precacheAsset(cache, url).catch((err) => console.warn('[SW] Pre-cache skip:', url, err))
+      )
+    );
+  }
+};
+
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(
-        ASSETS_TO_CACHE.map((url) =>
-          cache
-            .add(new Request(url, { mode: url.includes('unpkg.com') ? 'cors' : 'same-origin' }))
-            .catch((err) => console.warn('[SW] Pre-cache skip:', url, err))
-        )
-      )
-    )
+    caches.open(CACHE_NAME).then((cache) => precacheInBatches(cache, ASSETS_TO_CACHE))
   );
 });
 

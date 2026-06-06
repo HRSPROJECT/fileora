@@ -74,6 +74,10 @@ async function prerender() {
     });
     const page = await browser.newPage();
 
+    await page.evaluateOnNewDocument(() => {
+      localStorage.setItem('fileora-theme', 'dark');
+    });
+
     for (const route of routes) {
       console.log(`Prerendering route: ${route}`);
       const url = `http://localhost:${PORT}${route}`;

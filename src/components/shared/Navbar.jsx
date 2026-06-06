@@ -185,6 +185,7 @@ export default function Navbar() {
           type="button"
           onClick={toggleTheme}
           aria-label="Toggle theme"
+          suppressHydrationWarning
         >
           {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
         </button>

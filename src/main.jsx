@@ -33,4 +33,6 @@ if (isPrerendered) {
   createRoot(container).render(app)
 }
 
-document.documentElement.classList.add('app-ready')
+if (!document.documentElement.classList.contains('app-ready')) {
+  document.documentElement.classList.add('app-ready')
+}
