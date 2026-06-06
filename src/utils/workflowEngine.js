@@ -378,6 +378,9 @@ export const getContinueOptions = (sourceToolId, file, isOnline = true, files = 
 
 export const blobToHandoffFile = (blob, name, type) => {
   const mime = type || blob.type || 'application/octet-stream'
-  const filename = name || `fileora-${Date.now()}`
-  return new File([blob], filename, { type: mime })
+  let filename = name || `fileora-${Date.now()}`
+  if (mime === 'application/pdf' && !filename.toLowerCase().endsWith('.pdf')) {
+    filename = `${filename}.pdf`
+  }
+  return new File([blob], filename, { type: mime === 'application/octet-stream' && filename.endsWith('.pdf') ? 'application/pdf' : mime })
 }

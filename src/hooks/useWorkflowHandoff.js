@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useWorkflow } from '../context/WorkflowContext'
 
 /**
@@ -35,4 +35,26 @@ export function useWorkflowHandoff(toolId, { onFile, onFiles } = {}) {
   }, [toolId, peekHandoff, consumeHandoff, onFile, onFiles])
 
   return { handoffNotice: notice, clearHandoffNotice: () => setNotice(null) }
+}
+
+/**
+ * Handoff helper for tools that must run a loader (e.g. handleFile) — not just setState.
+ * Call after `handleFile` / `loadFile` is defined in the component.
+ */
+export function useFileLoaderHandoff(toolId, loadFile) {
+  const loadRef = useRef(loadFile)
+
+  useEffect(() => {
+    loadRef.current = loadFile
+  }, [loadFile])
+
+  const onHandoffFile = useCallback((file) => {
+    if (file) void loadRef.current(file)
+  }, [])
+
+  const onHandoffFiles = useCallback((files) => {
+    if (files?.length) void loadRef.current(files[0])
+  }, [])
+
+  return useWorkflowHandoff(toolId, { onFile: onHandoffFile, onFiles: onHandoffFiles })
 }

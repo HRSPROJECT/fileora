@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { useState, useEffect, useRef } from 'react'
+import { useFileLoaderHandoff } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -63,14 +63,32 @@ export default function SignPdf() {
 
   const [downloadableBlob, setDownloadableBlob] = useState(null)
 
-  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
-  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('sign-pdf', { onFile: onHandoffFile })
-
   const drawCanvasRef = useRef(null)
   const isDrawingRef = useRef(false)
   const prevPosRef = useRef({ x: 0, y: 0 })
   const containerRef = useRef(null)
   const fileInputRef = useRef(null)
+
+  // Render a specific page as background preview
+  const renderPage = async (pdf, pageNumber) => {
+    try {
+      const page = await pdf.getPage(pageNumber)
+      const viewport = page.getViewport({ scale: 1.0 })
+      
+      setPageWidth(viewport.width)
+      setPageHeight(viewport.height)
+
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+      canvas.width = viewport.width
+      canvas.height = viewport.height
+
+      await page.render({ canvasContext: context, viewport }).promise
+      setPreviewPageUrl(canvas.toDataURL('image/jpeg', 0.85))
+    } catch (err) {
+      console.error('Error rendering PDF page preview:', err)
+    }
+  }
 
   // Load PDF file
   const handleFile = async (selectedFile) => {
@@ -100,26 +118,7 @@ export default function SignPdf() {
     }
   }
 
-  // Render a specific page as background preview
-  const renderPage = async (pdf, pageNumber) => {
-    try {
-      const page = await pdf.getPage(pageNumber)
-      const viewport = page.getViewport({ scale: 1.0 })
-      
-      setPageWidth(viewport.width)
-      setPageHeight(viewport.height)
-
-      const canvas = document.createElement('canvas')
-      const context = canvas.getContext('2d')
-      canvas.width = viewport.width
-      canvas.height = viewport.height
-
-      await page.render({ canvasContext: context, viewport }).promise
-      setPreviewPageUrl(canvas.toDataURL('image/jpeg', 0.85))
-    } catch (err) {
-      console.error('Error rendering PDF page preview:', err)
-    }
-  }
+  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('sign-pdf', handleFile)
 
   // Watch page changes
   useEffect(() => {

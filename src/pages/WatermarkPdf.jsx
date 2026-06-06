@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react'
-import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { useState, useRef } from 'react'
+import { useFileLoaderHandoff } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -51,9 +51,6 @@ export default function WatermarkPdf() {
   
   const imageInputRef = useRef(null)
 
-  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
-  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('watermark-pdf', { onFile: onHandoffFile })
-
   const handleFile = async (selectedFile) => {
     setError('')
     setFile(selectedFile)
@@ -91,6 +88,8 @@ export default function WatermarkPdf() {
       setProgressText('')
     }
   }
+
+  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('watermark-pdf', handleFile)
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]

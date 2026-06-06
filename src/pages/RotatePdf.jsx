@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { useState } from 'react'
+import { useFileLoaderHandoff } from '../hooks/useWorkflowHandoff'
 import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
@@ -35,9 +35,6 @@ export default function RotatePdf() {
   const [progressText, setProgressText] = useState('')
   const [progressPercent, setProgressPercent] = useState(0)
   const [downloadableBlob, setDownloadableBlob] = useState(null)
-
-  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
-  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('rotate-pdf', { onFile: onHandoffFile })
 
   const handleFile = async (selectedFile) => {
     setError('')
@@ -93,6 +90,8 @@ export default function RotatePdf() {
       setProgressText('')
     }
   }
+
+  const { handoffNotice, clearHandoffNotice } = useFileLoaderHandoff('rotate-pdf', handleFile)
 
   const rotatePage = (pageNum, direction = 90) => {
     setRotations((prev) => {
