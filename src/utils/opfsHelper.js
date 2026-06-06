@@ -10,8 +10,8 @@ export const isOpfsSupported = () => {
 
 /**
  * Saves a File or Blob directly to the browser's sandbox disk space
- * @param {string} fileName 
- * @param {Blob|File} blobOrFile 
+ * @param {string} fileName
+ * @param {Blob|File} blobOrFile
  * @returns {Promise<FileSystemFileHandle>}
  */
 export const saveToOPFS = async (fileName, blobOrFile) => {
@@ -28,7 +28,7 @@ export const saveToOPFS = async (fileName, blobOrFile) => {
 
 /**
  * Retrieves a File object from the sandboxed disk space
- * @param {string} fileName 
+ * @param {string} fileName
  * @returns {Promise<File>}
  */
 export const getFromOPFS = async (fileName) => {
@@ -42,32 +42,72 @@ export const getFromOPFS = async (fileName) => {
 
 /**
  * Deletes a specific file from the sandboxed disk space
- * @param {string} fileName 
+ * @param {string} fileName
  * @returns {Promise<void>}
  */
 export const deleteFromOPFS = async (fileName) => {
   if (!isOpfsSupported()) return;
   try {
     const root = await navigator.storage.getDirectory();
-    await root.removeEntry(fileName);
+    await root.removeEntry(fileName, { recursive: true });
   } catch (err) {
-    console.warn(`OPFS: Failed to delete file ${fileName}:`, err);
+    if (err?.name !== 'NotFoundError') {
+      console.warn(`OPFS: Failed to delete file ${fileName}:`, err);
+    }
   }
 };
 
+let clearQueue = Promise.resolve();
+
+const isBenignOpfsError = (err) =>
+  err?.name === 'NotFoundError' || err?.name === 'NoModificationAllowedError';
+
 /**
- * Clears the entire Origin Private File System directory for this app session
+ * Clears the entire Origin Private File System directory for this app session.
+ * Serialized so concurrent callers (StrictMode, reset, mount) do not race.
  * @returns {Promise<void>}
  */
 export const clearOPFSSandbox = async () => {
   if (!isOpfsSupported()) return;
+
+  clearQueue = clearQueue
+    .then(() => clearOPFSSandboxInternal())
+    .catch(() => {});
+
+  return clearQueue;
+};
+
+const clearOPFSSandboxInternal = async () => {
   try {
     const root = await navigator.storage.getDirectory();
+    const names = [];
     for await (const name of root.keys()) {
-      await root.removeEntry(name);
+      names.push(name);
     }
-    console.log('OPFS sandbox cleared successfully.');
+
+    if (names.length === 0) return;
+
+    let removed = 0;
+    let skipped = 0;
+
+    for (const name of names) {
+      try {
+        await root.removeEntry(name, { recursive: true });
+        removed += 1;
+      } catch (err) {
+        if (isBenignOpfsError(err)) {
+          skipped += 1;
+          continue;
+        }
+        console.warn(`OPFS: Failed to delete "${name}":`, err);
+        skipped += 1;
+      }
+    }
+
+    if (import.meta.env?.DEV && removed > 0) {
+      console.debug(`OPFS: cleared ${removed} item(s)${skipped ? `, skipped ${skipped}` : ''}.`);
+    }
   } catch (err) {
-    console.error('OPFS: Failed to clear storage sandbox:', err);
+    console.warn('OPFS: Failed to clear storage sandbox:', err);
   }
 };
