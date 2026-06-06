@@ -1,5 +1,5 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
@@ -10,15 +10,27 @@ if (typeof document !== 'undefined') {
     'head link[rel="canonical"]',
     'head meta[name="description"]',
     'head meta[property^="og:"]',
-    'head meta[name^="twitter:"]'
+    'head meta[name^="twitter:"]',
   ]
-  selectors.forEach(selector => {
-    document.querySelectorAll(selector).forEach(el => el.remove())
+  selectors.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((el) => el.remove())
   })
 }
 
-createRoot(document.getElementById('root')).render(
+const container = document.getElementById('root')
+const app = (
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 )
+
+// Production prerender leaves .app-shell in #root — hydrate instead of wiping (avoids logo/splash flash)
+const isPrerendered = container?.querySelector('.app-shell') != null
+
+if (isPrerendered) {
+  hydrateRoot(container, app)
+} else {
+  createRoot(container).render(app)
+}
+
+document.documentElement.classList.add('app-ready')
