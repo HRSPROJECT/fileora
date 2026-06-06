@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { FileImage, ArrowLeft, Shield, Columns, Layout, Download, ArrowLeftCircle, ArrowRightCircle, Trash2, Sliders, Check } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -7,7 +10,7 @@ import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { imagesToPdf } from '../utils/pdfUtils'
-import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import { downloadBlob, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
@@ -26,6 +29,10 @@ export default function JpgToPdf() {
   const [processing, setProcessing] = useState(false)
   const [resultBlob, setResultBlob] = useState(null)
   const [resultUrl, setResultUrl] = useState(null)
+
+  const onHandoffFile = useCallback((file) => { setFiles([file]); setError('') }, [])
+  const onHandoffFiles = useCallback((nextFiles) => { setFiles(nextFiles); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('jpg-to-pdf', { onFile: onHandoffFile, onFiles: onHandoffFiles })
 
   const runConvert = async () => {
     if (!files.length) return
@@ -139,6 +146,7 @@ export default function JpgToPdf() {
           <h1>Convert JPG to PDF Online</h1>
           <p>Easily convert JPG, JPEG, and WebP images to a clean PDF in seconds. Reorder pages, customize layouts, and export securely.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {files.length === 0 ? (
           <div className="container container-narrow">
@@ -376,6 +384,13 @@ export default function JpgToPdf() {
                   />
                 )}
               </div>
+              <ContinueWithBlob
+                sourceToolId="jpg-to-pdf"
+                blob={resultBlob}
+                fileName={files.length > 0 ? `${basename(files[0].file.name)}-converted.pdf` : 'converted.pdf'}
+                mimeType="application/pdf"
+                disabled={processing || !resultBlob}
+              />
             </div>
           </section>
         )}

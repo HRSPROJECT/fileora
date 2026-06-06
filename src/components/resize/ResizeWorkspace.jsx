@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Download, Image as ImageIcon, Lock, Unlock } from 'lucide-react'
 import { basename, downloadBlob, formatBytes, resizeImage } from '../../utils/imageUtils'
 import { readImageDimensions } from '../../utils/canvasUtils'
+import { useBlobUrl } from '../../utils/useBlobUrl'
 import SecureShareButton from '../shared/SecureShareButton'
+import ContinueWithBlob from '../shared/ContinueWithBlob'
 
 const presets = [
   ['Custom', null],
@@ -23,6 +25,7 @@ export default function ResizeWorkspace({ file, onReset }) {
   const [result, setResult] = useState(null)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
+  const resultUrl = useBlobUrl(result)
 
   useEffect(() => {
     let active = true
@@ -38,13 +41,26 @@ export default function ResizeWorkspace({ file, onReset }) {
     }
   }, [file])
 
+  const runResize = useCallback(async () => {
+    setProcessing(true)
+    setError('')
+    try {
+      const blob = await resizeImage(file, width, height, format)
+      setResult(blob)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setProcessing(false)
+    }
+  }, [file, width, height, format])
+
   useEffect(() => {
     if (!source || !width || !height) return
     const id = setTimeout(() => {
-      process()
+      runResize()
     }, 300)
     return () => clearTimeout(id)
-  }, [source, width, height, format])
+  }, [source, width, height, format, runResize])
 
   const updateWidth = (value) => {
     const next = Number(value) || 0
@@ -64,25 +80,12 @@ export default function ResizeWorkspace({ file, onReset }) {
     setHeight(preset[1])
   }
 
-  const process = async () => {
-    setProcessing(true)
-    setError('')
-    try {
-      const blob = await resizeImage(file, width, height, format)
-      setResult(blob)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setProcessing(false)
-    }
-  }
-
   return (
     <section className="workspace-panel">
       <div className="workspace-preview">
         {(result || source) ? (
           <img 
-            src={result ? URL.createObjectURL(result) : source.url} 
+            src={resultUrl || source?.url}
             alt="Preview" 
           />
         ) : (
@@ -138,6 +141,12 @@ export default function ResizeWorkspace({ file, onReset }) {
             />
           )}
         </div>
+        <ContinueWithBlob
+          sourceToolId="resize"
+          blob={result}
+          fileName={`${basename(file.name)}-${width}x${height}.${format}`}
+          disabled={!result || processing}
+        />
       </div>
     </section>
   )

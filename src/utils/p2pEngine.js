@@ -6,6 +6,25 @@ import Peer from 'peerjs';
 
 export const CHUNK_SIZE = 256 * 1024; // 256 KB chunks
 
+const CONTROL_TYPES = new Set(['AUTH', 'AUTH_OK', 'AUTH_FAIL', 'META', 'TRANSFER_COMPLETE']);
+
+/** True for JSON control payloads — excludes Blob (has .type MIME) and binary buffers. */
+export const isP2PControlMessage = (data) =>
+  data != null
+  && typeof data === 'object'
+  && !(data instanceof ArrayBuffer)
+  && !ArrayBuffer.isView(data)
+  && !(data instanceof Blob)
+  && typeof data.type === 'string'
+  && CONTROL_TYPES.has(data.type);
+
+export const getChunkByteLength = (data) => {
+  if (data instanceof ArrayBuffer) return data.byteLength;
+  if (ArrayBuffer.isView(data)) return data.byteLength;
+  if (data instanceof Blob) return data.size;
+  return data?.byteLength ?? data?.size ?? 0;
+};
+
 export const makePeerId = () =>
   `fileora-${Math.floor(10000 + Math.random() * 90000)}`;
 

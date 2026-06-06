@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
+import ContinueWithBlob from '../components/shared/ContinueWithBlob';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Shield, Video, Download, Play, Plus, ArrowUp, ArrowDown, Trash2, AlertTriangle, Layers } from 'lucide-react';
 import Navbar from '../components/shared/Navbar';
@@ -108,6 +111,17 @@ export default function MergeVideo() {
     clearOPFSSandbox();
   };
 
+  const onHandoffFile = useCallback((nextFile) => {
+    handleFileSelect([nextFile]);
+  }, []);
+  const onHandoffFiles = useCallback((files) => {
+    handleFileSelect(files);
+  }, []);
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('merge-video', {
+    onFile: onHandoffFile,
+    onFiles: onHandoffFiles,
+  });
+
   return (
     <div className="app-shell">
       <Navbar />
@@ -134,6 +148,7 @@ export default function MergeVideo() {
           <h1>Video Merger &amp; Joiner</h1>
           <p>Stitch and concatenate multiple video clips together locally inside your browser. Drag and sort files dynamically—100% offline security means no bandwidth consumption or cloud logging.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         <section className="container" style={{ maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           {error && (
@@ -195,6 +210,16 @@ export default function MergeVideo() {
                   )}
                 </div>
               </div>
+
+              {resultBlob && (
+                <ContinueWithBlob
+                  sourceToolId="merge-video"
+                  blob={resultBlob}
+                  fileName="combined-video.mp4"
+                  mimeType="video/mp4"
+                  disabled={processing}
+                />
+              )}
             </div>
           ) : clips.length > 0 ? (
             <div className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

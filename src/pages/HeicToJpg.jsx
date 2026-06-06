@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import { useShare } from '../context/ShareContext'
@@ -30,6 +33,21 @@ export default function HeicToJpg() {
   const [progressText, setProgressText] = useState('')
   const [progressPercent, setProgressPercent] = useState(0)
   const [results, setResults] = useState([]) // array of { name, blob, dataUrl, size }
+
+  const onHandoffFile = useCallback((nextFile) => {
+    setFiles([nextFile])
+    setError('')
+    setResults([])
+  }, [])
+  const onHandoffFiles = useCallback((nextFiles) => {
+    setFiles(nextFiles)
+    setError('')
+    setResults([])
+  }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('heic-to-jpg', {
+    onFile: onHandoffFile,
+    onFiles: onHandoffFiles,
+  })
 
   const runConvert = async () => {
     if (!files.length) return
@@ -197,6 +215,7 @@ export default function HeicToJpg() {
           <h1>Convert HEIC to JPG Online</h1>
           <p>Instantly convert Apple HEIC photos to universally supported JPG, PNG, or WebP. Superfast, fully private batch conversions.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {files.length === 0 ? (
           <div className="container container-narrow">
@@ -423,6 +442,14 @@ export default function HeicToJpg() {
                       <span>Share Directly (P2P)</span>
                     </button>
                   </div>
+
+                  <ContinueWithBlob
+                    sourceToolId="heic-to-jpg"
+                    blob={results[0]?.blob}
+                    fileName={results[0]?.name}
+                    mimeType={results[0]?.blob?.type}
+                    disabled={results.length === 0 || processing}
+                  />
 
                   <button
                     className="btn btn-ghost"

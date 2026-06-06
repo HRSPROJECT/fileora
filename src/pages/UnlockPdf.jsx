@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { FileLock2, ArrowLeft, Shield, Unlock, Download } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -7,7 +10,7 @@ import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { decryptPDF, isEncrypted } from '../utils/pdfDecryptPatch'
-import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
@@ -23,6 +26,9 @@ export default function UnlockPdf() {
   const [processing, setProcessing] = useState(false)
   const [unlockedBlob, setUnlockedBlob] = useState(null)
   const [passwordRequired, setPasswordRequired] = useState(false)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('unlock-pdf', { onFile: onHandoffFile })
 
   const handleFile = async (selectedFile) => {
     setError('')
@@ -117,6 +123,7 @@ export default function UnlockPdf() {
           <h1>Free Online PDF Password Remover</h1>
           <p>Remove passwords and restrictions from PDF files instantly. 100% private decryption right inside your browser.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {!file ? (
           <div className="container container-narrow">
@@ -221,6 +228,13 @@ export default function UnlockPdf() {
                       />
                     )}
                   </div>
+                  <ContinueWithBlob
+                    sourceToolId="unlock-pdf"
+                    blob={unlockedBlob}
+                    fileName={`${basename(file.name)}-unlocked.pdf`}
+                    mimeType="application/pdf"
+                    disabled={processing || !unlockedBlob}
+                  />
                 </div>
               )}
             </div>

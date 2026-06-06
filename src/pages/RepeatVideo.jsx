@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
+import ContinueWithBlob from '../components/shared/ContinueWithBlob';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Shield, Video, Download, Play, Repeat, AlertTriangle, Settings } from 'lucide-react';
 import Navbar from '../components/shared/Navbar';
@@ -115,6 +118,13 @@ export default function RepeatVideo() {
     clearOPFSSandbox();
   };
 
+  const onHandoffFile = useCallback((nextFile) => {
+    handleFileSelect([nextFile]);
+  }, []);
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('repeat-video', {
+    onFile: onHandoffFile,
+  });
+
   return (
     <div className="app-shell">
       <Navbar />
@@ -141,6 +151,7 @@ export default function RepeatVideo() {
           <h1>Video Looper &amp; Repeater</h1>
           <p>Repeat a video multiple times and combine them into a single, seamless looped output locally in your browser. Lightning-fast remuxing with zero quality loss.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         <section className="container" style={{ maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           {error && (
@@ -202,6 +213,16 @@ export default function RepeatVideo() {
                   )}
                 </div>
               </div>
+
+              {resultBlob && (
+                <ContinueWithBlob
+                  sourceToolId="repeat-video"
+                  blob={resultBlob}
+                  fileName={`${file.name.replace(/\.[^/.]+$/, '')}-repeated.mp4`}
+                  mimeType="video/mp4"
+                  disabled={processing}
+                />
+              )}
             </div>
           ) : file ? (
             <div className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

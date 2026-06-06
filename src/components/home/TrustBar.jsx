@@ -1,9 +1,11 @@
 import { createElement } from 'react'
-import { Lock, Smartphone, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, Lock, Smartphone, Sparkles, WifiOff, Zap } from 'lucide-react'
 
 export default function TrustBar() {
   const items = [
     { icon: Lock, label: 'Files never uploaded' },
+    { icon: WifiOff, label: 'Offline-ready tools' },
+    { icon: ArrowRight, label: 'Continue with workflows' },
     { icon: Zap, label: 'WebAssembly powered' },
     { icon: Sparkles, label: 'Free forever' },
     { icon: Smartphone, label: 'Works on mobile' },

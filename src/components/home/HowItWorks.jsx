@@ -9,7 +9,7 @@ export default function HowItWorks({ steps }) {
     <section className="section container">
       <div className="section-heading">
         <p className="eyebrow">How it works</p>
-        <h2>Three steps, zero waiting rooms</h2>
+        <h2>{items.length} steps, zero waiting rooms</h2>
       </div>
       <div className="steps-grid">
         {items.map(([title, body], index) => (

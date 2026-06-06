@@ -1,10 +1,9 @@
 import { PDFDocument, PDFName, PDFHexString, PDFString, PDFDict, PDFArray, PDFRawStream, PDFNumber, PDFRef, PDFObjectStreamParser, PDFObjectParser, PDFInvalidObject } from 'pdf-lib';
 import { md5, RC4, hexToBytes, bytesToHex } from './crypto-rc4';
 import {
-  sha256,
-  aes256CbcDecrypt, aes256CbcDecryptNoPad, aes256EcbDecryptBlock,
+  aes256CbcDecryptNoPad, aes256EcbDecryptBlock,
   importAES256DecryptKey, aes256CbcDecryptWithKey,
-  computeHash2B, concat
+  computeHash2B,
 } from './crypto-aes';
 
 // ========== Constants ==========
@@ -536,7 +535,7 @@ export async function decryptPDF(pdfBytes, password) {
 
     // ========== RE-PARSE DECRYPTED OBJECT STREAMS ==========
     const indirectObjects = context.enumerateIndirectObjects();
-    for (const [ref, obj] of indirectObjects) {
+    for (const [, obj] of indirectObjects) {
       if (obj instanceof PDFRawStream && obj.dict) {
         const type = obj.dict.get(PDFName.of('Type'));
         if (type && type.toString() === '/ObjStm') {

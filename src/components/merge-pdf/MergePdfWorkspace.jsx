@@ -1,14 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Download, GripVertical, FileText } from 'lucide-react'
 import { downloadBlob, formatBytes } from '../../utils/imageUtils'
 import { countPdfPages, mergePdfFiles } from '../../utils/pdfUtils'
+import { useBlobUrl } from '../../utils/useBlobUrl'
 import SecureShareButton from '../shared/SecureShareButton'
+import ContinueWithBlob from '../shared/ContinueWithBlob'
 
 export default function MergePdfWorkspace({ files, setFiles, onReset }) {
   const [pageCounts, setPageCounts] = useState({})
   const [result, setResult] = useState(null)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
+  const previewUrl = useBlobUrl(result)
 
   useEffect(() => {
     let active = true
@@ -21,23 +24,7 @@ export default function MergePdfWorkspace({ files, setFiles, onReset }) {
     }
   }, [files])
 
-  useEffect(() => {
-    if (files.length < 2) return
-    const id = setTimeout(() => {
-      merge()
-    }, 500)
-    return () => clearTimeout(id)
-  }, [files])
-
-  const move = (from, to) => {
-    if (to < 0 || to >= files.length) return
-    const next = [...files]
-    const [item] = next.splice(from, 1)
-    next.splice(to, 0, item)
-    setFiles(next)
-  }
-
-  const merge = async () => {
+  const merge = useCallback(async () => {
     setProcessing(true)
     setError('')
     try {
@@ -48,15 +35,31 @@ export default function MergePdfWorkspace({ files, setFiles, onReset }) {
     } finally {
       setProcessing(false)
     }
+  }, [files])
+
+  useEffect(() => {
+    if (files.length < 2) return
+    const id = setTimeout(() => {
+      merge()
+    }, 500)
+    return () => clearTimeout(id)
+  }, [files.length, merge])
+
+  const move = (from, to) => {
+    if (to < 0 || to >= files.length) return
+    const next = [...files]
+    const [item] = next.splice(from, 1)
+    next.splice(to, 0, item)
+    setFiles(next)
   }
 
   return (
     <section className="workspace-panel">
       <div className="workspace-preview" style={{ background: 'var(--bg-secondary)', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        {result ? (
+        {previewUrl ? (
           <iframe 
-            src={URL.createObjectURL(result) + '#toolbar=0'} 
-            title="PDF Preview" 
+            src={previewUrl + '#toolbar=0'} 
+            title="PDF Preview"
             style={{ width: '100%', height: '100%', flex: 1, border: 'none' }}
           />
         ) : (
@@ -102,6 +105,13 @@ export default function MergePdfWorkspace({ files, setFiles, onReset }) {
             />
           )}
         </div>
+        <ContinueWithBlob
+          sourceToolId="merge-pdf"
+          blob={result}
+          fileName="fileora-merged.pdf"
+          mimeType="application/pdf"
+          disabled={!result || processing}
+        />
       </div>
     </section>
   )

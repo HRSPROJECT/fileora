@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { PenTool, Type, Image as ImageIcon, ArrowLeft, Shield, Download, Sparkles, Sliders, Check, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -8,7 +11,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import * as pdfjsLib from 'pdfjs-dist'
 import { PDFDocument } from 'pdf-lib'
-import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
+import { downloadBlob, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs'
@@ -57,8 +60,11 @@ export default function SignPdf() {
 
   const [error, setError] = useState('')
   const [processing, setProcessing] = useState(false)
-  const [progressText, setProgressText] = useState('')
+
   const [downloadableBlob, setDownloadableBlob] = useState(null)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('sign-pdf', { onFile: onHandoffFile })
 
   const drawCanvasRef = useRef(null)
   const isDrawingRef = useRef(false)
@@ -74,7 +80,7 @@ export default function SignPdf() {
     setPreviewPageUrl('')
     setDownloadableBlob(null)
     setProcessing(true)
-    setProgressText('Loading PDF page outlines...')
+
 
     try {
       const arrayBuffer = await selectedFile.arrayBuffer()
@@ -90,7 +96,7 @@ export default function SignPdf() {
       setFile(null)
     } finally {
       setProcessing(false)
-      setProgressText('')
+
     }
   }
 
@@ -274,7 +280,7 @@ export default function SignPdf() {
     }
 
     setProcessing(true)
-    setProgressText('Stamping signature onto PDF layout...')
+
     setError('')
 
     try {
@@ -324,7 +330,7 @@ export default function SignPdf() {
       setError('An error occurred during vector signing. Verify document encryption.')
     } finally {
       setProcessing(false)
-      setProgressText('')
+
     }
   }
 
@@ -395,6 +401,7 @@ export default function SignPdf() {
           <h1>Sign PDF Online</h1>
           <p>Create stylized digital signatures and position them anywhere on your documents losslessly completely inside your browser.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {!file && (
           <div className="container container-narrow">
@@ -755,6 +762,13 @@ export default function SignPdf() {
                       />
                     )}
                   </div>
+                  <ContinueWithBlob
+                    sourceToolId="sign-pdf"
+                    blob={downloadableBlob}
+                    fileName={`${basename(file.name)}-signed.pdf`}
+                    mimeType="application/pdf"
+                    disabled={processing || !downloadableBlob}
+                  />
 
                   <button
                     className="btn btn-ghost"

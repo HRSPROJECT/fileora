@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { FileImage, ArrowLeft, Shield, Columns, Layout, Download } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -7,7 +10,7 @@ import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { imagesToPdf } from '../utils/pdfUtils'
-import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
@@ -24,6 +27,10 @@ export default function PngToPdf() {
   const [margin, setMargin] = useState(0) // 0, 10, 20
   const [processing, setProcessing] = useState(false)
   const [resultBlob, setResultBlob] = useState(null)
+
+  const onHandoffFile = useCallback((file) => { setFiles([file]); setError('') }, [])
+  const onHandoffFiles = useCallback((nextFiles) => { setFiles(nextFiles); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('png-to-pdf', { onFile: onHandoffFile, onFiles: onHandoffFiles })
 
   const runConvert = async () => {
     if (!files.length) return
@@ -99,6 +106,7 @@ export default function PngToPdf() {
           <h1>Free Online PNG to PDF Converter</h1>
           <p>Convert PNG images to A4, Letter, or original sized PDF instantly. 100% locally compiled in your browser.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {files.length === 0 ? (
           <div className="container container-narrow">
@@ -283,6 +291,13 @@ export default function PngToPdf() {
                   />
                 )}
               </div>
+              <ContinueWithBlob
+                sourceToolId="png-to-pdf"
+                blob={resultBlob}
+                fileName={files.length > 0 ? `${basename(files[0].name)}-png-to-pdf.pdf` : 'png-to-pdf.pdf'}
+                mimeType="application/pdf"
+                disabled={processing || !resultBlob}
+              />
             </div>
           </section>
         )}

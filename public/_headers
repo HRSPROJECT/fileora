@@ -95,6 +95,9 @@
 /scanner
   Link: <https://fileora.tech/scanner>; rel="canonical"
 
+/share
+  Link: <https://fileora.tech/share>; rel="canonical"
+
 /mov-to-mp4
   Link: <https://fileora.tech/mov-to-mp4>; rel="canonical"
 

@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { Shield, ArrowLeft, Download, Sparkles, Eye, EyeOff, Lock, Check } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -34,6 +37,9 @@ export default function ProtectPdf() {
   const [processing, setProcessing] = useState(false)
   const [progressText, setProgressText] = useState('')
   const [downloadableBlob, setDownloadableBlob] = useState(null)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('protect-pdf', { onFile: onHandoffFile })
 
   const handleFile = (selectedFile) => {
     setError('')
@@ -153,6 +159,7 @@ export default function ProtectPdf() {
           <h1>Protect PDF Online</h1>
           <p>Enforce strong password locks and user permission controls. Secure bank statements, agreements, and blueprints client-side.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {!file && (
           <div className="container container-narrow">
@@ -335,6 +342,13 @@ export default function ProtectPdf() {
                       />
                     )}
                   </div>
+                  <ContinueWithBlob
+                    sourceToolId="protect-pdf"
+                    blob={downloadableBlob}
+                    fileName={`${basename(file.name)}-protected.pdf`}
+                    mimeType="application/pdf"
+                    disabled={processing || !downloadableBlob}
+                  />
                   <button onClick={() => setDownloadableBlob(null)} className="btn btn-ghost" style={{ fontSize: '12px' }}>
                     Adjust Security Settings
                   </button>

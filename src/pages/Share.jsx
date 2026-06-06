@@ -7,10 +7,13 @@ import {
 } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
+import { NetworkRequiredBanner, OfflineToolsPolicyNote } from '../components/shared/NetworkPolicyNote'
+import { useNetworkStatus } from '../utils/useNetworkStatus'
 import { 
   createPeer, waitForPeerOpen, waitForConnOpen,
   sendFileChunks, normalizePeerId,
-  makePeerId, makePin, CHUNK_SIZE
+  makePeerId, makePin, CHUNK_SIZE,
+  isP2PControlMessage, getChunkByteLength,
 } from '../utils/p2pEngine'
 import { makeQrDataUrl, isQrFriendlyPayload } from '../utils/shareQr'
 import { useShare } from '../context/ShareContext'
@@ -45,8 +48,7 @@ export default function Share() {
   // Tabs: 'send' | 'receive'
   const [activeTab, setActiveTab] = useState(initialTab)
   
-  // Internet connection state
-  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true)
+  const isOnline = useNetworkStatus()
   
   // File states
   const [selectedFile, setSelectedFile] = useState(null)
@@ -93,38 +95,26 @@ export default function Share() {
 
   // Preload file if available in context
   useEffect(() => {
-    if (sharedFile) {
-      setSelectedFile(sharedFile);
-      clearSharedFile(); // Clear context so it doesn't double-trigger
-      setStatus('File preloaded successfully. Ready to generate share channel.');
-    }
-  }, [sharedFile, clearSharedFile]);
+    if (!sharedFile) return undefined
+    const id = setTimeout(() => {
+      setSelectedFile(sharedFile)
+      clearSharedFile()
+      setStatus('File preloaded successfully. Ready to generate share channel.')
+    }, 0)
+    return () => clearTimeout(id)
+  }, [sharedFile, clearSharedFile])
 
-  // Monitor internet connection status
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const handleOnline = () => {
-      setIsOnline(true);
-      setErrorMessage('');
-    };
-    const handleOffline = () => {
-      setIsOnline(false);
-      setErrorMessage('You are currently offline. An active internet connection is required to start a P2P share session.');
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    // Initial check
-    if (!navigator.onLine) {
-      handleOffline();
-    }
-
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+      if (receivedFile?.url) URL.revokeObjectURL(receivedFile.url)
+    }
+  }, [receivedFile?.url])
+
+  useEffect(() => {
+    if (!isOnline) {
+      setErrorMessage('You are currently offline. Enable Wi‑Fi or mobile data to use P2P Share.')
+    }
+  }, [isOnline])
 
   const cleanupConnections = () => {
     if (activeConnRef.current) {
@@ -210,7 +200,7 @@ export default function Share() {
   const startCloudShare = async () => {
     if (!selectedFile) return;
     if (!navigator.onLine) {
-      setErrorMessage('You are offline. Please connect to the internet to generate a secure channel.');
+      setErrorMessage('You are offline. Enable Wi‑Fi or mobile data to generate a share channel.');
       return;
     }
 
@@ -339,7 +329,7 @@ export default function Share() {
   // RECEIVER FLOW (PeerJS)
   const connectToSender = async () => {
     if (!navigator.onLine) {
-      setErrorMessage('You are offline. Please connect to the internet to contact the signaling server.');
+      setErrorMessage('You are offline. Enable Wi‑Fi or mobile data to contact the signaling server.');
       return;
     }
     const senderId = normalizePeerId(targetPeerId);
@@ -391,7 +381,7 @@ export default function Share() {
       let opfsFileName = '';
 
       conn.on('data', (data) => {
-        if (data && typeof data === 'object' && data.type) {
+        if (isP2PControlMessage(data)) {
           if (data.type === 'AUTH_OK') {
             setStatus('Authenticated! Awaiting file transfer...');
             setTransferStatus('Handshake established. Buffering...');
@@ -472,9 +462,8 @@ export default function Share() {
               }
             });
           }
-        } else {
-          if (data) {
-            bytesReceived += data.byteLength || data.size || 0;
+        } else if (data) {
+            bytesReceived += getChunkByteLength(data);
 
             const chunkData = data;
             opfsWriteQueue = opfsWriteQueue.then(async () => {
@@ -512,7 +501,6 @@ export default function Share() {
                 }
               }
             }
-          }
         }
       });
 
@@ -542,9 +530,20 @@ export default function Share() {
   return (
     <div className="app-shell">
       <Helmet>
-        <title>🔒 Secure P2P File Share - Fileora</title>
-        <meta name="description" content="Share massive files of any size directly device-to-device with no servers. Completely private, end-to-end encrypted local WebRTC peer-to-peer file sharing." />
+        <title>Secure P2P File Share - Fileora</title>
+        <meta name="description" content="Share large files device-to-device with a secure PIN. Internet required to pair two browsers — file content never uploads to Fileora. All other tools work offline." />
         <link rel="canonical" href="https://fileora.tech/share" />
+        <meta property="og:title" content="Secure P2P File Share - Fileora" />
+        <meta property="og:description" content="Send files browser-to-browser with a secure PIN. No uploads, no cloud storage." />
+        <meta property="og:url" content="https://fileora.tech/share" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://fileora.tech/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@fileora_tech" />
+        <meta name="twitter:creator" content="@fileora_tech" />
+        <meta name="twitter:title" content="Secure P2P File Share - Fileora" />
+        <meta name="twitter:description" content="Send files browser-to-browser with a secure PIN. No uploads, no cloud storage." />
+        <meta name="twitter:image" content="https://fileora.tech/og-image.png" />
       </Helmet>
 
       <Navbar />
@@ -560,8 +559,11 @@ export default function Share() {
             </div>
             <h1 className="h1-premium" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Direct P2P File Share</h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.975rem', maxWidth: '500px', margin: '0 auto' }}>
-              Files stream natively from memory to memory. 100% private, fully encrypted, with zero server storage.
+              Files stream directly browser-to-browser. Internet is required to connect two devices — your file is never uploaded to Fileora.
             </p>
+            <div style={{ maxWidth: '560px', margin: '1rem auto 0' }}>
+              <OfflineToolsPolicyNote compact />
+            </div>
           </div>
 
           {/* Main Panel Card */}
@@ -587,11 +589,22 @@ export default function Share() {
               </button>
             </div>
 
-            {/* Offline Error Banner */}
             {!isOnline && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', padding: '12px 16px', borderRadius: '8px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.25rem' }}>
-                <AlertCircle size={16} />
-                <span>You are currently offline. Please check your internet connection to use P2P share.</span>
+              <NetworkRequiredBanner onRetry={() => {
+                if (navigator.onLine) {
+                  setErrorMessage('')
+                } else {
+                  setErrorMessage('Still offline. Please enable Wi‑Fi or mobile data, then tap check again.')
+                }
+              }} />
+            )}
+
+            {isOnline && (
+              <div className="network-policy-note" style={{ marginBottom: '1rem' }}>
+                <Wifi size={16} aria-hidden="true" />
+                <p>
+                  <strong>Network required for pairing only.</strong> Internet connects sender and receiver. File bytes stay peer-to-peer and are never stored on Fileora servers.
+                </p>
               </div>
             )}
 
@@ -609,7 +622,7 @@ export default function Share() {
                 </div>
                 {(errorMessage.toLowerCase().includes('signaling') || errorMessage.toLowerCase().includes('connect') || errorMessage.toLowerCase().includes('insecure') || errorMessage.toLowerCase().includes('fail')) && (
                   <div style={{ fontSize: '12px', opacity: 0.85, paddingLeft: '24px', borderTop: '1px solid rgba(239, 68, 68, 0.15)', paddingTop: '6px', marginTop: '4px', textAlign: 'left', lineHeight: '1.4' }}>
-                    💡 <strong>Tip:</strong> Ad blockers can sometimes block secure WebRTC signaling servers. If this persists, try disabling your ad blocker for Fileora, or switch to <strong>Local Offline Mode</strong>.
+                    💡 <strong>Tip:</strong> Ad blockers can sometimes block WebRTC signaling. Try disabling them for Fileora, or confirm Wi‑Fi/mobile data is enabled. P2P Share cannot work fully offline.
                   </div>
                 )}
               </div>
@@ -636,7 +649,7 @@ export default function Share() {
                     <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 1rem', color: 'var(--accent-primary)' }}>
                       <Upload size={24} />
                     </div>
-                    <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '0.25rem' }}>Drag & drop any file here</h3>
+                    <h2 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '0.25rem' }}>Drag & drop any file here</h2>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Supports documents, images, and videos up to 10GB+</p>
                   </div>
                 ) : (
@@ -948,33 +961,33 @@ export default function Share() {
 
           {/* Security details section */}
           <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border-color)', paddingTop: '2.5rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.5rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.5rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
               <ShieldCheck size={20} style={{ color: 'var(--accent-primary)' }} />
               P2P Security & Privacy Precautions
-            </h3>
+            </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', textAlign: 'left' }} className="mobile-grid-1col">
               <div style={{ background: 'rgba(15, 23, 42, 0.3)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: '12px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>🔒 100% Direct & Private</h4>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>🔒 100% Direct & Private</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                   Your files are never uploaded, stored, or processed on any server. The data streams directly from the sender's browser memory to the receiver's browser memory using WebRTC.
                 </p>
               </div>
               <div style={{ background: 'rgba(15, 23, 42, 0.3)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: '12px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>🔑 Secure PIN Authorization</h4>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>🔑 Secure PIN Authorization</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                   Every session is protected by a randomized Channel ID and a secure 4-digit PIN. Only peers who have the PIN can establish a tunnel and receive the file.
                 </p>
               </div>
               <div style={{ background: 'rgba(15, 23, 42, 0.3)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: '12px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>🛡️ End-to-End Encryption</h4>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>🛡️ End-to-End Encryption</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                   Data connections are protected with DTLS (Datagram Transport Layer Security) and SRTP protocols. This guarantees that your file content cannot be intercepted.
                 </p>
               </div>
               <div style={{ background: 'rgba(15, 23, 42, 0.3)', border: '1px solid var(--border-color)', padding: '1.25rem', borderRadius: '12px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>📡 PeerJS Cloud Broker</h4>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>📡 Internet for pairing only</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  We utilize the public PeerJS signaling service to negotiate connection handshake metadata (SDP/ICE) between devices. No file content ever touches this signaling server.
+                  P2P Share is the only Fileora tool that needs an active network connection. A lightweight signaling service helps two browsers find each other — file content never passes through it.
                 </p>
               </div>
             </div>

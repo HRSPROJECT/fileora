@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { Hash, ArrowLeft, Shield, Download, Sparkles, Sliders, Check } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -8,7 +11,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import * as pdfjsLib from 'pdfjs-dist'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
+import { downloadBlob, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs'
@@ -24,8 +27,6 @@ export default function NumberPdf() {
   const [file, setFile] = useState(null)
   const [pdfDocJS, setPdfDocJS] = useState(null)
   const [previewPageUrl, setPreviewPageUrl] = useState('')
-  const [pageWidth, setPageWidth] = useState(612)
-  const [pageHeight, setPageHeight] = useState(792)
   const [totalPages, setTotalPages] = useState(0)
 
   // Side settings
@@ -40,6 +41,9 @@ export default function NumberPdf() {
   const [processing, setProcessing] = useState(false)
   const [progressText, setProgressText] = useState('')
   const [downloadableBlob, setDownloadableBlob] = useState(null)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('number-pdf', { onFile: onHandoffFile })
 
   const handleFile = async (selectedFile) => {
     setError('')
@@ -61,8 +65,7 @@ export default function NumberPdf() {
       const pageToRender = (excludeFirst && pdf.numPages > 1) ? 2 : 1
       const page = await pdf.getPage(pageToRender)
       const viewport = page.getViewport({ scale: 1.0 })
-      setPageWidth(viewport.width)
-      setPageHeight(viewport.height)
+
 
       const canvas = document.createElement('canvas')
       const context = canvas.getContext('2d')
@@ -143,7 +146,6 @@ export default function NumberPdf() {
         const pWidth = page.getWidth()
         const pHeight = page.getHeight()
         const textWidth = helveticaFont.widthOfTextAtSize(label, fontSize)
-        const textHeight = fontSize * 0.8
 
         let x = pWidth / 2 - textWidth / 2
         let y = 30 // bottom default
@@ -290,6 +292,7 @@ export default function NumberPdf() {
           <h1>Add Page Numbers to PDF</h1>
           <p>Organize document hierarchies. Set custom sizes, color palettes, spacing, formats, cover-page skips, and placement presets locally.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {processing && progressText && !previewPageUrl && (
           <div className="container" style={{ maxWidth: '640px', padding: '3rem 1.5rem', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
@@ -530,6 +533,13 @@ export default function NumberPdf() {
                       />
                     )}
                   </div>
+                  <ContinueWithBlob
+                    sourceToolId="number-pdf"
+                    blob={downloadableBlob}
+                    fileName={`${basename(file.name)}-numbered.pdf`}
+                    mimeType="application/pdf"
+                    disabled={processing || !downloadableBlob}
+                  />
 
                   <button
                     className="btn btn-ghost"

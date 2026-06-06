@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { FileDown, ArrowLeft, Shield, Sparkles, Download } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -7,7 +10,7 @@ import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { PDFDocument } from 'pdf-lib'
-import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 
@@ -27,6 +30,9 @@ export default function CompressPdf() {
   const [processing, setProcessing] = useState(false)
   const [compressedBlob, setCompressedBlob] = useState(null)
   const [compressedSize, setCompressedSize] = useState(0)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('compress-pdf', { onFile: onHandoffFile })
 
   useEffect(() => {
     if (!file) return
@@ -147,6 +153,7 @@ export default function CompressPdf() {
           <h1>Free Online PDF Compressor</h1>
           <p>Reduce PDF file size to 100KB, 200KB, or 500KB instantly. All operations run directly in your browser securely.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {!file ? (
           <div className="container container-narrow">
@@ -284,6 +291,13 @@ export default function CompressPdf() {
                   />
                 )}
               </div>
+              <ContinueWithBlob
+                sourceToolId="compress-pdf"
+                blob={compressedBlob}
+                fileName={file ? `${basename(file.name)}-compressed-${targetSize}.pdf` : 'compressed.pdf'}
+                mimeType="application/pdf"
+                disabled={processing || !compressedBlob}
+              />
             </div>
           </section>
         )}

@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
+import ContinueWithBlob from '../components/shared/ContinueWithBlob';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Shield, Music, Download, Play, AlertTriangle, Settings } from 'lucide-react';
 import Navbar from '../components/shared/Navbar';
@@ -92,6 +95,13 @@ export default function MovToMp3() {
     clearOPFSSandbox();
   };
 
+  const onHandoffFile = useCallback((nextFile) => {
+    handleFileSelect([nextFile]);
+  }, []);
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('mov-to-mp3', {
+    onFile: onHandoffFile,
+  });
+
   return (
     <div className="app-shell">
       <Navbar />
@@ -118,6 +128,7 @@ export default function MovToMp3() {
           <h1>Extract MOV to MP3</h1>
           <p>Extract high-fidelity audio streams directly from Apple QuickTime .MOV captures and export as standard .MP3 files locally. Completely private, fast, and offline.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         <section className="container" style={{ maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           {error && (
@@ -180,6 +191,16 @@ export default function MovToMp3() {
                   )}
                 </div>
               </div>
+
+              {resultBlob && (
+                <ContinueWithBlob
+                  sourceToolId="mov-to-mp3"
+                  blob={resultBlob}
+                  fileName={`${file.name.replace(/\.[^/.]+$/, '')}.mp3`}
+                  mimeType="audio/mpeg"
+                  disabled={processing}
+                />
+              )}
             </div>
           ) : file ? (
             <div className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

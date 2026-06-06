@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import { useShare } from '../context/ShareContext'
@@ -95,6 +98,13 @@ export default function PdfToJpg() {
       setProgressText('')
     }
   }
+
+  const onHandoffFile = useCallback((nextFile) => {
+    handleFile(nextFile)
+  }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('pdf-to-jpg', {
+    onFile: onHandoffFile,
+  })
 
   const runConvert = async () => {
     if (!pdfDoc || !selectedPages.length) return
@@ -288,6 +298,7 @@ export default function PdfToJpg() {
           <h1>Convert PDF to JPG Online</h1>
           <p>Extract all pages or select specific ones to convert into high-quality JPG or PNG images instantly. Purely client-side security.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {/* Hero loading indicator */}
         {processing && progressText && !pdfDoc && (
@@ -601,6 +612,14 @@ export default function PdfToJpg() {
                       <span>Share Directly (P2P)</span>
                     </button>
                   </div>
+
+                  <ContinueWithBlob
+                    sourceToolId="pdf-to-jpg"
+                    blob={results[0]?.blob}
+                    fileName={results[0]?.name}
+                    mimeType={format === 'png' ? 'image/png' : 'image/jpeg'}
+                    disabled={results.length === 0 || processing}
+                  />
 
                   <button
                     className="btn btn-ghost"

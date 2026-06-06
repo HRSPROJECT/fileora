@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { Scale, ArrowLeft, Shield, Columns, Layout, Download } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -7,7 +10,7 @@ import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import { PDFDocument } from 'pdf-lib'
-import { downloadBlob, formatBytes } from '../utils/imageUtils'
+import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 const faqs = [
@@ -24,6 +27,9 @@ export default function ResizePdf() {
   const [orientation, setOrientation] = useState('portrait') // 'portrait', 'landscape'
   const [processing, setProcessing] = useState(false)
   const [resultBlob, setResultBlob] = useState(null)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('resize-pdf', { onFile: onHandoffFile })
 
   useEffect(() => {
     if (!file) return
@@ -151,6 +157,7 @@ export default function ResizePdf() {
           <h1>Free Online PDF Page Resizer</h1>
           <p>Resize PDF pages to standard A4, A3, Letter dimensions in landscape or portrait. Perfectly scaled in your browser.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {!file ? (
           <div className="container container-narrow">
@@ -294,6 +301,13 @@ export default function ResizePdf() {
                   />
                 )}
               </div>
+              <ContinueWithBlob
+                sourceToolId="resize-pdf"
+                blob={resultBlob}
+                fileName={file ? `${basename(file.name)}-resized-${pageSize}-${orientation}.pdf` : 'resized.pdf'}
+                mimeType="application/pdf"
+                disabled={processing || !resultBlob}
+              />
             </div>
           </section>
         )}

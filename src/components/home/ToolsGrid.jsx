@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileArchive, FileImage, FilePlus2, ImageIcon, Maximize2, Repeat2, FileDown, Scissors, FileLock, Scale, Crop, FileText, ArrowLeftRight, Contact, RotateCw, Type, Hash, Shield, PenTool, Sparkles, Search, X, Camera, Video, Music, Layers } from 'lucide-react'
+import { FileArchive, FileImage, FilePlus2, ImageIcon, Maximize2, Repeat2, FileDown, Scissors, FileLock, Scale, Crop, FileText, ArrowLeftRight, Contact, RotateCw, Type, Hash, Shield, PenTool, Sparkles, Search, X, Camera, Video, Music, Layers, Share2 } from 'lucide-react'
 import ToolCard from '../shared/ToolCard'
 
 const tools = [
@@ -156,6 +156,14 @@ const tools = [
     title: 'Sign PDF',
     description: 'Type cursive typography or draw anti-aliased digital signatures on PDF pages.',
     formats: 'PDF',
+  },
+  {
+    href: '/share',
+    icon: <Share2 size={25} />,
+    title: 'P2P File Share',
+    description: 'Send large files device-to-device with a secure PIN. Requires internet to pair — file never uploads to Fileora.',
+    badge: 'Online',
+    formats: 'Any file · WebRTC · Wi‑Fi required',
   },
   {
     href: '/scanner',
@@ -355,7 +363,7 @@ export default function ToolsGrid(props) {
       <div className="section-heading">
         <p className="eyebrow">All tools</p>
         <h2>Everything useful, nothing invasive</h2>
-        <p>Each tool runs locally in your browser, so your private files stay on your device.</p>
+        <p>Each tool runs locally in your browser. All tools work offline after load — except P2P Share, which needs internet to connect two devices.</p>
       </div>
 
       <div className="search-container">

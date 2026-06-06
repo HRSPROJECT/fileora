@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import { Helmet } from 'react-helmet-async'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
@@ -18,6 +20,19 @@ const faqs = [
 export default function ImageToPdf() {
   const [files, setFiles] = useState([])
   const [error, setError] = useState('')
+
+  const onHandoffFile = useCallback((file) => {
+    setFiles([file])
+    setError('')
+  }, [])
+  const onHandoffFiles = useCallback((nextFiles) => {
+    setFiles(nextFiles)
+    setError('')
+  }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('image-to-pdf', {
+    onFile: onHandoffFile,
+    onFiles: onHandoffFiles,
+  })
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) }
   const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Fileora Image to PDF Converter', url: 'https://fileora.tech/image-to-pdf', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }
 
@@ -47,6 +62,7 @@ export default function ImageToPdf() {
           <h1>Free Image to PDF Converter Online</h1>
           <p>Turn JPG, PNG and WebP images into a single PDF with page size and margin controls. Absolutely private execution in your browser.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
         {files.length ? <ImageToPdfWorkspace files={files} setFiles={setFiles} onReset={() => setFiles([])} /> : <ImageToPdfLanding error={error} onFiles={(nextFiles) => {
           const supported = ['image/jpeg', 'image/png', 'image/webp']
           const accepted = nextFiles.filter((next) => supported.includes(next.type) && next.size <= 50 * 1024 * 1024)

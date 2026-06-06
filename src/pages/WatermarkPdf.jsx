@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { Type, Image as ImageIcon, ArrowLeft, Shield, Download, Sparkles, Sliders, Check, RefreshCw } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -8,7 +11,7 @@ import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
 import * as pdfjsLib from 'pdfjs-dist'
 import { PDFDocument, rgb, degrees as pdfDegrees, StandardFonts } from 'pdf-lib'
-import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
+import { downloadBlob, basename } from '../utils/imageUtils'
 import SecureShareButton from '../components/shared/SecureShareButton'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs'
@@ -22,7 +25,7 @@ const faqs = [
 
 export default function WatermarkPdf() {
   const [file, setFile] = useState(null)
-  const [pdfDocJS, setPdfDocJS] = useState(null)
+
   const [previewPageUrl, setPreviewPageUrl] = useState('')
   const [pageWidth, setPageWidth] = useState(612) // standard letter width
   const [pageHeight, setPageHeight] = useState(792) // standard letter height
@@ -48,10 +51,13 @@ export default function WatermarkPdf() {
   
   const imageInputRef = useRef(null)
 
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('watermark-pdf', { onFile: onHandoffFile })
+
   const handleFile = async (selectedFile) => {
     setError('')
     setFile(selectedFile)
-    setPdfDocJS(null)
+
     setPreviewPageUrl('')
     setDownloadableBlob(null)
     setProcessing(true)
@@ -61,8 +67,6 @@ export default function WatermarkPdf() {
       const arrayBuffer = await selectedFile.arrayBuffer()
       const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) })
       const pdf = await loadingTask.promise
-      setPdfDocJS(pdf)
-      
       // Render first page as a beautiful background preview
       const page = await pdf.getPage(1)
       const viewport = page.getViewport({ scale: 1.0 })
@@ -235,7 +239,7 @@ export default function WatermarkPdf() {
 
   const handleReset = () => {
     setFile(null)
-    setPdfDocJS(null)
+
     setPreviewPageUrl('')
     setDownloadableBlob(null)
     setImageFile(null)
@@ -246,7 +250,7 @@ export default function WatermarkPdf() {
 
   // Preview overlay styles depending on settings
   const getPreviewOverlayStyle = () => {
-    const scaleFactor = 1.0 // coordinates are absolute inside width/height
+
     const op = opacity / 100
     
     let styles = {
@@ -352,6 +356,7 @@ export default function WatermarkPdf() {
           <h1>Add Watermark to PDF</h1>
           <p>Protect your visual property. Add customized text or image stamps onto PDF pages with pixel precision completely in your browser.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {processing && progressText && !previewPageUrl && (
           <div className="container" style={{ maxWidth: '640px', padding: '3rem 1.5rem', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
@@ -695,6 +700,13 @@ export default function WatermarkPdf() {
                       />
                     )}
                   </div>
+                  <ContinueWithBlob
+                    sourceToolId="watermark-pdf"
+                    blob={downloadableBlob}
+                    fileName={`${basename(file.name)}-watermarked.pdf`}
+                    mimeType="application/pdf"
+                    disabled={processing || !downloadableBlob}
+                  />
 
                   <button
                     className="btn btn-ghost"

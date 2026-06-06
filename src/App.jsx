@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { ThemeProvider } from './context/ThemeContext'
 import { ShareProvider } from './context/ShareContext'
+import { WorkflowProvider } from './context/WorkflowContext'
 
 // Eagerly load Home (most visited page)
 import Home from './pages/Home'
@@ -71,6 +72,7 @@ export default function App() {
   return (
     <HelmetProvider>
       <ShareProvider>
+        <WorkflowProvider>
         <ThemeProvider>
           <BrowserRouter>
           <ScrollToTop />
@@ -122,6 +124,7 @@ export default function App() {
           </Suspense>
           </BrowserRouter>
         </ThemeProvider>
+        </WorkflowProvider>
       </ShareProvider>
     </HelmetProvider>
   )

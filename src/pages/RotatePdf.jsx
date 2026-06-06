@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { RotateCw, RotateCcw, ArrowLeft, Shield, Download, FileText, Sparkles, HelpCircle, Check } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -32,6 +35,9 @@ export default function RotatePdf() {
   const [progressText, setProgressText] = useState('')
   const [progressPercent, setProgressPercent] = useState(0)
   const [downloadableBlob, setDownloadableBlob] = useState(null)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('rotate-pdf', { onFile: onHandoffFile })
 
   const handleFile = async (selectedFile) => {
     setError('')
@@ -207,6 +213,7 @@ export default function RotatePdf() {
           <h1>Rotate PDF Online</h1>
           <p>Rotate pages clockwise or counterclockwise. Perfect for correcting upside-down document scans and landscape formats locally.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {processing && progressText && !pdfDocJS && (
           <div className="container" style={{ maxWidth: '640px', padding: '3rem 1.5rem', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
@@ -395,6 +402,13 @@ export default function RotatePdf() {
                       />
                     )}
                   </div>
+                  <ContinueWithBlob
+                    sourceToolId="rotate-pdf"
+                    blob={downloadableBlob}
+                    fileName={`${basename(file.name)}-rotated.pdf`}
+                    mimeType="application/pdf"
+                    disabled={processing || !downloadableBlob}
+                  />
 
                   <button
                     className="btn btn-ghost"

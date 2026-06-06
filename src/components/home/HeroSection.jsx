@@ -8,7 +8,7 @@ export default function HeroSection() {
         <p className="eyebrow">Fileora for file work that stays yours</p>
         <h1>Fileora — Secure Browser Tools for PDF, Image &amp; Video Files</h1>
         <p className="hero-copy">
-          Professional-grade tools that run entirely in your browser. No signup, no uploads, no limits.
+          Professional-grade tools that run entirely in your browser. Chain steps with <strong>Continue with</strong> — compress an image, then jump to PDF, resize, or share without re-uploading. Offline-ready processing, no signup, no limits. P2P Share is the only tool that needs network access to pair two devices.
         </p>
         <div className="hero-actions">
           <Link className="btn btn-primary" to="/compress">

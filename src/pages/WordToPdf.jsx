@@ -1,4 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { FileText, ArrowLeft, Shield, Download, Sparkles, Settings, Eye, CheckCircle } from 'lucide-react'
 import Navbar from '../components/shared/Navbar'
@@ -29,10 +32,10 @@ const applyMathFixes = (container) => {
     { regex: /"\[†/g, replace: '∫ [' },
     { regex: /¦/g, replace: 'φ' },
     { regex: /É/g, replace: 'ω' },
-    { regex: /\'ù\s*\"²¨/g, replace: '∇²ψ' },
-    { regex: /\'ù/g, replace: '∇²' },
-    { regex: /\"²¨/g, replace: '∂²ψ' },
-    { regex: /\"/g, replace: '∂' },
+    { regex: /'ù\s*"²¨/g, replace: '∇²ψ' },
+    { regex: /'ù/g, replace: '∇²' },
+    { regex: /"²¨/g, replace: '∂²ψ' },
+    { regex: /"/g, replace: '∂' },
     { regex: /†/g, replace: '∫' }
   ];
 
@@ -117,6 +120,9 @@ export default function WordToPdf() {
   const [pdfPages, setPdfPages] = useState([]) // dataURLs of converted PDF pages
   
   const docxPreviewRef = useRef(null)
+
+  const onHandoffFile = useCallback((next) => { setFile(next); setError('') }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('word-to-pdf', { onFile: onHandoffFile })
 
   const handleFile = (selectedFile) => {
     setError('')
@@ -371,6 +377,7 @@ export default function WordToPdf() {
           <h1>Convert Word to PDF</h1>
           <p>Transform documents with complex equations, math typography, chemical sets, and formatting into structured PDFs instantly without any cloud uploads.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {processing && progressText && (
           <div className="container" style={{ maxWidth: '640px', padding: '3rem 1.5rem', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
@@ -492,6 +499,13 @@ export default function WordToPdf() {
                         />
                       )}
                     </div>
+                    <ContinueWithBlob
+                      sourceToolId="word-to-pdf"
+                      blob={resultBlob}
+                      fileName={`${basename(file.name)}.pdf`}
+                      mimeType="application/pdf"
+                      disabled={processing || !resultBlob}
+                    />
                   </div>
                 )}
               </div>
@@ -694,7 +708,7 @@ export default function WordToPdf() {
         }
 
         /* Enable premium scientific font for math elements */
-        .docx-render-host math, .docx-render-host m\:oMath, .docx-render-host span.math {
+        .docx-render-host math, .docx-render-host m:oMath, .docx-render-host span.math {
           font-family: "STIX Two Math", "Cambria Math", "Segoe UI Symbol", sans-serif !important;
         }
       `}</style>

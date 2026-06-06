@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { UploadCloud } from 'lucide-react'
+import { useBlobUrl } from '../../utils/useBlobUrl'
 
 export default function DropZone({
   accept,
@@ -12,6 +13,7 @@ export default function DropZone({
 }) {
   const inputRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
+  const previewUrl = useBlobUrl(previewFile)
 
   const handleFiles = (fileList) => {
     if (!fileList || fileList.length === 0) return
@@ -38,8 +40,8 @@ export default function DropZone({
         if (event.key === 'Enter' || event.key === ' ') inputRef.current?.click()
       }}
     >
-      {previewFile ? (
-        <img className="drop-preview" src={URL.createObjectURL(previewFile)} alt="Selected preview" />
+      {previewUrl ? (
+        <img className="drop-preview" src={previewUrl} alt="Selected preview" />
       ) : (
         <UploadCloud size={46} />
       )}

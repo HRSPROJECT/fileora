@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
+import ContinueWithBlob from '../components/shared/ContinueWithBlob';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Shield, Video, Download, Play, Scissors, AlertTriangle, Clock } from 'lucide-react';
 import Navbar from '../components/shared/Navbar';
@@ -220,6 +223,13 @@ export default function TrimVideo() {
     }
   };
 
+  const onHandoffFile = useCallback((nextFile) => {
+    handleFileSelect([nextFile]);
+  }, []);
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('trim-video', {
+    onFile: onHandoffFile,
+  });
+
   return (
     <div className="app-shell">
       <Navbar />
@@ -246,6 +256,7 @@ export default function TrimVideo() {
           <h1>Video Trimming Tool</h1>
           <p>Cut and slice specific portions of your videos offline. Set start/end boundaries on a precise frame player—ideal for clipping social uploads or extracting key segments with zero cloud logging.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         <section className="container tool-description-section">
           {error && (
@@ -307,6 +318,16 @@ export default function TrimVideo() {
                   )}
                 </div>
               </div>
+
+              {resultBlob && (
+                <ContinueWithBlob
+                  sourceToolId="trim-video"
+                  blob={resultBlob}
+                  fileName={`${file.name.replace(/\.[^/.]+$/, '')}-trimmed.mp4`}
+                  mimeType="video/mp4"
+                  disabled={processing}
+                />
+              )}
             </div>
           ) : file ? (
             <div className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

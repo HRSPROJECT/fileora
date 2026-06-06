@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Download, GripVertical, FileText } from 'lucide-react'
 import { downloadBlob, formatBytes } from '../../utils/imageUtils'
 import { imagesToPdf } from '../../utils/pdfUtils'
+import { useBlobUrl } from '../../utils/useBlobUrl'
 import SecureShareButton from '../shared/SecureShareButton'
+import ContinueWithBlob from '../shared/ContinueWithBlob'
 
 export default function ImageToPdfWorkspace({ files, setFiles, onReset }) {
   const [pageSize, setPageSize] = useState('a4')
@@ -11,24 +13,9 @@ export default function ImageToPdfWorkspace({ files, setFiles, onReset }) {
   const [result, setResult] = useState(null)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
+  const previewUrl = useBlobUrl(result)
 
-  useEffect(() => {
-    if (files.length === 0) return
-    const id = setTimeout(() => {
-      generate()
-    }, 500)
-    return () => clearTimeout(id)
-  }, [files, pageSize, orientation, margin])
-
-  const move = (from, to) => {
-    if (to < 0 || to >= files.length) return
-    const next = [...files]
-    const [item] = next.splice(from, 1)
-    next.splice(to, 0, item)
-    setFiles(next)
-  }
-
-  const generate = async () => {
+  const generate = useCallback(async () => {
     setProcessing(true)
     setError('')
     try {
@@ -39,15 +26,31 @@ export default function ImageToPdfWorkspace({ files, setFiles, onReset }) {
     } finally {
       setProcessing(false)
     }
+  }, [files, pageSize, orientation, margin])
+
+  useEffect(() => {
+    if (files.length === 0) return
+    const id = setTimeout(() => {
+      generate()
+    }, 500)
+    return () => clearTimeout(id)
+  }, [files.length, generate])
+
+  const move = (from, to) => {
+    if (to < 0 || to >= files.length) return
+    const next = [...files]
+    const [item] = next.splice(from, 1)
+    next.splice(to, 0, item)
+    setFiles(next)
   }
 
   return (
     <section className="workspace-panel">
       <div className="workspace-preview" style={{ background: 'var(--bg-secondary)', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        {result ? (
+        {previewUrl ? (
           <iframe 
-            src={URL.createObjectURL(result) + '#toolbar=0'} 
-            title="PDF Preview" 
+            src={previewUrl + '#toolbar=0'} 
+            title="PDF Preview"
             style={{ width: '100%', height: '100%', flex: 1, border: 'none' }}
           />
         ) : (
@@ -105,6 +108,13 @@ export default function ImageToPdfWorkspace({ files, setFiles, onReset }) {
             />
           )}
         </div>
+        <ContinueWithBlob
+          sourceToolId="image-to-pdf"
+          blob={result}
+          fileName="fileora-images.pdf"
+          mimeType="application/pdf"
+          disabled={!result || processing}
+        />
       </div>
     </section>
   )

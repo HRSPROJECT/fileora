@@ -3,6 +3,7 @@ import { Download } from 'lucide-react'
 import { basename, convertImage, downloadBlob, formatBytes } from '../../utils/imageUtils'
 import JSZip from 'jszip'
 import SecureShareButton from '../shared/SecureShareButton'
+import ContinueWithBlob from '../shared/ContinueWithBlob'
 
 export default function ConvertWorkspace({ file, onReset }) {
   const preview = useMemo(() => URL.createObjectURL(file), [file])
@@ -71,6 +72,12 @@ export default function ConvertWorkspace({ file, onReset }) {
             />
           )}
         </div>
+        <ContinueWithBlob
+          sourceToolId="convert"
+          blob={result}
+          fileName={`${basename(file.name)}.${format}`}
+          disabled={!result || processing}
+        />
       </div>
     </section>
   )

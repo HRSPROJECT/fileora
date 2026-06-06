@@ -16,9 +16,11 @@ const faqs = [
   { q: 'What file formats does Fileora support?', a: 'JPEG, PNG, WebP, AVIF for images. PDF for document tools. More formats coming soon.' },
   { q: 'How does local processing work?', a: "Fileora uses modern web technologies like WebAssembly, HTML5 APIs, and client-side JavaScript. Instead of sending your PDF or image files to a cloud server where they could be logged or stored, your browser processes them locally using your computer's own CPU. Once processing is complete, the file is saved directly to your Downloads folder without ever crossing the internet." },
   { q: 'Is there a limit on file size or the number of conversions?', a: 'No, there are absolutely no file size limits or daily conversion thresholds on Fileora. Because we do not upload files to remote servers, we do not incur heavy bandwidth or cloud compute costs. This allows us to offer completely unlimited document compression, resizing, conversion, scanning, and editing tools to our users free of charge, forever.' },
-  { q: 'Why is Fileora a better alternative to cloud-based PDF tools?', a: 'Cloud-based tools like iLovePDF, Smallpdf, or CamScanner require uploading your private files to their external servers. This poses significant privacy, data compliance, and security risks, especially for sensitive legal, financial, or personal documents. Fileora runs 100% offline inside your browser sandbox, meaning your private data never leaves your physical device. It is also faster since you do not have to wait for uploads or downloads.' },
-  { q: 'Can I use Fileora without an active internet connection?', a: "Yes! Once the application is initially loaded in your browser, Fileora’s core processing engine runs entirely client-side. This means you can compress images, convert formats, split or merge PDFs, and scan documents offline without any active internet connection. It is the perfect travel companion for private offline file work." },
-  { q: 'Does Fileora store or look at my metadata?', a: 'No. We have a strict zero-data-collection policy. Fileora does not log your files, capture document metadata, or track your personal information. Everything is kept inside your browser session. The only network requests made are standard static asset fetches to load the web app, making it completely private and compliant with GDPR, HIPAA, and CCPA standards.' }
+  { q: 'Why is Fileora a better alternative to cloud-based PDF tools?', a: 'Cloud-based tools like iLovePDF, Smallpdf, or CamScanner require uploading your private files to their external servers. This poses significant privacy, data compliance, and security risks, especially for sensitive legal, financial, or personal documents. Fileora processes files inside your browser sandbox, meaning your data never leaves your physical device during compression, conversion, or editing. It is also faster since you do not have to wait for uploads or downloads.' },
+  { q: 'Can I use Fileora without an active internet connection?', a: "Yes — for almost every tool. Once Fileora is loaded in your browser, you can compress images, convert formats, split or merge PDFs, scan documents, and process video offline. The only exception is P2P Share, which needs an internet connection to connect two devices. Your file still transfers directly between browsers and is never uploaded to Fileora." },
+  { q: 'Does P2P Share work offline?', a: 'No. P2P Share needs an active internet connection (Wi‑Fi or mobile data) so two browsers can find each other. File content still streams device-to-device and is never stored on Fileora servers. All other tools work offline after the first page load.' },
+  { q: 'Does Fileora store or look at my metadata?', a: 'No. We have a strict zero-data-collection policy. Fileora does not log your files, capture document metadata, or track your personal information. Everything is kept inside your browser session. Processing tools do not upload your files. P2P Share only uses the network to pair devices — not to store file content.' },
+  { q: 'What is Continue with?', a: 'After any tool finishes, click Continue with to open sensible next steps for that file type. For example, after compressing an image you can jump to Image to PDF, Resizer, Converter, Scanner, or P2P Share. After merging a PDF you see PDF tools like Compress, Split, Protect, or Sign. Your output stays in the browser — no re-upload.' }
 ]
 
 const organizationSchema = {
@@ -27,7 +29,7 @@ const organizationSchema = {
   name: 'Fileora',
   url: 'https://fileora.tech',
   logo: 'https://fileora.tech/favicon.svg',
-  description: 'Privacy-first, 100% offline browser-based document and image converter utilities suite.',
+  description: 'Privacy-first browser-based document, image, and video tools. Process files locally offline — P2P Share is the only online pairing feature.',
   knowsAbout: [
     'PDF compression',
     'image optimization',
@@ -102,7 +104,11 @@ export default function Home() {
         <HeroSection />
         <TrustBar />
         <ToolsGrid id="tools" />
-        <HowItWorks />
+        <HowItWorks steps={[
+          ['Drop your file', 'Choose a file from your device or drag it into any tool workspace.'],
+          ['Process locally in your browser', 'Fileora uses WebAssembly and client-side APIs. Your file never uploads to our servers.'],
+          ['Download or continue', 'Save the result, or tap Continue with to open the next tool with your output already loaded.'],
+        ]} />
         
         {/* Technical Architecture Deep-dive Section */}
         <section className="tech-section">
@@ -110,7 +116,7 @@ export default function Home() {
             <div className="section-heading">
               <p className="eyebrow">Technical Architecture</p>
               <h2>Private, sandboxed, and near-native local performance</h2>
-              <p>Under the hood of the browser engines powering your 100% offline workflow.</p>
+              <p>Under the hood of the browser engines powering your offline-first workflow — except P2P Share, which needs internet to pair devices.</p>
             </div>
             
             <div className="tech-grid">
@@ -140,7 +146,7 @@ export default function Home() {
                 </div>
                 <h3>In-Browser Sandboxing</h3>
                 <p>
-                  Every operation runs inside your browser's native security sandbox. By eliminating network uploads entirely, your files are immune to interception, data breaches, or cloud logging. Once you close the tab, <strong>all loaded document memory is immediately freed</strong>.
+                  Every operation runs inside your browser's native security sandbox. Processing tools eliminate file uploads, so your documents avoid cloud logging. P2P Share uses the network only to pair two browsers — never to store file content. Once you close the tab, <strong>all loaded document memory is immediately freed</strong>.
                 </p>
               </div>
             </div>

@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import { Helmet } from 'react-helmet-async'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
@@ -18,6 +20,19 @@ const faqs = [
 export default function MergePdf() {
   const [files, setFiles] = useState([])
   const [error, setError] = useState('')
+
+  const onHandoffFile = useCallback((file) => {
+    setFiles([file])
+    setError('')
+  }, [])
+  const onHandoffFiles = useCallback((nextFiles) => {
+    setFiles(nextFiles)
+    setError('')
+  }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('merge-pdf', {
+    onFile: onHandoffFile,
+    onFiles: onHandoffFiles,
+  })
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) }
   const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Fileora PDF Merger', url: 'https://fileora.tech/merge-pdf', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }
 
@@ -47,6 +62,7 @@ export default function MergePdf() {
           <h1>Free PDF Merger — Combine PDFs Online</h1>
           <p>Merge multiple PDF files in your chosen order without uploads or quality loss. Enjoy 100% private, instantaneous client-side stitching.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
         {files.length ? <MergePdfWorkspace files={files} setFiles={setFiles} onReset={() => setFiles([])} /> : <MergePdfLanding error={error} onFiles={(nextFiles) => {
           const total = nextFiles.reduce((sum, item) => sum + item.size, 0)
           const accepted = nextFiles.filter((next) => next.type === 'application/pdf')

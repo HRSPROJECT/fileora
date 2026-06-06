@@ -1,4 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import { useShare } from '../context/ShareContext'
@@ -7,8 +10,10 @@ import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
 import { jsPDF } from 'jspdf'
-import { formatBytes } from '../utils/imageUtils'
+
 import Tesseract from 'tesseract.js'
+
+const makePageId = () => `page_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
 
 // Solve 8x8 linear system using Gaussian Elimination
 function solveGaussian(A, b) {
@@ -293,7 +298,7 @@ export default function Scanner() {
   
   // Camera auto-capture & stability analysis states
   const [isAutoCapture, setIsAutoCapture] = useState(true); // Default to Auto-capture
-  const [stabilityProgress, setStabilityProgress] = useState(0); // 0 to 100
+
   const [isCapturingProgress, setIsCapturingProgress] = useState(false);
   const [liveScanStatus, setLiveScanStatus] = useState('searching'); // searching, motion, low-light, aligning, perfect, manual
   
@@ -304,6 +309,7 @@ export default function Scanner() {
   const [pageSize, setPageSize] = useState('fit'); 
   const [pdfQuality, setPdfQuality] = useState('high'); 
   const [isCompiling, setIsCompiling] = useState(false);
+  const [compiledPdfBlob, setCompiledPdfBlob] = useState(null);
 
   // Live editor crop/preview/ocr modes, dynamic preview URL, drag positions, and auto-capture cooldown
   const [editorMode, setEditorMode] = useState('crop'); // 'crop', 'preview', or 'ocr'
@@ -400,6 +406,20 @@ export default function Scanner() {
   const stabilityTimerRef = useRef(null);
   const lastFramePixelsRef = useRef(null);
   const stableFramesRef = useRef(0);
+  const capturePageRef = useRef(() => {});
+
+  const stopCamera = () => {
+    if (activeStreamRef.current) {
+      activeStreamRef.current.getTracks().forEach(track => track.stop());
+      activeStreamRef.current = null;
+    }
+    setIsCameraActive(false);
+
+    if (stabilityTimerRef.current) {
+      clearInterval(stabilityTimerRef.current);
+      stabilityTimerRef.current = null;
+    }
+  };
 
   // Initialize and list cameras
   useEffect(() => {
@@ -431,7 +451,6 @@ export default function Scanner() {
     stopCamera();
     setError('');
     setIsCameraActive(true);
-    setStabilityProgress(0);
     stableFramesRef.current = 0;
     lastFramePixelsRef.current = null;
 
@@ -489,21 +508,6 @@ export default function Scanner() {
       setError('Could not access the camera. Please check permissions or upload document images instead.');
       setIsCameraActive(false);
     }
-  };
-
-  const stopCamera = () => {
-    if (activeStreamRef.current) {
-      activeStreamRef.current.getTracks().forEach(track => track.stop());
-      activeStreamRef.current = null;
-    }
-    setIsCameraActive(false);
-    
-    // Clear stability timer loop
-    if (stabilityTimerRef.current) {
-      clearInterval(stabilityTimerRef.current);
-      stabilityTimerRef.current = null;
-    }
-    setStabilityProgress(0);
   };
 
   // Switch active webcam device
@@ -644,9 +648,9 @@ export default function Scanner() {
 
         // If perfect document alignment & stability is reached, capture instantly!
         if (currentStatus === 'perfect') {
-          capturePage();
+          capturePageRef.current();
         }
-      } catch (err) {
+      } catch {
         // Silent catch for canvas startup mismatch frames
       }
     }, 250);
@@ -658,6 +662,15 @@ export default function Scanner() {
       }
     };
   }, [isCameraActive, isAutoCapture, pendingDuplicatePage, isCapturingProgress, devices, selectedDeviceId, captureCooldown]);
+
+  const addPageToTray = (page) => {
+    setPages(prev => {
+      const nextPages = [...prev, page];
+      setCurrentPageIdx(nextPages.length - 1);
+      return nextPages;
+    });
+    setCaptureCooldown(4);
+  };
 
   // Capture current camera video frame
   const capturePage = async () => {
@@ -699,7 +712,7 @@ export default function Scanner() {
     const signature = await getPerceptualSignature(originalSrc);
 
     const newPage = {
-      id: `page_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      id: makePageId(),
       originalSrc,
       originalWidth: canvas.width,
       originalHeight: canvas.height,
@@ -738,7 +751,9 @@ export default function Scanner() {
       if (videoRef.current) {
         try {
           videoRef.current.pause();
-        } catch (e) {}
+        } catch {
+          /* pause may fail if stream already ended */
+        }
       }
       // Prompt user with modal duplicate alert instead of adding directly
       setPendingDuplicatePage(newPage);
@@ -747,15 +762,9 @@ export default function Scanner() {
     }
   };
 
-  const addPageToTray = (page) => {
-    setPages(prev => {
-      const nextPages = [...prev, page];
-      setCurrentPageIdx(nextPages.length - 1);
-      return nextPages;
-    });
-    // Trigger 4-second capture cooldown so user can comfortably flip pages or swap documents!
-    setCaptureCooldown(4);
-  };
+  useEffect(() => {
+    capturePageRef.current = capturePage;
+  });
 
   const handlePageDrop = (targetIdx) => {
     if (draggedPageIdx === null || draggedPageIdx === targetIdx) return;
@@ -968,6 +977,20 @@ export default function Scanner() {
       reader.readAsDataURL(file);
     }
   };
+
+  const onHandoffFile = useCallback((file) => {
+    if (file?.type?.startsWith('image/')) {
+      handleFileUpload([file]);
+    }
+  }, []);
+  const onHandoffFiles = useCallback((files) => {
+    const images = files.filter((f) => f.type.startsWith('image/'));
+    if (images.length) handleFileUpload(images);
+  }, []);
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('scanner', {
+    onFile: onHandoffFile,
+    onFiles: onHandoffFiles,
+  });
 
   // Page removal
   const deletePage = (idx) => {
@@ -1249,7 +1272,10 @@ export default function Scanner() {
         pdf.addImage(docJpgData, 'JPEG', xOffset, yOffset, printWidth, printHeight, `page_${i}`, 'FAST');
       }
 
-      pdf.save(`fileora_scan_${Date.now()}.pdf`);
+      const pdfBlob = pdf.output('blob');
+      const finalName = `fileora_scan_${Date.now()}.pdf`;
+      setCompiledPdfBlob(pdfBlob);
+      pdf.save(finalName);
     } catch (err) {
       console.error('PDF generation error:', err);
     } finally {
@@ -1259,6 +1285,10 @@ export default function Scanner() {
 
   const handleShare = async () => {
     if (pages.length === 0) return;
+    if (!navigator.onLine) {
+      setError('P2P Share needs an internet connection. Enable Wi‑Fi or mobile data, then try again. Scanning and PDF export still work offline.');
+      return;
+    }
     setIsCompiling(true);
 
     try {
@@ -1427,6 +1457,7 @@ export default function Scanner() {
           <h1>AI Document Scanner</h1>
           <p>Scan documents using your webcam or photos. Features automatic quadrilateral crop detection, perspective warp alignment, and professional monochrome black & white filters.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         <section className="container" style={{ marginBottom: '64px' }}>
           <div className={`responsive-workspace scanner-workspace ${pages.length === 0 ? 'no-pages' : ''}`}>
@@ -1559,6 +1590,16 @@ export default function Scanner() {
                       <span>Share Directly (P2P)</span>
                     </button>
                   </div>
+
+                  {compiledPdfBlob && (
+                    <ContinueWithBlob
+                      sourceToolId="scanner"
+                      blob={compiledPdfBlob}
+                      fileName="fileora-scan.pdf"
+                      mimeType="application/pdf"
+                      disabled={isCompiling}
+                    />
+                  )}
                 </div>
               </div>
             )}
@@ -1641,7 +1682,7 @@ export default function Scanner() {
                           addPageToTray(pendingDuplicatePage);
                           setPendingDuplicatePage(null);
                           if (videoRef.current) {
-                            try { videoRef.current.play(); } catch (e) {}
+                            try { videoRef.current.play(); } catch { /* ignore */ }
                           }
                           lastFramePixelsRef.current = null;
                         }}
@@ -1654,7 +1695,7 @@ export default function Scanner() {
                         onClick={() => {
                           setPendingDuplicatePage(null);
                           if (videoRef.current) {
-                            try { videoRef.current.play(); } catch (e) {}
+                            try { videoRef.current.play(); } catch { /* ignore */ }
                           }
                           lastFramePixelsRef.current = null;
                         }}

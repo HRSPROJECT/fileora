@@ -1,4 +1,4 @@
-import { saveToOPFS, getFromOPFS, deleteFromOPFS } from './opfsHelper';
+import { saveToOPFS, getFromOPFS } from './opfsHelper';
 
 let ffmpegInstance = null;
 let isLoading = false;
@@ -151,7 +151,7 @@ export const remuxMovToMp4 = async (inputOpfsName, outputOpfsName, settingsOrPro
  * Compresses a video using resolution scaling and target CRF bitrates
  */
 export const compressVideo = async (inputOpfsName, outputOpfsName, settings, onProgress) => {
-  const { quality, scale, format } = settings;
+  const { quality, scale } = settings;
   const ffmpeg = await loadFFmpegEngine(onProgress);
   
   onProgress({ message: 'Reading video stream buffer...', progress: 5 });

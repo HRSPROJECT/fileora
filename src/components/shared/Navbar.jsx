@@ -146,8 +146,14 @@ export default function Navbar() {
           <NavLink className="nav-link" to="/scanner">
             AI Scanner
           </NavLink>
-          <NavLink className="nav-link nav-link-share-pulsing" to="/share" style={{ color: 'var(--accent-primary)', fontWeight: '600' }}>
+          <NavLink
+            className="nav-link nav-link-share-pulsing"
+            to="/share"
+            title="Requires internet to pair devices. Files are not uploaded."
+            style={{ color: 'var(--accent-primary)', fontWeight: '600' }}
+          >
             P2P Share
+            <span className="network-share-hint">Wi‑Fi</span>
           </NavLink>
 
           <a
@@ -196,7 +202,7 @@ export default function Navbar() {
         <div className="mobile-drawer mobile-drawer-scrollable">
           <a href={toolsHref} onClick={close} className="mobile-drawer-header">All Tools</a>
           <NavLink to="/share" onClick={close} className="mobile-nav-link" style={{ fontWeight: '700', color: 'var(--accent-primary)', borderBottom: '1px dashed var(--border-color)', paddingBottom: '12px', marginBottom: '8px' }}>
-            🔒 Secure P2P Share
+            🔒 P2P Share <span className="network-share-hint">Wi‑Fi required</span>
           </NavLink>
 
           

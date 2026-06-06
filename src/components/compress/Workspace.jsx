@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import JSZip from 'jszip';
 import { compressImage, formatBytes } from '../../utils/imageUtils';
 import { useShare } from '../../context/ShareContext';
+import ContinueWithPanel from '../shared/ContinueWithPanel';
+import { blobToHandoffFile } from '../../utils/workflowEngine';
 import ImageComparisonSlider from './ImageComparisonSlider';
 
 const Workspace = ({ files, setFiles, onReset }) => {
@@ -177,6 +179,15 @@ const Workspace = ({ files, setFiles, onReset }) => {
   };
 
   const activeResult = results[activeFileIndex];
+
+  const getActiveHandoffFile = () => {
+    const res = results[activeFileIndex];
+    const source = files[activeFileIndex];
+    if (!res?.blob || !source) return null;
+    const nameWithoutExt = source.name.substring(0, source.name.lastIndexOf('.')) || source.name;
+    const ext = format.toLowerCase() === 'jpeg' ? 'jpg' : format.toLowerCase();
+    return blobToHandoffFile(res.blob, `${nameWithoutExt}-optimized.${ext}`, res.blob.type);
+  };
 
   const totals = React.useMemo(() => {
     let orig = 0;
@@ -516,6 +527,12 @@ const Workspace = ({ files, setFiles, onReset }) => {
                 <span>{isSharing ? 'Preparing Share...' : (files.length > 1 ? 'Share ZIP Directly (P2P)' : 'Share Directly (P2P)')}</span>
               </button>
             )}
+
+            <ContinueWithPanel
+              sourceToolId="compress"
+              file={getActiveHandoffFile()}
+              disabled={!activeResult || isProcessing}
+            />
           </div>
 
         </div>

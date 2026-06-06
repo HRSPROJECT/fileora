@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import { Helmet } from 'react-helmet-async'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
@@ -35,6 +37,19 @@ export default function Compress() {
   const [files, setFiles] = useState([])
   const [error, setError] = useState('')
 
+  const onHandoffFile = useCallback((file) => {
+    setFiles([file])
+    setError('')
+  }, [])
+  const onHandoffFiles = useCallback((nextFiles) => {
+    setFiles(nextFiles)
+    setError('')
+  }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('compress', {
+    onFile: onHandoffFile,
+    onFiles: onHandoffFiles,
+  })
+
   const addFiles = (newFiles) => {
     const accepted = newFiles.filter((file) => file.type.startsWith('image/') && file.size <= 50 * 1024 * 1024)
     setError(accepted.length ? '' : 'Please choose JPEG, PNG, WebP or AVIF images up to 50MB each.')
@@ -67,6 +82,7 @@ export default function Compress() {
           <h1>Free Image Compressor Online</h1>
           <p>Compress JPEG, PNG, WebP and AVIF images locally with quality controls and a before-after preview. File size reduces up to 90% in seconds without leaving your browser.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
         {files.length > 0 ? <Workspace files={files} setFiles={setFiles} onReset={() => setFiles([])} /> : <LandingPage onFileSelect={addFiles} error={error} />}
         
         <section className="container tool-description-section">

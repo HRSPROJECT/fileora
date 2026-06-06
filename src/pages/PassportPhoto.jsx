@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
+import ContinueWithBlob from '../components/shared/ContinueWithBlob'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import { useShare } from '../context/ShareContext'
@@ -8,7 +11,7 @@ import Footer from '../components/shared/Footer'
 import DropZone from '../components/shared/DropZone'
 import HowItWorks from '../components/home/HowItWorks'
 import FaqSection from '../components/home/FaqSection'
-import { downloadBlob, formatBytes, basename } from '../utils/imageUtils'
+import { downloadBlob, basename } from '../utils/imageUtils'
 
 const faqs = [
   { q: 'What passport sizes are supported?', a: 'We support the US Passport / Visa (2" x 2" or 51 x 51 mm), the EU / UK / India standard Passport (35 x 45 mm), and custom manual crop dimension adjustments.' },
@@ -50,17 +53,17 @@ export default function PassportPhoto() {
   const [gridCount, setGridCount] = useState(8) // 4, 6, 8, 12
   
   const [error, setError] = useState('')
-  const [downloadUrl, setDownloadUrl] = useState('')
   const navigate = useNavigate()
   const { setFileToShare } = useShare()
   const [processing, setProcessing] = useState(false)
+  const [outputBlob, setOutputBlob] = useState(null)
+  const [outputFileName, setOutputFileName] = useState('')
   
   const canvasRef = useRef(null)
 
   // Load selected image file
   const handleFile = (selectedFile) => {
     setError('')
-    setDownloadUrl('')
     setSelectedBgKeyColor(null)
     setBgColor('original')
     setZoom(1.0)
@@ -77,6 +80,15 @@ export default function PassportPhoto() {
     }
     img.src = URL.createObjectURL(selectedFile)
   }
+
+  const onHandoffFile = useCallback((nextFile) => {
+    if (nextFile?.type?.startsWith('image/')) {
+      handleFile(nextFile)
+    }
+  }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('passport-photo', {
+    onFile: onHandoffFile,
+  })
 
   // Handle drag offset adjustments on canvas
   const handleMouseDown = (e) => {
@@ -116,6 +128,37 @@ export default function PassportPhoto() {
       b: pixel[2]
     })
     setReplacingColor(false)
+  }
+
+  const hexToRgb = (hex) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 255, g: 255, b: 255 }
+  }
+
+  const drawSourceImage = (ctx, targetW, targetH) => {
+    if (!image) return
+    ctx.save()
+    const imgAspect = image.width / image.height
+    let drawW = targetW
+    let drawH = targetW / imgAspect
+
+    if (drawH < targetH) {
+      drawH = targetH
+      drawW = targetH * imgAspect
+    }
+
+    drawW *= zoom
+    drawH *= zoom
+
+    const x = (targetW - drawW) / 2 + offsetX
+    const y = (targetH - drawH) / 2 + offsetY
+
+    ctx.drawImage(image, x, y, drawW, drawH)
+    ctx.restore()
   }
 
   // Draw crop guides or perform pixel replacement on canvas render
@@ -212,39 +255,6 @@ export default function PassportPhoto() {
 
   }, [image, templateKey, zoom, offsetX, offsetY, customWidth, customHeight, bgColor, selectedBgKeyColor, bgTolerance, layoutMode])
 
-  const drawSourceImage = (ctx, targetW, targetH) => {
-    ctx.save()
-    // Calculate aspect match
-    const imgAspect = image.width / image.height
-    let drawW = targetW
-    let drawH = targetW / imgAspect
-    
-    if (drawH < targetH) {
-      drawH = targetH
-      drawW = targetH * imgAspect
-    }
-    
-    // Scale zoom factor
-    drawW *= zoom
-    drawH *= zoom
-    
-    // Draw centered with drag offsets
-    const x = (targetW - drawW) / 2 + offsetX
-    const y = (targetH - drawH) / 2 + offsetY
-    
-    ctx.drawImage(image, x, y, drawW, drawH)
-    ctx.restore()
-  }
-
-  const hexToRgb = (hex) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 255, g: 255, b: 255 }
-  }
-
   const runCompile = async () => {
     if (!image || !canvasRef.current) return
     
@@ -299,8 +309,10 @@ export default function PassportPhoto() {
       }
 
       canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob)
-        downloadBlob(blob, `${basename(file.name)}-passport.jpg`)
+        const name = `${basename(file.name)}-passport.jpg`
+        setOutputBlob(blob)
+        setOutputFileName(name)
+        downloadBlob(blob, name)
       }, 'image/jpeg', 0.95)
       
     } else {
@@ -427,7 +439,10 @@ export default function PassportPhoto() {
       a4Ctx.fillText('Created securely on Fileora.tech — Free local passport generator.', 1240, 3350)
 
       a4Canvas.toBlob((blob) => {
-        downloadBlob(blob, `${basename(file.name)}-passport-A4-sheet.jpg`)
+        const name = `${basename(file.name)}-passport-A4-sheet.jpg`
+        setOutputBlob(blob)
+        setOutputFileName(name)
+        downloadBlob(blob, name)
       }, 'image/jpeg', 0.95)
     }
   }
@@ -596,12 +611,13 @@ export default function PassportPhoto() {
   const handleReset = () => {
     setFile(null)
     setImage(null)
-    setDownloadUrl('')
     setSelectedBgKeyColor(null)
     setBgColor('original')
     setZoom(1.0)
     setOffsetX(0)
     setOffsetY(0)
+    setOutputBlob(null)
+    setOutputFileName('')
   }
 
   const appSchema = {
@@ -650,6 +666,7 @@ export default function PassportPhoto() {
           <h1>Passport Photo Maker</h1>
           <p>Align, crop, replace backgrounds, and compile printable sheets locally. Zero network server uploads ensures total security.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         {!file && (
           <div className="container container-narrow">
@@ -920,6 +937,16 @@ export default function PassportPhoto() {
                   <span>Share Directly (P2P)</span>
                 </button>
               </div>
+
+              {outputBlob && (
+                <ContinueWithBlob
+                  sourceToolId="passport-photo"
+                  blob={outputBlob}
+                  fileName={outputFileName}
+                  mimeType="image/jpeg"
+                  disabled={processing}
+                />
+              )}
             </div>
           </section>
         )}

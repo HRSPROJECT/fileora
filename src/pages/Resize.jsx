@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff'
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel'
 import { Helmet } from 'react-helmet-async'
 import Navbar from '../components/shared/Navbar'
 import Footer from '../components/shared/Footer'
@@ -18,6 +20,12 @@ const faqs = [
 export default function Resize() {
   const [file, setFile] = useState(null)
   const [error, setError] = useState('')
+
+  const onHandoffFile = useCallback((next) => {
+    setFile(next)
+    setError('')
+  }, [])
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('resize', { onFile: onHandoffFile })
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) }
   const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Fileora Image Resizer', url: 'https://fileora.tech/resize', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }
 
@@ -47,6 +55,7 @@ export default function Resize() {
           <h1>Free Image Resizer Online</h1>
           <p>Resize images with custom dimensions, locked aspect ratio and ready-made social presets. Fast, browser-based resizing with no server upload.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
         {file ? <ResizeWorkspace file={file} onReset={() => setFile(null)} /> : <ResizeLanding error={error} onFiles={(files) => {
           const next = files[0]
           if (!next || !['image/jpeg', 'image/png', 'image/webp'].includes(next.type) || next.size > 50 * 1024 * 1024) {

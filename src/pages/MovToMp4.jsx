@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useWorkflowHandoff } from '../hooks/useWorkflowHandoff';
+import { WorkflowHandoffNotice } from '../components/shared/ContinueWithPanel';
+import ContinueWithBlob from '../components/shared/ContinueWithBlob';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Shield, Video, Download, Play, AlertTriangle, Settings } from 'lucide-react';
 import Navbar from '../components/shared/Navbar';
@@ -100,6 +103,13 @@ export default function MovToMp4() {
     clearOPFSSandbox();
   };
 
+  const onHandoffFile = useCallback((nextFile) => {
+    handleFileSelect([nextFile]);
+  }, []);
+  const { handoffNotice, clearHandoffNotice } = useWorkflowHandoff('mov-to-mp4', {
+    onFile: onHandoffFile,
+  });
+
   return (
     <div className="app-shell">
       <Navbar />
@@ -126,6 +136,7 @@ export default function MovToMp4() {
           <h1>Apple MOV to MP4 Converter</h1>
           <p>Remux Apple QuickTime .MOV containers into universally playable .MP4 formats locally. Zero upload wait times, zero cloud storage risks—100% privacy-compliant browser processing.</p>
         </section>
+        <WorkflowHandoffNotice message={handoffNotice} onDismiss={clearHandoffNotice} />
 
         <section className="container" style={{ maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           {error && (
@@ -195,6 +206,16 @@ export default function MovToMp4() {
                   )}
                 </div>
               </div>
+
+              {resultBlob && (
+                <ContinueWithBlob
+                  sourceToolId="mov-to-mp4"
+                  blob={resultBlob}
+                  fileName={`${file.name.replace(/\.[^/.]+$/, '')}.mp4`}
+                  mimeType="video/mp4"
+                  disabled={processing}
+                />
+              )}
             </div>
           ) : file ? (
             <div className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
