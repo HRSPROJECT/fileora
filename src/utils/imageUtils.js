@@ -1,5 +1,7 @@
 import imageCompression from 'browser-image-compression';
 
+const IMAGE_COMPRESSION_LIB_URL = '/browser-image-compression.js';
+
 export const compressImage = async (file, format = 'image/webp', quality = 0.8, scale = 100) => {
   try {
       // Basic validation
@@ -28,6 +30,7 @@ export const compressImage = async (file, format = 'image/webp', quality = 0.8, 
         maxSizeMB: Math.max(file.size / 1024 / 1024, 0.05), // Don't strictly force MB size limit on quality
         maxWidthOrHeight: Math.min(targetDimension, 3840), // Apply scale, max 4K
         useWebWorker: true,
+        libURL: IMAGE_COMPRESSION_LIB_URL,
         fileType: mimeType,
         initialQuality: quality,
         alwaysKeepResolution: scale === 100 // Keep exact resolution if scale is 100

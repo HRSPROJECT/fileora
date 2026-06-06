@@ -3,7 +3,7 @@
  * Local Vite dev (localhost:5173) is never intercepted — see shouldBypassFetch().
  */
 
-const CACHE_NAME = 'fileora-cache-v6';
+const CACHE_NAME = 'fileora-cache-v7';
 
 const ASSETS_TO_CACHE = [
   '/',
@@ -14,6 +14,7 @@ const ASSETS_TO_CACHE = [
   '/icon-512.png',
   '/apple-touch-icon.png',
   '/manifest.json',
+  '/browser-image-compression.js',
   '/icons.svg',
   '/robots.txt',
   '/sitemap.xml',
